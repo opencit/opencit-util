@@ -1,0 +1,127 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.intel.mtwilson</groupId>
+  <artifactId>mtwilson-maven-build-coreutil-features</artifactId>
+    <packaging>pom</packaging>
+
+<parent>
+  <groupId>com.intel.mtwilson</groupId>
+  <artifactId>mtwilson-maven-build-coreutil-root</artifactId>
+  <version>3.0-SNAPSHOT</version>
+</parent>	
+
+    <modules>
+        <module>mtwilson-configuration</module>
+	<module>mtwilson-configuration-settings-ws-v2</module>
+    <module>mtwilson-configuration-ws-v2</module>
+    <module>mtwilson-extensions-cache</module>
+    <module>mtwilson-extensions-ws-v2</module>
+        <module>mtwilson-feature-xml</module>
+    <module>mtwilson-http-security</module>
+    <module>mtwilson-http-servlets</module>
+        <module>mtwilson-launcher</module>
+        <module>mtwilson-launcher-api</module>
+    <module>mtwilson-localization</module>
+    <module>mtwilson-repository-api</module>
+    <module>mtwilson-rpc</module>
+    <module>mtwilson-rpc-jdbi</module>
+    <module>mtwilson-rpc-model</module>
+        <module>mtwilson-core-setup</module>
+        <module>mtwilson-password-vault</module>
+    <module>mtwilson-setup-ext</module>
+    <module>mtwilson-shiro-file</module>
+    <module>mtwilson-shiro-jdbi</module>
+    <module>mtwilson-shiro-util</module>
+    <module>mtwilson-shiro-ws-v2</module>
+    <module>mtwilson-util</module>
+        <module>mtwilson-version</module>
+    <module>mtwilson-version-ws-v2</module>
+    <module>mtwilson-webservice-util</module>
+    </modules>
+
+	<build>
+<plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>aspectj-maven-plugin</artifactId>
+                <configuration>
+                    <aspectLibraries>
+                        <!-- security framework -->
+                        <aspectLibrary>
+                            <groupId>org.apache.shiro</groupId>
+                            <artifactId>shiro-aspectj</artifactId>
+                        </aspectLibrary>
+                    </aspectLibraries>
+                </configuration>
+            </plugin>
+</plugins>	
+	
+	</build>
+	
+	<dependencies>
+        <!-- logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+			<scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+	
+        <!-- for compile-time aspects declared in the plugins section -->
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
+            <version>1.7.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjtools</artifactId>
+            <version>1.7.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-aspectj</artifactId>
+            <version>1.2.2</version>
+            <scope>compile</scope>
+        </dependency>
+	</dependencies>
+	
+	<dependencyManagement>
+        <dependencies>
+
+        <dependency>
+    <groupId>com.intel.mtwilson.maven</groupId>
+    <artifactId>mtwilson-maven-bom-coreutil</artifactId>
+  <version>3.0-SNAPSHOT</version>
+  <type>pom</type>
+	<scope>import</scope>
+        </dependency>
+
+        <dependency>
+    <groupId>com.intel.mtwilson.maven</groupId>
+    <artifactId>mtwilson-maven-bom-external</artifactId>
+  <version>3.0-SNAPSHOT</version>
+  <type>pom</type>
+	<scope>import</scope>
+        </dependency>
+        </dependencies>
+
+		</dependencyManagement>
+	
+	
+	</project>
