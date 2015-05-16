@@ -1,7 +1,6 @@
 package com.intel.mtwilson.util;
 
 import com.intel.mtwilson.Folders;
-import com.intel.mtwilson.My;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
@@ -26,7 +25,7 @@ public class ResourceFinder {
     public static File getFile(String filename) throws FileNotFoundException {
         // try standard install locations        
 //        System.out.println("ResourceFinder os.name="+System.getProperty("os.name"));
-        ArrayList<File> files = new ArrayList<File>();
+        ArrayList<File> files = new ArrayList<>();
         // first try an absolute filename or relative to current directory
         files.add(new File(filename));
         // then try a location relative to application configuration dir and then application dir
