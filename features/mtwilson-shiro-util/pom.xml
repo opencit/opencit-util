@@ -116,11 +116,13 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
         </dependency>
+        <!--
         <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>
             <artifactId>mtwilson-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        -->
         <!--
         <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>

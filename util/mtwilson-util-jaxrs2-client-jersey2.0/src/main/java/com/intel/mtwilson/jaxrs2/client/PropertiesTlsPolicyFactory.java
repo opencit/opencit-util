@@ -9,7 +9,8 @@ import com.intel.dcsg.cpg.configuration.PropertiesConfiguration;
 import com.intel.dcsg.cpg.tls.policy.TlsPolicy;
 import com.intel.dcsg.cpg.x509.repository.KeystoreCertificateRepository;
 import com.intel.mtwilson.tls.policy.TlsPolicyDescriptor;
-import com.intel.mtwilson.tls.policy.factory.TlsPolicyFactory;
+import com.intel.mtwilson.tls.policy.factory.TlsPolicyFactoryUtil;
+//import com.intel.mtwilson.tls.policy.factory.TlsPolicyFactory;
 import java.io.IOException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -89,7 +90,8 @@ public class PropertiesTlsPolicyFactory {
         } else if (insecure != null && insecure.equalsIgnoreCase("true")) {
             tlsPolicyDescriptor.setPolicyType("INSECURE");
         }
-        TlsPolicy tlsPolicy = TlsPolicyFactory.createTlsPolicy(tlsPolicyDescriptor);
+//        TlsPolicy tlsPolicy = TlsPolicyFactory.createTlsPolicy(tlsPolicyDescriptor);
+        TlsPolicy tlsPolicy = TlsPolicyFactoryUtil.createTlsPolicy(tlsPolicyDescriptor);
         return tlsPolicy;
 
     }

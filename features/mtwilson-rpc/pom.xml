@@ -65,6 +65,7 @@
             <scope>provided</scope>
         </dependency>
         -->
+        <!--
         <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>
             <artifactId>mtwilson-my</artifactId>
@@ -75,12 +76,16 @@
             <artifactId>mtwilson-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        -->
+        <!--
+        deprecated: please consult core/util roadmap for replacement plan
         <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>
             <artifactId>mtwilson-env</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+        -->
         <!--
         <dependency>
             <groupId>com.intel.mtwilson.services</groupId>
@@ -122,16 +127,18 @@
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-performance</artifactId>
         </dependency>
+        <!--
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>mtwilson-attestation-jpa</artifactId>
             <version>${project.version}</version>
-        </dependency>
+        </dependency>        
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>mtwilson-management-jpa</artifactId>
             <version>${project.version}</version>
         </dependency>
+        -->
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-patch</artifactId>
@@ -189,6 +196,12 @@
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-common</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
             <scope>provided</scope>
         </dependency>
                                 

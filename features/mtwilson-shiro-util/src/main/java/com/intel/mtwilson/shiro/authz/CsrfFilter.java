@@ -10,15 +10,12 @@ import com.intel.dcsg.cpg.authz.token.TokenFactory;
 import com.intel.dcsg.cpg.authz.token.TokenValidator;
 import com.intel.dcsg.cpg.authz.token.UnsupportedTokenVersionException;
 import com.intel.dcsg.cpg.crypto.key.KeyNotFoundException;
+import com.intel.mtwilson.configuration.ConfigurationFactory;
 import java.util.HashSet;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import org.apache.shiro.web.filter.authz.AuthorizationFilter;
-import com.intel.dcsg.cpg.net.InternetAddress;
-import com.intel.mtwilson.My;
-import com.intel.mtwilson.shiro.EncryptedTokenContent;
 import com.intel.mtwilson.shiro.Username;
-import com.thoughtworks.xstream.XStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -27,7 +24,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.StringUtils;
 import org.apache.shiro.web.util.WebUtils;
@@ -48,7 +44,7 @@ public class CsrfFilter extends AuthorizationFilter {
     private TokenValidator tokenValidator = null;
 
     public CsrfFilter() throws IOException {
-        int duration = My.configuration().getConfiguration().getInt("mtwilson.portal.sessionTimeOut", 1800); // use same duration as the session timeout in Mt Wilson 1.2
+        int duration = Integer.valueOf(ConfigurationFactory.getConfiguration().get("mtwilson.portal.sessionTimeOut", "1800")); // use same duration as the session timeout in Mt Wilson 1.2
         tokenFactory = new TokenFactory(); 
         tokenValidator = new TokenValidator(tokenFactory);
         tokenValidator.setExpiresAfter(duration);  // in seconds

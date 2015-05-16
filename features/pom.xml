@@ -31,9 +31,7 @@
         <module>mtwilson-password-vault</module>
     <module>mtwilson-setup-ext</module>
     <module>mtwilson-shiro-file</module>
-    <module>mtwilson-shiro-jdbi</module>
     <module>mtwilson-shiro-util</module>
-    <module>mtwilson-shiro-ws-v2</module>
     <module>mtwilson-util</module>
         <module>mtwilson-version</module>
     <module>mtwilson-version-ws-v2</module>

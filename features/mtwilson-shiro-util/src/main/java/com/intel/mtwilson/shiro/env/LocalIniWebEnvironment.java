@@ -5,10 +5,7 @@
 package com.intel.mtwilson.shiro.env;
 
 import com.intel.mtwilson.Folders;
-import com.intel.mtwilson.My;
 import java.io.File;
-import org.apache.shiro.config.ConfigurationException;
-import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.IniFactorySupport;
 import org.apache.shiro.web.env.IniWebEnvironment;
 
@@ -32,8 +29,7 @@ public class LocalIniWebEnvironment extends IniWebEnvironment {
     protected String[] getDefaultConfigLocations() {
         log.debug("getDefaultConfigLocations {}", Folders.configuration()+File.separator+"shiro.ini");
         return new String[] {
-//            My.filesystem().getConfigurationPath()+File.separator+"shiro.ini", // without file prefix its interpreted as relative to webapp
-            "file:///"+(Folders.configuration()+File.separator+"shiro.ini").replace(File.separator,"/"),
+            "file:///"+(Folders.configuration()+File.separator+"shiro.ini").replace(File.separator,"/"), // without file prefix its interpreted as relative to webapp
             IniWebEnvironment.DEFAULT_WEB_INI_RESOURCE_PATH,
             IniFactorySupport.DEFAULT_INI_RESOURCE_PATH
         };

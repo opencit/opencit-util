@@ -4,19 +4,10 @@
  */
 package com.intel.mtwilson.v2.rpc.jdbi;
 
-import com.intel.mtwilson.My;
-import java.io.IOException;
+import com.intel.mtwilson.MyJdbc;
+import com.intel.mtwilson.jdbi.util.ExistingConnectionFactory;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Set;
-import javax.sql.DataSource;
-import org.apache.commons.dbcp.BasicDataSource;
 import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,23 +29,28 @@ public class MyJdbi {
   }*/
  public static RpcDAO rpc() throws SQLException {
 //     createTables();
-    DBI dbi = new DBI(new ExistingConnectionFactory());
-    
+         try {
+        DBI dbi = new DBI(new ExistingConnectionFactory(MyJdbc.openConnection()));
     return dbi.open(RpcDAO.class);
+         }
+         catch(Exception e) {
+             throw new RuntimeException(e);
+         }
+    
   } 
 
- 
+ /*
  public static class ExistingConnectionFactory implements ConnectionFactory {
         @Override
         public Connection openConnection() throws SQLException {
             try {
-                return My.jdbc().connection();
+                return MyJdbc.openConnection();
             }
             catch(Exception e) {
                 throw new RuntimeException(e);
             }
         }    
 }
- 
+*/ 
  
 }

@@ -29,19 +29,14 @@
             <artifactId>commons-codec</artifactId>
         </dependency>
         
-        <!-- required for RSA/ECB/OAEP -->
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk16</artifactId>
-            <version>1.46</version>
-        </dependency>
 
-        <!-- required for parsing some TPM structures -->
-        <dependency>
-            <groupId>com.intel.mtwilson.services</groupId>
-            <artifactId>mtwilson-privacyca-niarl</artifactId>
-            <version>${mtwilson.version}</version>
-        </dependency>
+        <!-- required for RSA/ECB/OAEP, and also by TpmUtils for makeCert and makeEkCert subject alternative name extensions -->
+                <dependency>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk16</artifactId> <!-- was  bcprov-jdk15 in HisPrivacyCAWebServices2 -->
+                    <version>1.46</version>                     <!-- was 1.41 -->
+                  <!--  <scope>provided</scope>--> <!-- need to include it for the -setup.jar  -->
+                </dependency>
     	
         <dependency>
             <groupId>junit</groupId>
