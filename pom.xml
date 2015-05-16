@@ -59,6 +59,7 @@
   
   <modules>
     <module>features</module>
+    <module>features-deprecated</module>
     <module>integration</module>
     <module>maven</module>
     <module>util</module>
