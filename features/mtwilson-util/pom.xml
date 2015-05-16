@@ -116,11 +116,13 @@
             <scope>provided</scope>
         </dependency>
         -->
+        <!--
         <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>
             <artifactId>mtwilson-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        -->
         
         <dependency>
             <groupId>com.intel.mtwilson.services</groupId>
@@ -138,11 +140,14 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math3</artifactId>
         </dependency>
+        <!--
         <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>
             <artifactId>mtwilson-my</artifactId>
             <version>${project.version}</version>
         </dependency>
+        -->
+        
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-i18n</artifactId>
