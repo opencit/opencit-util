@@ -87,11 +87,13 @@
                                                             
         <!-- end jetty -->
 	
+        <!--
         <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>
             <artifactId>mtwilson-my</artifactId>
             <version>${project.version}</version>
         </dependency>
+        -->
 
         <dependency>
             <groupId>org.slf4j</groupId>

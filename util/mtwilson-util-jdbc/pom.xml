@@ -73,8 +73,16 @@
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-objectpool</artifactId>
-            <version>0.1-SNAPSHOT</version>
         </dependency>        
+
+        <!-- only needed when using ConnectionFactory -->
+        <!--
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-configuration</artifactId>
+            <optional>true</optional>
+        </dependency>        
+        -->
 
         <!-- aspectj -->
         <dependency>
