@@ -5,7 +5,6 @@
 package com.intel.mtwilson.jdbi.util;
 
 import com.intel.dcsg.cpg.io.UUID;
-import com.intel.mtwilson.My;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import org.skife.jdbi.v2.StatementContext;

@@ -5,6 +5,7 @@
 package com.intel.mtwilson.jdbi.util;
 
 import org.skife.jdbi.v2.DBI;
+import java.sql.Connection;
 
 /**
  *
@@ -13,9 +14,9 @@ import org.skife.jdbi.v2.DBI;
 public class JdbiUtil {
     private static DBI dbi = null;
     
-    public static DBI getDBI() {
+    public static DBI getDBI(Connection connection) {
         if (dbi == null) {
-            dbi = new DBI(new ExistingConnectionFactory());
+            dbi = new DBI(new ExistingConnectionFactory(connection));
         }
         return dbi;
     }
