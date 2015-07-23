@@ -117,6 +117,13 @@ public class Sha1DigestTest {
     }
     
     @Test
+    public void testSha1ExtendMore() {
+        
+        Sha1Digest extended = Sha1Digest.ZERO.extend(Sha1Digest.valueOfHex("a70ce2d17d75e54fc5205c65a2734ab9fa86cd28")).extend(Sha1Digest.valueOfHex("2fe3b71980d9690fee6855ac94a741ce0a3133d0"));
+        log.debug(extended.toHexString()); // 69ca5a62b1540100e142446daf6e5b3e34b9c4f0
+    }
+    
+    @Test
     public void testEquals() {
         assertEquals(Sha1Digest.valueOfHex("de8990b384d71983a7646e65326a699acf463d3c"), Sha1Digest.valueOfHex("de8990b384d71983a7646e65326a699acf463d3c"));
     }
