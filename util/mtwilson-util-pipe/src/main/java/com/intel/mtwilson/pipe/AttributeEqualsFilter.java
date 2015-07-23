@@ -5,7 +5,6 @@
 package com.intel.mtwilson.pipe;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
 import org.apache.commons.beanutils.PropertyUtils;
 
 /**
@@ -33,16 +32,11 @@ public class AttributeEqualsFilter<T> implements Filter<T> {
     @Override
     public boolean accept(T item) {
         try {
-            Map<String, Object> targetAttrs = PropertyUtils.describe(item); // throws IllegalAccessException, InvocationTargetException, NoSuchMethodException
-            if (targetAttrs.containsKey(attributeName)) {
-                Object targetValue = PropertyUtils.getSimpleProperty(item, attributeName);
-                log.debug("Item {} attribute {} value {}", item.getClass().getName(), attributeName, targetValue);
-                return targetValue != null && targetValue.equals(attributeValue);
-            }
-            log.debug("Item {} does not contain attribute {}", item.getClass().getName(), attributeName);
-            return false;
+            Object targetValue = PropertyUtils.getProperty(item, attributeName); // getProperty supports nested properties like "class.name" which resolves to getClass().getName()
+            log.debug("Item {} attribute {} value {}", item.getClass().getName(), attributeName, targetValue);
+            return targetValue != null && targetValue.equals(attributeValue);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            log.warn("Cannot check item {} due to exception: {}", item.getClass().getName(), e.toString());
+            log.warn("Cannot evaluate item {} attribute {} due to exception: {}", item.getClass().getName(), attributeName, e.toString());
             return false;
         }
     }
