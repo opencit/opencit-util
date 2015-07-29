@@ -70,6 +70,7 @@
   <modules>
     <module>features</module>
     <module>features-deprecated</module>
+    <module>features-linux</module>
     <module>integration</module>
     <module>maven</module>
     <module>util</module>
