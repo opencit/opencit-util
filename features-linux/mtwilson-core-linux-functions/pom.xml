@@ -7,18 +7,16 @@
   <description>Linux utility functions for Mt Wilson control scripts.</description>
 
     <parent>
-    <parent>
 		<groupId>com.intel.mtwilson</groupId>
 		<artifactId>mtwilson-maven-build-coreutil-features-linux</artifactId>
 		<version>3.0-SNAPSHOT</version>
-    </parent>
     </parent>
   
  
  <build>
      <resources>
          <resource>
-             <directory>src/main/scripts</directory>
+             <directory>${basedir}/src/main/script</directory>
          </resource>
      </resources>
 
@@ -36,7 +34,7 @@
                         <configuration>
                             <artifacts>
                                 <artifact>
-                                    <file>${project.source.directory}/main/scripts/functions.sh</file>
+                                    <file>${basedir}/src/main/script/functions.sh</file>
                                     <type>sh</type>
                                 </artifact>
                             </artifacts>
