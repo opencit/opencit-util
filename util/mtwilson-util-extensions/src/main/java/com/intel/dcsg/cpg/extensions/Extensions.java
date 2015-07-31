@@ -228,6 +228,10 @@ public class Extensions {
             try {
                 Class<?> clazz = Class.forName(item.name);
                 Constructor constructor = ReflectionUtil.getNoArgConstructor(clazz);
+                if( constructor == null ) {
+                    log.debug("findAll: class {} does not have a no-arg constructor", item.name);
+                    continue;
+                }
                 Object instance = constructor.newInstance();
                 T implementation = (T)instance;
                 result.add(implementation);
