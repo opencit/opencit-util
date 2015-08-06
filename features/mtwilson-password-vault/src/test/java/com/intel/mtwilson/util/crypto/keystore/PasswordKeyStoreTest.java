@@ -56,4 +56,17 @@ public class PasswordKeyStoreTest {
             assertArrayEquals(testPassword.toByteArray(), retrieved.toByteArray());
         }
     }    
+    
+    @Test
+    public void testMaxSizePasswordKeyStore() throws Exception {
+        ByteArrayResource resource = new ByteArrayResource();
+        String keystorePassword = RandomUtil.randomBase64String(16);
+        try(PasswordKeyStore keystore = new PasswordKeyStore("JCEKS", resource, keystorePassword.toCharArray())) {
+        for(int i=1; i<=Integer.MAX_VALUE; i++) {
+            log.debug("Adding password {}", i);
+            Password testPassword = new Password(RandomUtil.randomBase64String(16).toCharArray());
+                keystore.set(String.format("test.%d", i), testPassword);
+            }        
+        }
+    }
 }
