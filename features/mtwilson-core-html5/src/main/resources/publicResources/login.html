@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Login</title>
+        <meta name="author" content="jbuhacoff">
+    </head>
+    <body>
+
+            <div class="row">
+                <div class="col-xs-2 col-sm-4"></div>
+                <div class="col-xs-8 col-sm-4" data-bind="with: loginViewModel">
+                    <form id="loginForm" class="form-signin" data-bind="with: loginRequest, submit: login">
+                        <h2 class="form-signin-heading">Please sign in</h2>
+
+                        <div class="form-group">        
+                            <label for="inputUsername">Username</label>
+                            <input type="text" id="inputUsername" class="form-control" placeholder="Username" data-bind="value: username" required autofocus>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputPassword">Password</label>
+                            <input type="password" id="inputPassword" class="form-control" placeholder="Password" data-bind="value: password" required>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" value="remember-me" data-bind="checked: remember_me"> Remember me
+                            </label>
+                        </div>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+                        <div class="form-group has-error">
+                            <p style="color: red" data-bind="text: error, visible: error"></p>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-xs-2 col-sm-4"></div>
+
+            </div>
+
+<!--        <script src="js/kms_login.js"></script> -->
+        <script type="text/javascript">
+            // script requires:  kms_login.js  for loginViewModel
+            // style requires: bootstrap, dashboard, intel
+            console.log("login.html script");
+            resourceLoader.loadJS(['js/knockout.js', 'js/jquery.js', 'js/kms_login.js'], function() { 
+                console.log("login.html: loaded scripts");
+                mainViewModel.loginViewModel = new LoginViewModel();
+                ko.applyBindings(mainViewModel, document.getElementById("login"));
+            });
+        </script>
+    </body>
+</html>

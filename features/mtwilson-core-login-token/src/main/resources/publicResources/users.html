@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Users</title>
+        <meta name="author" content="jbuhacoff">
+    </head>
+    <body>
+
+        
+            <div class="row">
+                <div class="col-md-2"></div>
+        <div class="col-md-8" style="margin-top: 10px;">        
+            <div class="panel panel-default" data-bind="with: usersViewModel">
+                <div class="panel-heading">
+
+                    <ul class="list-inline pull-right">
+                        <!--
+                       <li><a href="#"><i class="glyphicon glyphicon-cog"></i></a></li>
+                       <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-comment"></i><span class="count">3</span></a><ul class="dropdown-menu" role="menu"><li><a href="#">1. Is there a way..</a></li><li><a href="#">2. Hello, admin. I would..</a></li><li><a href="#"><strong>All messages</strong></a></li></ul></li>
+                       <li><a href="#"><i class="glyphicon glyphicon-user"></i></a></li>
+                        -->
+                        <li><a title="Refresh" data-toggle="modal" href="#" data-bind="click: searchUsers"><span class="glyphicon glyphicon-refresh"></span> Refresh</a></li>
+                        <li><a title="Add User" data-toggle="modal" href="#addUserModalDialog"><span class="glyphicon glyphicon-plus-sign"></span> Add User</a></li>
+                    </ul>
+
+                    <h1>Users</h1>
+                </div>
+                <div class="panel-body">
+                    <p><span data-bind="text: users().length"></span> Users</p>
+                    <table class="table table-striped" data-bind="visible: users().length > 0">
+                        <thead>
+                            <tr>
+                                <th style="width: 75px;">Username</th>
+                                <th style="width: 150px;">First Name</th>
+                                <th style="width: 150px;">Last Name</th>
+                                <th style="width: 150px;">Email Address</th>
+                                <th style="width: 75px;"><!-- Action Icons --></th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: users">
+                            <tr>
+                                <td><span data-bind="text: username"></span></td>
+                                <td><span data-bind="text: contact.first_name"></span></td>
+                                <td><span data-bind="text: contact.last_name"></span></td>
+                                <td><span data-bind="text: contact.email_address"></span></td>
+                                <td>
+                                    <a title="View User" data-toggle="modal" href="#viewUserModalDialog" data-bind="click: $parent.viewUser"><span class="glyphicon glyphicon-file"></span></a>
+                                    <a title="Delete User" data-toggle="modal" href="#deleteUserModalDialog" data-bind="click: $parent.confirmDeleteUser"><span class="glyphicon glyphicon-trash"></span></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+
+         <div class="col-md-2"></div>
+
+            
+</div>     
+                               
+
+        
+        <!--
+        <section data-bind="with: searchCriteria">
+            <h1>search users</h1>
+            <form id="searchUsersForm">
+                <fieldset>
+                    <legend>Search Users</legend>
+                    <p>Submit this form to search for existing users.</p>
+                    <input type="text" data-bind="value: id" placeholder="key id"/>
+                    <input type="text" data-bind="value: name" placeholder="key name"/>
+                    <input type="text" data-bind="value: role" placeholder="key role (ex. key-encryption)"/>
+                    <input type="text" data-bind="value: algorithm" placeholder="algorithm (ex. DES, DES3, AES)"/>
+                    <input type="text" data-bind="value: key_length" placeholder="key length (ex. 128, 192, 256)"/>
+                    <input type="text" data-bind="value: cipher_mode" placeholder="cipher mode (ex. ECB, CBC, OFB)"/>
+                    <input type="text" data-bind="value: padding_mode" placeholder="padding mode"/>
+                    <input type="text" data-bind="value: digest_algorithm" placeholder="digest algorithm (ex. SHA-256)"/>
+                    <input type="text" data-bind="value: transfer_policy" placeholder="key transfer policy"/>
+                    <input type="hidden" data-bind="value: offset" value="0"/>
+                    <input type="hidden" data-bind="value: limit" value="25"/>
+                    <input type="submit" value="Submit" data-bind="click: $parent.searchUsers"/>
+                </fieldset>
+            </form>
+        </section>
+        -->
+
+
+        <div class="modal" id="addUserModalDialog" data-bind="with: usersViewModel">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 class="modal-title">Add User</h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <!--tabs-->
+                        <div class="container">
+                            <div class="col-md-4">
+                                    <div class="tab-pane" id="registerUserTab">
+                                        <form id="registerUserForm" data-bind="with: registerUserRequest">
+                                            <fieldset>
+                                                <p>Submit this form to add a user.</p>
+                                                <div class="form-group">        
+                                                    <label for="inputUsername">Username</label>
+                                                    <input type="text" id="inputUsername" class="form-control" placeholder="Username" data-bind="value: username" required autofocus>
+                                                </div>
+                                                <div class="form-group">        
+                                                    <label for="inputFirstName">First Name</label>
+                                                    <input type="text" id="inputFirstName" class="form-control" placeholder="First Name" data-bind="value: contact.first_name" required>
+                                                </div>
+                                                <div class="form-group">        
+                                                    <label for="inputLastName">Last Name</label>
+                                                    <input type="text" id="inputLastName" class="form-control" placeholder="Last Name" data-bind="value: contact.last_name" required>
+                                                </div>
+                                                <div class="form-group">        
+                                                    <label for="inputEmailAddress">Email Address</label>
+                                                    <input type="text" id="inputEmailAddress" class="form-control" placeholder="Email Address" data-bind="value: contact.email_address" required>
+                                                </div>
+                                                <textarea data-bind="value: transfer_key_pem" cols="80" rows="10" placeholder="Paste the public key here, in PEM format"></textarea>
+                                                <br>
+                                                <input type="submit" value="Submit" class="btn btn-primary" data-bind="click: $parent.registerUser"/>
+                                            </fieldset>
+                                        </form>
+                                    </div>
+                            </div>
+                        </div>  
+
+                        <!--/tabs-->          
+
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#" data-dismiss="modal" class="btn">Close</a>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <div class="modal" id="deleteUserModalDialog" data-bind="with: usersViewModel">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 class="modal-title">Delete User</h4>
+                    </div>
+                    <div class="modal-body">        
+            <form id="deleteUserForm" data-bind="with: deleteUserRequest">
+                <fieldset>
+                    <p>Submit this form to request the server to delete an existing user.</p>
+                    <input type="text" name="id" data-bind="value: id" placeholder="Required user id" value="" disabled/> 
+                    <input type="text" name="username" data-bind="value: username" placeholder="Username" value="" disabled/>
+                    <input type="text" name="firstName" data-bind="value: contact.first_name" placeholder="First Name" value="" disabled/>
+                    <input type="text" name="lastName" data-bind="value: contact.last_name" placeholder="Last Name" value="" disabled/>
+                    <input type="text" name="emailAddress" data-bind="value: contact.email_address" placeholder="Email Address" value="" disabled/>
+                    <br>
+                    <input type="submit" class="btn btn-primary"  value="Delete" data-bind="click: $parent.deleteUser" />
+                </fieldset>
+            </form>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#" data-dismiss="modal" class="btn">Close</a>
+                    </div>
+                </div>
+                </div>
+        </div>
+
+        <div class="modal" id="viewUserModalDialog" data-bind="with: usersViewModel">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 class="modal-title">View User</h4>
+                    </div>
+                    <div class="modal-body">        
+            <form id="viewUserForm" data-bind="with: viewUserRequest">
+                <fieldset>
+                    <input type="text" name="id" data-bind="value: id" placeholder="Required user id" value="" disabled/> 
+                    <input type="text" name="username" data-bind="value: username" placeholder="Username" value="" disabled/>
+                    <input type="text" name="firstName" data-bind="value: contact.first_name" placeholder="First Name" value="" disabled/>
+                    <input type="text" name="lastName" data-bind="value: contact.last_name" placeholder="Last Name" value="" disabled/>
+                    <input type="text" name="emailAddress" data-bind="value: contact.email_address" placeholder="Email Address" value="" disabled/>
+                    <br>
+                    <textarea data-bind="value: transfer_key_pem" cols="80" rows="10" placeholder="Paste the public key here, in PEM format"></textarea>
+                    <br>
+                </fieldset>
+            </form>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#" data-dismiss="modal" class="btn">Close</a>
+                    </div>
+                </div>
+                </div>
+        </div>
+        
+        <!--
+        <div class="modal" id="viewUserModalDialog" data-bind="with: usersViewModel">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 class="modal-title">View User</h4>
+                    </div>
+                    <div class="modal-body">        
+            <form id="deleteUserForm" data-bind="with: viewUserRequest">
+                <fieldset>
+                    <p>Submit this form to request the server to delete an existing SAML certificate.</p>
+                    <input type="text" name="id" data-bind="value: id" placeholder="Required key id" value="" disabled/> 
+                    <input type="text" name="subject" data-bind="value: subject" placeholder="subject" value="" disabled/>
+                    <input type="text" name="issuer" data-bind="value: issuer" placeholder="issuer" value="" disabled/>
+                    < ! - -
+                    <input type="text" name="algorithm" data-bind="value: algorithm" placeholder="algorithm" value="" disabled/>
+                    <input type="text" name="key_length" data-bind="value: key_length" placeholder="key length" value="" disabled/>
+                    <input type="text" name="cipher_mode" data-bind="value: cipher_mode" placeholder="cipher mode" value="" disabled/>
+                    <input type="text" name="padding_mode" data-bind="value: padding_mode" placeholder="padding mode" value="" disabled/>
+                    <input type="text" name="digest_algorithm" data-bind="value: digest_algorithm" placeholder="digest algorithm" value="" disabled/>
+                    <input type="text" name="transfer_policy" data-bind="value: transfer_policy" placeholder="key transfer policy" value="" disabled/>
+                    - - >
+                    <br>
+                    <textarea data-bind="value: certificate_pem" cols="80" rows="10" placeholder="Certificate in PEM format" disabled></textarea>
+                    <br>
+                    <input type="submit" class="btn btn-primary"  value="Delete" data-bind="click: $parent.deleteUser" />
+                </fieldset>
+            </form>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#" data-dismiss="modal" class="btn">Close</a>
+                    </div>
+                </div>
+                </div>
+        </div>        
+        -->
+        <!--
+        <section data-bind="with: viewUserRequest, visible: viewUserRequest().id">
+            <h1>view key</h1>
+            <form id="viewUserForm" >
+                <fieldset>
+                    <legend>View User</legend>
+                    <p>Cannot change properties of an existing key.</p>
+                    <input type="text" name="id" data-bind="value: id" placeholder="Required key id" value="" disabled/> 
+                    <input type="text" name="algorithm" data-bind="value: algorithm" placeholder="algorithm" value="" disabled/>
+                    <input type="text" name="key_length" data-bind="value: key_length" placeholder="key length" value="" disabled/>
+                    <input type="text" name="cipher_mode" data-bind="value: cipher_mode" placeholder="cipher mode" value="" disabled/>
+                    <input type="text" name="padding_mode" data-bind="value: padding_mode" placeholder="padding mode" value="" disabled/>
+                    <input type="text" name="digest_algorithm" data-bind="value: digest_algorithm" placeholder="digest algorithm" value="" disabled/>
+                    <input type="text" name="transfer_policy" data-bind="value: transfer_policy" placeholder="key transfer policy" value="" disabled/>
+                    <input type="submit" value="Close" data-bind="click: $parent.closeViewUser" />
+                </fieldset>
+            </form>
+        </section>
+        -->
+                    <!-- <button data-bind="click: submitUserDeleteForm">Delete</button> -->
+
+                    
+        <!-- Placed at the end of the document so the pages load faster -->
+        
+        
+        <script type="text/javascript">
+            /*
+            var endpoint = "/v1";
+            function MainViewModel() {
+                var self = this;
+                self.usersViewModel = new UserListViewModel();
+                self.settingsViewModel = new SettingListViewModel();
+            }
+        */
+            console.log("users.html script");
+            resourceLoader.loadJS(['js/knockout.js', 'js/jquery.js', '/v1/resources/js/kms_users.js'], function() { 
+                console.log("users.html: loaded scripts");
+            // add our view models to the main view model defined by index.html
+                mainViewModel.usersViewModel =  new UserListViewModel();
+                ko.applyBindings(mainViewModel, document.getElementById("users"));
+                mainViewModel.usersViewModel.searchUsers({});
+            });
+
+
+        </script>
+
+    </body>
+</html>
