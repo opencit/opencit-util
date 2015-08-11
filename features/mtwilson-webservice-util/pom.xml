@@ -130,6 +130,10 @@
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-crypto</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-validation</artifactId>
+        </dependency>
         <!--
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
@@ -142,10 +146,6 @@
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-io</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.intel.mtwilson.util</groupId>
-            <artifactId>mtwilson-util-validation</artifactId>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

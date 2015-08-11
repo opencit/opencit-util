@@ -55,8 +55,8 @@
 -->
   <distributionManagement>
       <repository>
-	  <id>autobuildsvr-share</id>
-	  <url>dav:https://10.1.71.30/maven/repository</url>
+	  <id>buildserver-share</id>
+	  <url>dav:https://10.1.71.30/maven/share</url>
           <name>Internal Maven Repository</name>
       </repository>
   </distributionManagement>
@@ -70,6 +70,7 @@
   <modules>
     <module>features</module>
     <module>features-deprecated</module>
+    <module>features-linux</module>
     <module>integration</module>
     <module>maven</module>
     <module>util</module>
