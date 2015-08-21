@@ -119,6 +119,19 @@
             var discovery = new FeatureDiscovery();
 
             $(document).ready(function() {
+                //$("#login_content").hide();
+                //$("#dashboard_content").load("dashboard.html");
+                //resourceLoader.loadHTML("dashboard.html", "#dashboard_content");
+                //$("#dashboard_content").show();
+                setTimeout(function() {
+                    resourceLoader.loadHTML("login.html",
+                            {into: "#main",
+                                tab: "login",
+                                activate: true // means switch to this tab as soon as its loaded; same as providing callback: function() { mainViewModel.tab("#login", "#main"); }
+                            });
+                }, 1000); // delay this call by 1 second for quick display of the logo splash screen while the discovery call below loads the rest of the UI
+                
+                
                 // register scripts and stylesheets already loaded as part of the page markup
                 resourceLoader.registerLoadedJS();
                 resourceLoader.registerLoadedCSS();
@@ -191,18 +204,6 @@
                 
 
 
-                //$("#login_content").hide();
-                //$("#dashboard_content").load("dashboard.html");
-                //resourceLoader.loadHTML("dashboard.html", "#dashboard_content");
-                //$("#dashboard_content").show();
-                setTimeout(function() {
-                    resourceLoader.loadHTML("login.html",
-                            {into: "#main",
-                                tab: "login",
-                                activate: true // means switch to this tab as soon as its loaded; same as providing callback: function() { mainViewModel.tab("#login", "#main"); }
-                            });
-                }, 1000); // delay this call by 1 second for quick display of the logo splash screen while the discovery call below loads the rest of the UI
-                
                 
             });
         </script>
