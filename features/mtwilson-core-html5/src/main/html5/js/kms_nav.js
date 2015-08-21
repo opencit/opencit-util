@@ -12,7 +12,7 @@
                 //this.html = ko.observable(buttonHtml);
                 //console.log("THE NAVBAR IS THERE??? %O", $("#navbar").find("ul"));//
 //                $("#navbar").find("ul");
-                $("#navbar").find("ul").append(buttonHtml);
+                $("#navbar ul.nav").append(buttonHtml);
                 console.log("Added button to navbar: %s", buttonHtml);
             }
 
