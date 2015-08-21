@@ -33,6 +33,9 @@ import org.apache.commons.io.IOUtils;
  * src/main/resources/publicResources
  * </pre>
  *
+ * A limitation of this API is discovery or directory listing is not possible,
+ * so the caller must know the file path under publicResources in advance.
+ * 
  * To serve files from the filesystem, use the default servlet that comes with
  * Jetty or any other web server.
  *

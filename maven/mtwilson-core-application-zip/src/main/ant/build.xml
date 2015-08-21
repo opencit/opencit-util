@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="extract-feature-zip-into-application" default="test" basedir=".">
+	<target name="test">
+<echo message="Hello BEFORE scriptdef"/>
+                                <scriptdef name="extract-features" language="javascript">
+                                    <element name="fileset" type="fileset"/>
+<![CDATA[
+  importClass(java.io.File);
+  filesets = elements.get("fileset");
+importClass(java.lang.System);
+System.out.println("hello world");
+      self.log("Number of filesets = " + filesets.size());
+   
+      for (i = 0; i < filesets.size(); ++i) {
+        self.log("fileset " + i + " basedir = "
+          + filesets.get(i).getDir(project));
+
+    fileset = filesets.get(i);
+    scanner = fileset.getDirectoryScanner(project);
+    scanner.scan();
+    files = scanner.getIncludedFiles();
+
+    for( j=0; j < files.length; j++) {
+
+        var basedir  = fileset.getDir(project);
+        var filename = files[j];
+        var src = new File(basedir, filename);
+		self.log("file = "+src.getAbsolutePath());
+	}
+
+      }
+               
+   self.log("Fileset basedir = "
+          + elements.get("fileset").get(0).getDir(project));
+          
+]]>
+                                </scriptdef>       
+<echo message="Hello AFTER scriptdef"/>
+                                <extract-features>
+                                    <fileset dir="${project.build.directory}/application/features">
+                                        <include name="*.zip"/>
+                                    </fileset>    
+                                </extract-features>                         
+<echo message="Hello END"/>
+		
+	</target>
+</project>
+
+<!--
+  for (i = 0; i < filesets.size(); ++i) {
+    fileset = filesets.get(i);
+    scanner = fileset.getDirectoryScanner(project);
+    scanner.scan();
+    files = scanner.getIncludedFiles();
+    for( j=0; j < files.length; j++) {
+
+        var basedir  = fileset.getDir(project);
+        var filename = files[j];
+        var src = new File(basedir, filename);
+        var dest= new File(basedir, filename + ".bz2");
+/*
+        bzip2 = self.project.createTask("bzip2");        
+        bzip2.setSrc( src);
+        bzip2.setDestfile(dest ); 
+        bzip2.execute();
+        */
+        echo = self.project.createTask("echo");
+        echo.setMessage("hello world: "+src);
+        echo.execute();
+    }
+  }
+
+-->

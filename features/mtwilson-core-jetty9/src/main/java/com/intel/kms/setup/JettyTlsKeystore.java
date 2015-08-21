@@ -17,7 +17,7 @@ import com.intel.dcsg.cpg.iso8601.Iso8601Date;
 import com.intel.dcsg.cpg.net.NetUtils;
 import com.intel.dcsg.cpg.x509.X509Builder;
 import com.intel.mtwilson.Folders;
-import com.intel.mtwilson.configuration.PasswordVaultFactory;
+import com.intel.mtwilson.core.PasswordVaultFactory;
 import com.intel.mtwilson.setup.AbstractSetupTask;
 import com.intel.mtwilson.util.crypto.keystore.PasswordKeyStore;
 import java.io.File;

@@ -274,7 +274,7 @@
             }
         */
             console.log("dashboard.html script");
-            resourceLoader.loadJS(['js/knockout.js', 'js/jquery.js', 'js/kms_keys.js'], function() { 
+            resourceLoader.loadJS(['js/knockout.js', 'js/jquery.js', '/v1/html5/features/kms-keys/js/kms_keys.js'], function() { 
                 console.log("dashboard.html: loaded scripts");
             // add our view models to the main view model defined by index.html
                 mainViewModel.keysViewModel =  new KeyListViewModel();

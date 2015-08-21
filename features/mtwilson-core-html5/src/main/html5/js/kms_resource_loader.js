@@ -37,10 +37,11 @@ function ResourceLoader() {
     var self = this;
     self.css = {}; // map of url -> css content
     self.js = {}; // map of url -> js content
+    self.json = {}; // map of url -> json content
     self.html = {}; // map of url -> html content
 
     // actions to execute after html has been inserted, such as applying knockout bindings
-    self.postWriteHTML = function(url, intoElement) {
+    self.postWriteHTML = function(url, intoElement, callback_args) {
         /*
          if( typeof(intoElement) === 'string' ) {
          console.log("ResourceLoader.postWriteHTML: jquery selector for url: %s", url);                        
@@ -54,7 +55,7 @@ function ResourceLoader() {
          }
          */
     };
-    self.writeHTML = function(url, intoElement) {
+    self.writeHTML = function(url, intoElement, callback_args) {
         if (typeof(intoElement) === 'object') {
             // if intoElement is an object, assume it has some parameters for us
             console.log("ResourceLoader.writeHTML jquery object");
@@ -79,7 +80,7 @@ function ResourceLoader() {
                             // now we know the identified element exists,
                             // so replace its content
                             identityElement.html(self.html[url]);
-                            self.postWriteHTML(url, intoElement);
+                            self.postWriteHTML(url, intoElement, callback_args);
                             // and check if called asked to auto-activate the tab
                             if (intoElement.hasOwnProperty('activate')) {
                                 if (intoElement.activate) {
@@ -90,7 +91,7 @@ function ResourceLoader() {
                         else {
                             // no other id was specified, so just insert into the "into" container
                             $(intoElement.into).html(self.html[url]);
-                            self.postWriteHTML(url, intoElement);
+                            self.postWriteHTML(url, intoElement, callback_args);
                         }
                     }
                 }
@@ -98,27 +99,27 @@ function ResourceLoader() {
             if (intoElement.hasOwnProperty('callback') && typeof(intoElement.callback) === 'function') {
                 console.log("ResourceLoader.writeHTML callback");
                 var fn = intoElement.callback;
-                fn({url: url, html: self.html[url]});
+                fn({url: url, html: self.html[url]}, callback_args);
             }
         }
         else if (typeof(intoElement) === 'string') {
             console.log("ResourceLoader.writeHTML string");
-            self.writeHTML(url, {into: intoElement});
+            self.writeHTML(url, {into: intoElement}, callback_args);
         }
         else if (typeof(intoElement) === 'function') {
             //  if intoElement is a callback, then call it (function is responsible for applying bindings, or whatever, by itself)
             console.log("ResourceLoader.writeHTML function");
-            self.writeHTML(url, {callback: intoElement});
+            self.writeHTML(url, {callback: intoElement}, callback_args);
         }
         else {
             console.log("ResourceLoader.writeHTML unsupported 2nd argument: %O", intoElement);
         }
     };
-    self.loadHTML = function(url, intoElement) {
+    self.loadHTML = function(url, intoElement, callback_args) {
         if (self.html[url]) {
             // already loaded it, so continue immediately
             console.log("ResourceLoader.loadHTML already in cache: %s", url);
-            self.writeHTML(url, intoElement);
+            self.writeHTML(url, intoElement, callback_args);
         }
         else {
             // have not loaded it yet, so request from server
@@ -136,7 +137,7 @@ function ResourceLoader() {
                      * <!DOCTYPE html><html><head><title>loaded content</title></head></html>
                      */
                     self.html[url] = content;
-                    self.writeHTML(url, intoElement);
+                    self.writeHTML(url, intoElement, callback_args);
                 }
             });
         }
@@ -161,7 +162,11 @@ function ResourceLoader() {
             }
             else {
                 request.done = true;
-                request.callback();
+                // the callback is invoked with whatever other callback args were provided
+                if( request["callback"] && typeof(request["callback"]) === "function" ) {
+                    var callback = request["callback"];
+                    callback(request["callback_args"], { "urls": request["urls"] }); // provide optional second argument as context for callback
+                }
             }
         }
         else {
@@ -184,8 +189,8 @@ function ResourceLoader() {
             }
         }
     };
-    self.loadJS = function(url_array, callback) {
-        var request = {"urls": url_array, "callback": callback, "done": false}; // done wlll be true when we invoke the callback function
+    self.loadJS = function(url_array, callback, callback_args) {
+        var request = {"urls": url_array, "callback": callback, "callback_args": callback_args, "done": false}; // done wlll be true when we invoke the callback function
         // first register each url and set a status if it's a new entry
         $.map(url_array, function(url) {
             if (!self.js[url]) {
@@ -206,7 +211,7 @@ function ResourceLoader() {
                 $.ajax({
                     type: "GET",
                     url: url, // like dashboard.html
-                    headers: {'Accept': 'application/javascript'},
+                    headers: {'Accept': 'text/plain'}, // prevents most browsers from executing the code immediately after download; so we have a chance to eval below and catch errors.  if you set it to application/javascript then browser will execute immediately , then eval below to execute it a second time
                     beforeSend: function(xhr, settings) { xhr.meta = { "url":url }; }, // define a new field "meta" in the xhr with our original request url
                     success: function(content, status, xhr) {
                         var url = xhr.meta.url; // get it from the request object NOT the outer scope (which might change values before we are called)
@@ -244,6 +249,120 @@ function ResourceLoader() {
             }
         }
     };
+    
+    self.postLoadJSON = function(request) {
+        // check if all the requested scripts have loaded, and if so invoke the callback
+        if( request.statusTimerId ) { clearTimeout(request.statusTimerId); request.statusTimerId = null; }
+        var url_array = request.urls;
+        var ready = true;
+        var statusCounts = {};
+        var loadedContent = [];
+        for (var i = 0; i < url_array.length; i++) {
+            var url = url_array[i];
+            var status = (self.json[url] && self.json[url].status ? self.json[url].status : "null");
+            if( !statusCounts[ status ] ) { statusCounts[status] = 0; }
+            statusCounts[status]++;
+            ready = ready && status === "done";
+            if( status === "done" ) {
+                loadedContent.push( { "url": url, "content": self.json[url].content } );
+            }
+        }
+        if (ready) {
+            console.log("ResourceLoader.loadJSON ready for callback on urls: %O", request.urls);
+            if (request.done) {
+                console.log("ResourceLoader.loadJSON skipping callback; already called before on urls: %O", request.urls);
+            }
+            else {
+                request.done = true;
+                // the callback is invoked with 1) the json content we downloaded, and 2) whatever other callback args were provided
+                if( request["callback"] && typeof(request["callback"]) === "function" ) {
+                    var callback = request["callback"];
+                    callback(loadedContent, request["callback_args"]); // note that arguments are different than callback for loadJS, because the first arg loadedContent includes both url and content; no need to provide third arg with list of all urls it would be redundant
+                }
+            }
+        }
+        else {
+            console.log("ResourceLoader.loadJSON not ready to callback for urls: %O", request.urls);
+            var status_array = $.map(url_array, function(value, index) {
+                return {"index": index, "url": value, "status": (self.json[value] ? self.json[value].status : "unknown")};
+            });
+            console.log("ResourceLoader.loadJSON status: %O", status_array);
+            // schedule another check unless the load status is error; this is required when two or more simultaneous load requests are issued that share a dependency, the first one sets status to pending and starts the download, the second one sees a download is in progress and calls postLoadJS just to see but if the download has not completed yet  and we don't schedule another check here it would just fail without trying again
+            // TODO: increase the next check time slightly each time we do it (maybe log curve) so that as more resources are loaded we're not trying to do all the checks at the same time
+            var currentTimeMs = new Date().getTime();
+            var priorTimeMs = request.statusTimerRequestedOn ? request.statusTimerRequestedOn : 0;
+            console.log("ResourceLoader.loadJSON currentTimeMs = %s, priorTimeMs = %s", currentTimeMs, priorTimeMs);
+            console.log("ResourceLoader.loadJSON last status check requested %d ms ago", currentTimeMs - priorTimeMs);
+            console.log("ResourceLoader.loadJSON status counts for urls: %O\n%O", url_array, statusCounts);
+            if( !statusCounts["error"] ) {
+//            if( self.json[url.status = "error" ) {
+                request.statusTimerRequestedOn = currentTimeMs;
+                request.statusTimerId = setTimeout(self.postLoadJS, 1000, request);
+            }
+        }
+    };
+    
+    /**
+     * 
+     * @param {array of string} url_array
+     * @param {function} callback
+     * @param {object} options: callback_args to pass to callback
+     * @returns {undefined}
+     */
+    self.loadJSON = function(url_array, callback, options) {
+        var request = {"urls": url_array, "callback": callback, "callback_args": options["callback_args"], "done": false}; // done wlll become true when we invoke the callback function
+        // first register each url and set a status if it's a new entry
+        $.map(url_array, function(url) {
+            if (!self.json[url]) {
+                self.json[url] = { status: "pending" };
+            }
+            else if (!self.json[url].status) {
+                self.json[url].status = "pending";
+            }
+        });
+        for (var i = 0; i < url_array.length; i++) {
+            var url = url_array[i];
+            if (self.json[url].status === "pending") {
+                // have not loaded it yet, so request from server
+                console.log("ResourceLoader.loadJSON downloading %s", url);
+                // set a value in the cache so that if a second loadJS is executed for the same script, it will skip it
+                self.json[url].status = "downloading";
+                //$.getScript(url, success);  // we could use this but then we can't submit special headers with token etc.
+                $.ajax({
+                    type: "GET",
+                    url: url, // like dashboard.html
+                    //headers: {'Accept': 'text/plain'}, // prevents most browsers from executing the code immediately after download; so we have a chance to eval below and catch errors.  if you set it to application/javascript then browser will execute immediately , then eval below to execute it a second time
+                    dataType: "json",
+                    beforeSend: function(xhr, settings) { xhr.meta = { "url":url }; }, // define a new field "meta" in the xhr with our original request url
+                    success: function(content, status, xhr) {
+                        var url = xhr.meta.url; // get it from the request object NOT the outer scope (which might change values before we are called)
+                        console.log("Fetch JSON url: %s results %O", url, content);
+                        console.log("XHR is: %O", xhr);
+                        /*
+                         * Example:
+                         * console.log("loaded JSON file");
+                         */
+                        self.json[url].status = "done";
+                        self.json[url].content = content;
+                        console.log("JSON is: %O", content);
+                        self.postLoadJSON(request);
+                    },
+                    error: function(xhr, jqstatus, httpstatus) {
+                        var url = xhr.meta.url; // get it from the request object NOT the outer scope (which might change values before we are called)
+                        console.error("Cannot load JS url:%s status:%s", url, httpstatus);
+                        console.error("xhr: %O", xhr);
+                        self.json[url].status = "error";
+                    }
+                });
+            }
+            else {
+                // already loaded and executed it (or it's already in progress), so skip it -- we don't want to repeat executing the script
+                console.log("ResourceLoader.loadJSON already in cache: %s", url);
+                // but we do want to check if we've loaded all required files, so we can invoke the callback
+                self.postLoadJSON(request);
+            }
+        }
+    };    
     // returns longest common prefix for all elements in the given array, or empty string if no common prefix  or if array is empty or has just one element, or if after all "null" and "undefined" elements are removed the has zero or one string elements
     // usage:   findPrefix(["str1x", "str2y"])  ==> "str"
     // example: first: https://localhost/js/uuid.js,  last: https://localhost/   result: https://localhost/

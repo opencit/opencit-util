@@ -64,20 +64,34 @@ function LoginViewModel() {
                 
                 // send the authorization token automatically with every ajax request
                 $(document).ajaxSend(function(event,jqxhr,settings){
-                    console.log("ajaxSend: url = "+settings.url);
+                    console.log("ajaxSend: url: %s", settings.url);
                     // check if url starts with /v1  (for example /v1/users)
-                    if( settings.url.lastIndexOf('/v1',0) === 0 ) {
+                    //if( settings.url.lastIndexOf('/v1',0) === 0 ) {
                         console.log("ajaxSend: accept header: %O", settings.accept);
                         console.log("ajaxSend: headers object: %O", settings.headers);
                         console.log("ajaxSend: AJAX request to /v1, setting authorization token: "+authorizationToken);
                         jqxhr.setRequestHeader("Authorization", "Token "+authorizationToken);
-                    }
+                    //}
                 });
                 
                 
                 // load the navbar and the dashboard, and activate the post-login primary view
                 
                 var nextView = self.options.postLoginActivatePage; // "dashboard.html";
+                
+                $(document).trigger({
+                    type: "mtwilson-core-html5:login:success",
+                    message: {"username": self.userProfile.username() },
+                    time: new Date()
+                });
+                /*
+                $(document).trigger({
+                    type: "customevent123",
+                    message: "foobar",
+                    time: new Date()
+                });
+                */
+/*                
                 for(var i=0; i<KMS_PAGES.length; i++) {
                     var viewDescriptor = KMS_PAGES[i]; // { href: ...,  target: "#main",  target_tab: "some-id" }
                     console.log("post login loading page: %O", viewDescriptor);
@@ -88,7 +102,7 @@ function LoginViewModel() {
                     loadOptions.activate = (nextView === viewDescriptor.href); // automatically activate the page specifeid by the "postLoginActivatePage" option
                     resourceLoader.loadHTML( viewDescriptor.href , loadOptions );
                 }
-                
+*/                
 /*
                 resourceLoader.loadHTML("navbar.html",
                         {into: "#navbar"

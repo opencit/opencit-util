@@ -1,1 +1,1 @@
-com.intel.kms.console.cmd.Start
+com.intel.kms.console.cmd.JettyStart

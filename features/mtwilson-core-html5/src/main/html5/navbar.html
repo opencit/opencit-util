@@ -5,20 +5,35 @@
         <meta name="author" content="jbuhacoff">
     </head>
     <body>
-            <div class="navbar-collapse collapse" style="display: none;" data-bind="visible: loginViewModel.userProfile.authenticated">
-                <ul class="nav navbar-nav navbar-right">
+        <!--   -->
+            <div class="navbar-collapse collapse" style="display: none;" data-bind="visible: mainViewModel.loginViewModel.userProfile.authenticated">
+                <ul class="nav navbar-nav navbar-right"></ul>
+                <!--
+                <p class="nav navbar-nav navbar-right" data-bind="foreach: navigationViewModel.items, as: 'item">
+                <span data-bind="html: $data"></span>
+                </p>
+                <ul class="nav navbar-nav navbar-right" data-bind="with: navigationViewModel">
+                -->
+                    <!-- ko foreach: { data: items, as: 'item' } -->
+                        <!-- ko html: item.html --><!-- /ko -->
+                        <<!-- div data-bind="html: item.html"></div -->
+                    <!-- /ko -->
+                    
+                    <!-- 
                     <li class="active"><a href="#dashboard" data-toggle="tab">Dashboard</a></li>
                     <li><a href="#settings" data-toggle="tab">Settings</a></li>
                     <li><a href="#help" data-toggle="tab">Help</a></li>
                     <li class="dropdown">
                         <a class="dropdown-toggle" role="button" data-toggle="dropdown" href="#"><i class="glyphicon glyphicon-user"></i> <span data-bind="text: loginViewModel.userProfile.username()">Me</span> <span class="caret"></span></a>
                         <ul id="g-account-menu" class="dropdown-menu" role="menu">
-                            <!-- TODO: need an extension point so we can load the profile menu item and others dynamically (logout would remain static) -->
                             <li><a href="#my_profile" data-toggle="tab">My Profile</a></li>
                             <li><a href="#logout" data-toggle="tab">Logout</a></li>
                         </ul>                
                     </li>
+                    -->
+                    <!--
                 </ul>
+                    -->
             </div>
         
 <script type="text/javascript">
@@ -29,8 +44,8 @@
             resourceLoader.loadJS(['js/knockout.js', 'js/jquery.js', 'js/kms_nav.js'], function() { 
                 console.log("navbar.html: loaded scripts");
             // add our view models to the main view model defined by index.html
-                mainViewModel.navigationViewModel = new NavigationViewModel();
-                ko.applyBindings(mainViewModel, document.getElementById("navbar"));
+            //    mainViewModel.navigationViewModel = new NavigationViewModel();  // moved this to 
+//                ko.applyBindings(mainViewModel, document.getElementById("navbar"));
             });
     
 

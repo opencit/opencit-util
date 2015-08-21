@@ -15,6 +15,7 @@
         <module>mtwilson-configuration</module>
 	<module>mtwilson-configuration-settings-ws-v2</module>
     <module>mtwilson-configuration-ws-v2</module>
+	<module>mtwilson-core-feature</module>
 	<module>mtwilson-core-html5</module>
 	<module>mtwilson-core-jetty9</module>
 	<module>mtwilson-core-login-token</module>

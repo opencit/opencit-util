@@ -36,6 +36,12 @@
                 </div>
                 <!-- the navbar contents are loaded dynamically and inserted into this div after login -->
                 <div id="navbar">
+                    <!-- 
+                    style="display: none;" data-bind="visible: mainViewModelloginViewModel.userProfile.authenticated"
+                    -->
+                        <div class="navbar-collapse collapse" >
+                            <ul class="nav navbar-nav navbar-right"></ul>
+                        </div>
                 </div>
             </div>
         </nav>
@@ -58,6 +64,8 @@
         <!-- Placed at the end of the document so the pages load faster -->
         <!-- infrastructure -->
         <script src="js/kms_resource_loader.js"></script>
+        <script src="js/kms_discovery.js"></script>
+        <script src="js/kms_nav.js"></script>
         <!-- <script src="js/require.js"></script>  -->
         <!-- independent -->
         <script src="js/uuid.js"></script>
@@ -108,14 +116,67 @@
             var mainViewModel = new MainViewModel();
 
             var resourceLoader = new ResourceLoader();
+            var discovery = new FeatureDiscovery();
 
             $(document).ready(function() {
                 // register scripts and stylesheets already loaded as part of the page markup
                 resourceLoader.registerLoadedJS();
                 resourceLoader.registerLoadedCSS();
 
-
                 ko.applyBindings(mainViewModel); // not much point to this when the main model is empty... 
+
+                // navigation view model defined in kms_nav.js
+                mainViewModel.navigationViewModel = new NavigationViewModel();
+                ko.applyBindings(mainViewModel, document.getElementById("navbar"));
+
+                // define the successful login handlers, which load the html pages and navbar buttons
+                $(document).on("mtwilson-core-html5:login:success.mtwilson-core-html5:navbar", function(e) {
+                    console.log("navbar intercepted login success event: %O", e);
+
+                    // discover navbar buttons
+                    discovery.eachJSON("/mtwilson-core-html5/navbar/main.json", function(json,context) {
+                        console.log("navbar main called with json: %O", json); // looks like { items: [ { "href": url }, ... ] }
+                        console.log("navbar main called after extension: %O", context );
+                        // so here we just want to create a memory model of what the buttons should be...
+                        // when the navbar loads (see content handler) it will bind to this model
+                        // so eventually when both are loaded the buttons will appear in the nav bar
+                        for(var i=0; i<json.items.length; i++) {
+                            console.log("Loading navbar button html from: %s", endpoint+json.items[i].href);
+                            resourceLoader.loadHTML( endpoint+json.items[i].href, function(button) {
+                                console.log("navbar main loaded html button: %O", button);
+                                // button is object like {"url":url,"html":html} defined by resource loader's loadHTML method
+                                mainViewModel.navigationViewModel.items.push(new NavigationBarButton(button));
+                            });
+                        }
+                    });
+
+                });
+
+                $(document).on("mtwilson-core-html5:login:success.mtwilson-core-html5:content", function(e) {
+                    console.log("content intercepted login success event: %O", e);
+
+                    // discover main tabs;   
+                    // for now, default tab is hardcoded to "dashbaord"
+                    var defaultMainTab = "dashboard";
+                    discovery.eachJSON("/mtwilson-core-html5/content/main.json", function(json,context) {
+                        console.log("content called with json: %O", json);
+                        console.log("content called after extension: %O", context );
+                        for(var i=0; i<json.items.length; i++) {
+                            var viewDescriptor = json.items[i];
+                            // by default all pages load into #main, but can override if needed, for example navbar sets target=#navbar
+                            if( !viewDescriptor["target"] ) { viewDescriptor["target"] = "#main"; }
+                            console.log("post login loading page: %O", viewDescriptor);
+                            var loadOptions = { into: viewDescriptor.target, tab: null, activate: null };
+                            if( viewDescriptor["target_tab"] ) {
+                                loadOptions.tab = viewDescriptor.target_tab;
+                            }
+                            loadOptions.activate = (defaultMainTab === viewDescriptor.target_tab); // automatically activate the page specifeid by the "postLoginActivatePage" option
+                            resourceLoader.loadHTML( endpoint+ viewDescriptor.href , loadOptions );
+                        }
+                    });
+
+                });
+
 
                 //$("#login_content").hide();
                 //$("#dashboard_content").load("dashboard.html");
@@ -127,7 +188,17 @@
                                 tab: "login",
                                 activate: true // means switch to this tab as soon as its loaded; same as providing callback: function() { mainViewModel.tab("#login", "#main"); }
                             });
-                }, 1000); // delay this call by 1 second to allow a quick display of the logo splash screen
+                }, 1000); // delay this call by 1 second for quick display of the logo splash screen while the discovery call below loads the rest of the UI
+                
+                
+                // discover features that implement "run on load" and invoke them
+                // this is an "open interface", with no expectation on what the
+                // features might do, in order to enable new integrations. 
+                // also a good place for features to declare their event handlers.
+                discovery.eachJS("/mtwilson-core-html5/init/ready.js", function(callback_args,context) {
+                    console.log("onready called after extension: %O with context: %O", callback_args, context );
+                });
+                
             });
         </script>
 

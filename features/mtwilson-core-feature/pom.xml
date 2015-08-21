@@ -3,15 +3,14 @@
 
 
     <groupId>com.intel.mtwilson.core</groupId>
-    <artifactId>mtwilson-core-html5</artifactId>
+    <artifactId>mtwilson-core-feature</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <description>Provides static HTML5 resources and mechanism for other JARs to provide more static HTML resources in publicResources folder</description>
+    <description>Provides an API for feature discovery</description>
     <parent>
-        <groupId>com.intel.mtwilson.maven</groupId>
-        <artifactId>mtwilson-core-feature-zip</artifactId>
+		<groupId>com.intel.mtwilson</groupId>
+		<artifactId>mtwilson-maven-build-coreutil-features</artifactId>
         <version>3.0-SNAPSHOT</version>
-        <relativePath/>
     </parent>
 
 
@@ -30,15 +29,7 @@
 	<artifactId>javax.servlet-api</artifactId>
 	<version>3.1.0</version>
     </dependency>
-
-    <!-- uses the feature directory internally to list available features -->
-        <dependency>
-    <groupId>com.intel.mtwilson.core</groupId>
-    <artifactId>mtwilson-core-feature</artifactId>
-    <version>0.1-SNAPSHOT</version>
-        </dependency>
        
-                     
         <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>
             <artifactId>mtwilson-configuration</artifactId>
@@ -46,10 +37,16 @@
         </dependency>
         <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>
+            <artifactId>mtwilson-feature-xml</artifactId>
+            <version>3.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.integration</groupId>
             <artifactId>mtwilson-launcher-api</artifactId>
             <version>3.0-SNAPSHOT</version>
         </dependency>
-      
+
+<!--      
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-console</artifactId>
@@ -58,6 +55,7 @@
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-crypto</artifactId>
         </dependency>
+-->
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-io</artifactId>
@@ -66,6 +64,7 @@
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-jaxrs2</artifactId>
         </dependency>
+<!--
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-performance</artifactId>
@@ -74,9 +73,14 @@
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-tls-policy</artifactId>
         </dependency>
+-->
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-xml</artifactId>
         </dependency>
 
         <dependency>
@@ -93,15 +97,17 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
         </dependency>        
+<!--
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
         </dependency>
+-->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
-    
+<!--    
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
@@ -112,7 +118,7 @@
             <artifactId>httpclient</artifactId>
             <version>4.2</version>
         </dependency>
-
+-->
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>

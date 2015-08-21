@@ -12,6 +12,8 @@
 </parent>	
 	
     <modules>
+    <module>mtwilson-core-application-zip</module>
+    <module>mtwilson-core-feature-zip</module>
     <module>mtwilson-dist-java-zip</module>
 	<module>mtwilson-feature-zip</module>
     <module>mtwilson-maven-bom-coreutil</module>

@@ -10,7 +10,7 @@ import com.intel.kms.setup.JettyPorts;
 import com.intel.kms.setup.JettyTlsKeystore;
 import com.intel.mtwilson.Folders;
 import com.intel.mtwilson.configuration.ConfigurationFactory;
-import com.intel.mtwilson.configuration.PasswordVaultFactory;
+import com.intel.mtwilson.core.PasswordVaultFactory;
 import com.intel.mtwilson.util.crypto.keystore.PasswordKeyStore;
 import java.io.File;
 import java.io.IOException;
@@ -138,6 +138,7 @@ public class StartHttpServer implements Runnable {
     }
 
     /**
+     * PROTOTYPE IMPLEMENTATION:
      * Assumes an "html5" feature containing static resources in the file system. 
      * The static resources
      * provided by kms-html5 are available under the URL path /v1/resources.
@@ -146,11 +147,18 @@ public class StartHttpServer implements Runnable {
      * KMS_HOME/features/html5/index.html with a splash screen and redirect to
      * "/v1/resources/index.html" 
      * 
+     * CIT 3.0 IMPLMENTATION:
+     * Assumes a "mtwilson-core-html5" feature containing static resources in
+     * the file system. The static resources provided by mtwilson-core-html5
+     * include a splash screen and automatic discovery of installed features
+     * that need to integrate with the user interface. The entry point to the
+     * application is KMS_HOME/features/mtwilson-core-html5/index.html
+     * 
      * @return location of hypertext directory either as relative path, absolute
      * file path, or jar resource path
      */
     public String getHypertextUrl() {
-        return configuration.get(JETTY_HYPERTEXT, Folders.features("html5"));
+        return configuration.get(JETTY_HYPERTEXT, Folders.features("mtwilson-core-html5")+File.separator+"html5");
     }
 
     /**
