@@ -73,7 +73,7 @@ public class Directory {
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     @Path("/directory")
-    public DirectoryListing getDirectoryListing(@BeanParam DirectoryFilterCriteria filters, @QueryParam("path") String relativePath, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+    public DirectoryListing getDirectoryListing(@BeanParam DirectoryFilterCriteria filters, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         if( filters == null ) { filters = new DirectoryFilterCriteria(); }
         // if a feature was specified, we look only there - otherwise we look in all features that extend html5
         FeatureFilterCriteria featureFilters = new FeatureFilterCriteria();
@@ -94,8 +94,8 @@ public class Directory {
             String featureHtml5Path = Folders.features(feature) + File.separator + "html5";
 
             String platformRelativePath = "";
-            if (relativePath != null) {
-                platformRelativePath = relativePath.replace("/", File.separator);
+            if (filters.relativePath != null) {
+                platformRelativePath = filters.relativePath.replace("/", File.separator);
             }
 
             File file = new File(featureHtml5Path + File.separator + platformRelativePath);

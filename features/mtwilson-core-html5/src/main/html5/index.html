@@ -177,6 +177,19 @@
 
                 });
 
+                $(document).on("mtwilson-core-html5:login:success.mtwilson-core-html5:init", function(e) {
+                    console.log("content intercepted login success event: %O", e);
+                    // discover features that implement "run on load" and invoke them
+                    // this is an "open interface", with no expectation on what the
+                    // features might do, in order to enable new integrations. 
+                    // also a good place for features to declare their event handlers.
+                    // this activity is restricted to AFTER successful login.
+                    discovery.eachJS("/mtwilson-core-html5/init/ready.js", function(callback_args,context) {
+                        console.log("onready called after extension: %O with context: %O", callback_args, context );
+                    });
+                });
+                
+
 
                 //$("#login_content").hide();
                 //$("#dashboard_content").load("dashboard.html");
@@ -190,14 +203,6 @@
                             });
                 }, 1000); // delay this call by 1 second for quick display of the logo splash screen while the discovery call below loads the rest of the UI
                 
-                
-                // discover features that implement "run on load" and invoke them
-                // this is an "open interface", with no expectation on what the
-                // features might do, in order to enable new integrations. 
-                // also a good place for features to declare their event handlers.
-                discovery.eachJS("/mtwilson-core-html5/init/ready.js", function(callback_args,context) {
-                    console.log("onready called after extension: %O with context: %O", callback_args, context );
-                });
                 
             });
         </script>

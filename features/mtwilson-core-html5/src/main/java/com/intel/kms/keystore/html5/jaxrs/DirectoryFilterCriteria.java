@@ -13,4 +13,7 @@ import javax.ws.rs.QueryParam;
 public class DirectoryFilterCriteria {
     @QueryParam("feature")
     public String featureId;
+    
+    @QueryParam("path")
+    String relativePath;
 }
