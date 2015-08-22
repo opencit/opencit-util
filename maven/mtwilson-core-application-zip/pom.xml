@@ -125,16 +125,20 @@
                                         </xmlproperty>
                                         <echo message="Extracting feature: ${feature.id}"/>
                                         <!-- move jar files into the application/java folder; without mapper it would be application/java/java -->
+                                        <!--
                                         <unzip src="@{feature.zip.file}" dest="${project.build.directory}/application/java">
                                             <patternset>
                                                 <include name="java/"/>
                                             </patternset>
                                             <mapper type="flatten"/>
                                         </unzip>
+                                        -->
                                         <unzip src="@{feature.zip.file}" dest="${project.build.directory}/application/features/${feature.id}">
+                                            <!--
                                             <patternset>
                                                 <exclude name="java/"/>
                                             </patternset>
+                                            -->
                                         </unzip>
                                         <!-- at this time, no need to keep the original feature.zip.file around because we extracted all its content -->
                                         <delete file="@{feature.zip.file}"/>
