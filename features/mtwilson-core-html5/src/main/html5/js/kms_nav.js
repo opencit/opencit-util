@@ -9,7 +9,7 @@
                 var buttonHtml = buttonHtmlScriptElement.find("ul").html();
                 buttonHtmlScriptElement.remove();
                 console.log("Filtered navigation button html to list item: %s", buttonHtml);
-                //this.html = ko.observable(buttonHtml);
+                this.html = ko.observable(buttonHtml);
                 //console.log("THE NAVBAR IS THERE??? %O", $("#navbar").find("ul"));//
 //                $("#navbar").find("ul");
                 $("#navbar ul.nav").append(buttonHtml);

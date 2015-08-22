@@ -34,7 +34,7 @@
     <!-- uses the feature directory internally to list available features -->
         <dependency>
     <groupId>com.intel.mtwilson.core</groupId>
-    <artifactId>mtwilson-core-feature</artifactId>
+    <artifactId>mtwilson-core-feature-inventory</artifactId>
     <version>0.1-SNAPSHOT</version>
         </dependency>
        

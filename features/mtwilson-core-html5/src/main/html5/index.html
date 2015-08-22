@@ -39,6 +39,12 @@
                     <!-- 
                     style="display: none;" data-bind="visible: mainViewModelloginViewModel.userProfile.authenticated"
                     -->
+                    <!--
+                    Previously was loaded as plugin with this entry in content/main.json:         { "href": "/html5/features/mtwilson-core-html5/navbar.html", "target": "#navbar" } 
+                    Now the div is here and the javascript link is included in this page  to ensure it's ready before other features are discovered.
+                    Probably something can be reworked so the navbar itself becomes an optional, discoverable feature (via init/ready.js) so that
+                    after the navbar itself loads it will then discover features that have nav bar buttons to provide. 
+                    -->
                         <div class="navbar-collapse collapse" >
                             <ul class="nav navbar-nav navbar-right"></ul>
                         </div>
