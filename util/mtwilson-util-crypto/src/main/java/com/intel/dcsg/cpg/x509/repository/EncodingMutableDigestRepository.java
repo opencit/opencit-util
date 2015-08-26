@@ -53,7 +53,7 @@ public class EncodingMutableDigestRepository implements MutableDigestRepository 
     public List<Digest> getDigests() {
         ArrayList<Digest> digests = new ArrayList<>();
         for(String item : data) {
-            Digest digest = new Digest(algorithm, codec.decode(item));
+            Digest digest = Digest.algorithm(algorithm).value(codec.decode(item));
             digests.add(digest);
         }
         return Collections.unmodifiableList(digests);        
