@@ -18,13 +18,10 @@ public class DigestTest {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DigestTest.class);
 
     @Test
-    public void testZero() {
-        Digest md5zero = Digest.md5().zero();
-        assertEquals("00000000000000000000000000000000", md5zero.toHex());
-        Digest sha1zero = Digest.sha1().zero();
-        assertEquals("0000000000000000000000000000000000000000", sha1zero.toHex());
-        Digest sha256zero = Digest.sha256().zero();
-        assertEquals("0000000000000000000000000000000000000000000000000000000000000000", sha256zero.toHex());
+    public void testZeroValues() {
+        assertEquals("00000000000000000000000000000000", Digest.md5().zero().toHex());
+        assertEquals("0000000000000000000000000000000000000000", Digest.sha1().zero().toHex());
+        assertEquals("0000000000000000000000000000000000000000000000000000000000000000", Digest.sha256().zero().toHex());
     }
     
     @Test
@@ -43,5 +40,14 @@ public class DigestTest {
         assertEquals("2fd4e1c67a2d28fced849ee1bb76e7391b93eb12", Digest.sha1().digest("The quick brown fox jumps over the lazy dog", utf8).toHex());
         assertEquals("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", Digest.sha256().digestHex("").toHex());
         assertEquals("730e109bd7a8a32b1cb9d9a09aa2325d2430587ddbc0c38bad911525", Digest.sha224().digest("The quick brown fox jumps over the lazy dog", utf8).toHex());
+    }
+    
+    @Test
+    public void testIsValid() {
+        assertTrue(Digest.md5().isValidHex("d41d8cd98f00b204e9800998ecf8427e"));
+        assertFalse(Digest.md5().isValidHex("d41d8cd98f00b204e9800998ecf8427eQ"));
+        assertFalse(Digest.md5().isValidHex("d41d8cd98f00b204e9800998ecf8427Q"));
+        assertFalse(Digest.md5().isValidHex("d41d8cd98f00b204e9800998ecf8427e8"));
+        assertFalse(Digest.md5().isValidHex("d41d8cd98f00b204e9800998ecf8427"));
     }
 }
