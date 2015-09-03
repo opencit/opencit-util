@@ -17,32 +17,49 @@ public class Iso8601DateTest {
 
     @Test
     public void testDate() {
-        assertNotNull(Iso8601Date.valueOf("2015-09-01"));
-        log.debug("testDate: {}", Iso8601Date.valueOf("2015-09-01").toString());
+        Iso8601Date date = Iso8601Date.valueOf("2015-09-01");
+        assertNotNull(date);
+        assertEquals("2015-09-01T00:00:00-0700", date.toString());
+//        log.debug("testDate: {}", Iso8601Date.valueOf("2015-09-01").toString());
     }
     @Test
     public void testDateTimeUtc() {
-        assertNotNull(Iso8601Date.valueOf("2015-09-01T12:44:03+00:00"));
-        log.debug("testDateTimeUtc: {}", Iso8601Date.valueOf("2015-09-01T12:44:03+00:00").toString());
+        Iso8601Date date = Iso8601Date.valueOf("2015-09-01T12:44:03+00:00");
+        assertNotNull(date);
+        assertEquals("2015-09-01T05:44:03-0700", date.toString());
+//        assertNotNull(Iso8601Date.valueOf("2015-09-01T12:44:03+00:00"));
+//        log.debug("testDateTimeUtc: {}", Iso8601Date.valueOf("2015-09-01T12:44:03+00:00").toString());
     }
     @Test
     public void testDateTimeUtcZ() {
-        assertNotNull(Iso8601Date.valueOf("2015-09-01T12:44:03Z"));
-        log.debug("testDateTimeUtcZ: {}", Iso8601Date.valueOf("2015-09-01T12:44:03Z").toString());
+        Iso8601Date date = Iso8601Date.valueOf("2015-09-01T12:44:03Z");
+        assertNotNull(date);
+        assertEquals("2015-09-01T05:44:03-0700", date.toString());
+//        assertNotNull(Iso8601Date.valueOf("2015-09-01T12:44:03Z"));
+//        log.debug("testDateTimeUtcZ: {}", Iso8601Date.valueOf("2015-09-01T12:44:03Z").toString());
     }
     @Test
     public void testWeek() {
-        assertNotNull(Iso8601Date.valueOf("2015-W36"));
-        log.debug("testWeek: {}", Iso8601Date.valueOf("2015-W36").toString());
+        Iso8601Date date = Iso8601Date.valueOf("2015-W36");
+        assertNotNull(date);
+        assertEquals("2015-08-31T00:00:00-0700", date.toString());
+//        assertNotNull(Iso8601Date.valueOf("2015-W36"));
+//        log.debug("testWeek: {}", Iso8601Date.valueOf("2015-W36").toString());
     }
     @Test
     public void testWeekDay() {
-        assertNotNull(Iso8601Date.valueOf("2015-W36-2"));
-        log.debug("testWeekDay: {}", Iso8601Date.valueOf("2015-W36-2").toString());
+        Iso8601Date date = Iso8601Date.valueOf("2015-W36-2");
+        assertNotNull(date);
+        assertEquals("2015-09-01T00:00:00-0700", date.toString());
+//        assertNotNull(Iso8601Date.valueOf("2015-W36-2"));
+//        log.debug("testWeekDay: {}", Iso8601Date.valueOf("2015-W36-2").toString());
     }
     @Test
     public void testOrdinal() {
-        assertNotNull(Iso8601Date.valueOf("2015-244"));
-        log.debug("testOrdinal: {}", Iso8601Date.valueOf("2015-244").toString());
+        Iso8601Date date = Iso8601Date.valueOf("2015-244");
+        assertNotNull(date);
+        assertEquals("2015-09-01T00:00:00-0700", date.toString());
+//        assertNotNull(Iso8601Date.valueOf("2015-244"));
+//        log.debug("testOrdinal: {}", Iso8601Date.valueOf("2015-244").toString());
     }
 }
