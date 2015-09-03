@@ -39,6 +39,9 @@ public class Iso8601Date extends Date {
     private static final String rMinute = "(?:[0-5][0-9])";
     private static final String rSecond = "(?:[0-5][0-9]|60)"; // the 60 is for leap second
     private static final String rFraction = "(?:\\056[0-9]+)"; // octal 46 is hex 0x2e for period "." (ascii 46)
+    private static final String rWeek = "(?:0[1-9]|[1-4][0-9]|5[0-2])";
+    private static final String rWeekDay = "(?:[1-7])";
+    private static final String rYearDay = "(?:00[1-9]|0[1-9][0-9]|[1-2][0-9][0-9]|3[0-5][0-9]|36[0-5])";
     private static final String rTimezoneWithZ = "[Zz]";
     private static final String rTimezoneWithColon = "[+-]"+rHour+":"+rMinute;
     private static final String rTimezoneWithoutColon = "[+-]"+rHour+rMinute;
@@ -47,19 +50,29 @@ public class Iso8601Date extends Date {
     private static final String rCompleteTime = "(?:"+rTime+rTimezone+"?)";
     private static final String rDate = rYear+"-"+rMonth+"-"+rDay;
     private static final String rDatetime = rDate+"[Tt]"+rCompleteTime;
+    private static final String rDateWeek = rYear+"-"+rWeek;
+    private static final String rDateWeekDay = rYear+"-"+rWeek+"-"+rWeekDay;
+    private static final String rDateYearDay = rYear+"-"+rYearDay;
     
+    private static final Pattern pDate = Pattern.compile(rDate);
     private static final Pattern pDatetime = Pattern.compile(rDatetime);
     private static final Pattern pTimezone = Pattern.compile(".*("+rTimezone+")$"); // anchor to end of line
     private static final Pattern pTimezoneWithZ = Pattern.compile(".*("+rTimezoneWithZ+")$");
     private static final Pattern pTimezoneWithColon = Pattern.compile(".*("+rTimezoneWithColon+")$"); // anchor to end of line
+    private static final Pattern pDateWeek = Pattern.compile(rDateWeek);
+    private static final Pattern pDateWeekDay = Pattern.compile(rDateWeekDay);
+    private static final Pattern pDateYearDay = Pattern.compile(rDateYearDay);
 //    private final Pattern datetimeTimezoneWithColon = Pattern.compile(rDatetime+"[+-]"+rTimezoneWithColon);
 //    private final Pattern datetimeTimezoneWithoutColon = Pattern.compile(rDatetime+"[+-]"+rTimezoneWithoutColon);
     public static final Pattern patterns[] = new Pattern[] { pDatetime };
     
-    public static final SimpleDateFormat iso8601DateInputs[] = new SimpleDateFormat[] { 
+    public static final SimpleDateFormat iso8601DateTimeInputs[] = new SimpleDateFormat[] { 
         new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"), 
         new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ"), 
         new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ")
+        };
+    public static final SimpleDateFormat iso8601DateInputs[] = new SimpleDateFormat[] { 
+        new SimpleDateFormat("yyyy-MM-dd")
         };
     private static final SimpleDateFormat iso8601DateOutput = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"); // capital Z produces output like -0800 which is ok for iso8601 but not for rfc3339
 //    private Date date;
@@ -103,6 +116,17 @@ public class Iso8601Date extends Date {
      * @return 
      */
     private static Date parseText(String text) {
+        // first check date-only formats because they don't need a tiemezone
+        for(SimpleDateFormat f : iso8601DateInputs) {
+            try {
+                Date date = f.parse(text);
+                return date;
+            }
+            catch(ParseException e) {
+                log.trace("Failed to parse date input {} using pattern {}", text, f.toPattern()); // ignore errors because we can try the next format
+            }
+        }
+        // next try date-time formats 
         Matcher timezoneMatcher = pTimezone.matcher(text);
         // if no timezone specified, assume server local timezone
         if( !timezoneMatcher.matches() ) {
@@ -123,7 +147,7 @@ public class Iso8601Date extends Date {
             int start = timezoneWithZMatcher.start(1);
             text = text.substring(0, start)+"-0000";
         }
-        for(SimpleDateFormat f : iso8601DateInputs) {
+        for(SimpleDateFormat f : iso8601DateTimeInputs) {
             try {
                 Date date = f.parse(text);
                 return date;
