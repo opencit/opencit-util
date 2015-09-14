@@ -45,6 +45,17 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- required to use XmlDsigVerify because it uses X509Util from crypto and PemLikeParser from pem -->
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-crypto</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-pem</artifactId>
+            <optional>true</optional>
+        </dependency>
                 
   </dependencies>  
 </project>

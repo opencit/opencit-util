@@ -1,0 +1,11 @@
+
+
+Updating a version of a project in mtwilson util:
+
+First, update the pom.xml of the project (like mtwilson-util-validation/pom.xml)
+
+Second, update the corresponding version in maven/mtwilson-maven-bom-coreutil/pom.xml  ... this file is referenced in a few places so they will be automatically up to date with this change
+
+Third, search for any uses of the project with a specific version number and evaluate whether they can be upgraded to the most current one now listed in the bom, and even better to import the bom directly into their dependency management section. 
+
+grep -R "<artifactId>mtwilson-util-validation</artifactId>" -B 3 -A 3 * | grep "<version>" | grep pom.xml

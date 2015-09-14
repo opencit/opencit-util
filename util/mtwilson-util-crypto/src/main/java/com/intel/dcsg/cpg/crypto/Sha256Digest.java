@@ -54,7 +54,7 @@ public class Sha256Digest extends AbstractDigest {
      * @return a new instance with the extended value, or null if there was an error
      * @since 0.2
      */
-    public Sha256Digest extend(Sha1Digest data) {
+    public Sha256Digest extend(Sha256Digest data) {
         return extend(data.toByteArray());
     }
 

@@ -39,6 +39,7 @@
     <maven.build.timestamp.format>yyyyMMdd.HHmm</maven.build.timestamp.format>
   </properties>
 
+<!--
   <distributionManagement>
       <repository>
 	  <id>cloudsecurity-maven-repository</id>
@@ -51,6 +52,15 @@
           <name>Documentation Site in Cloud Security Portal at Intel</name>
       </site>
   </distributionManagement>
+-->
+  <distributionManagement>
+      <repository>
+	  <id>buildserver-share</id>
+	  <url>dav:https://10.1.71.30/maven/share</url>
+          <name>Internal Maven Repository</name>
+      </repository>
+  </distributionManagement>
+
 
     <issueManagement>
         <system>Redmine</system>
@@ -60,6 +70,7 @@
   <modules>
     <module>features</module>
     <module>features-deprecated</module>
+    <module>features-linux</module>
     <module>integration</module>
     <module>maven</module>
     <module>util</module>
@@ -68,6 +79,13 @@
   
   <build>
   
+    <extensions>
+        <extension>
+            <groupId>org.apache.maven.wagon</groupId>
+            <artifactId>wagon-webdav-jackrabbit</artifactId>
+            <version>2.9</version>
+        </extension>
+    </extensions>
 
         <plugins>
 

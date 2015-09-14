@@ -31,47 +31,11 @@
 	</build>
 
   <dependencies>
-  <!--
-        <dependency>
-            <groupId>com.intel.mtwilson.util</groupId>
-            <artifactId>mtwilson-util-validation</artifactId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.intel.mtwilson.util</groupId>
-            <artifactId>mtwilson-util-crypto</artifactId>
-            <version>0.1.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.intel.mtwilson.util</groupId>
-            <artifactId>mtwilson-util-io</artifactId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency>
-      -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
-	<!--
-	<dependency>
-		<groupId>org.apache.commons</groupId>
-		<artifactId>commons-io</artifactId>
-		<version>1.3.2</version>
-	</dependency>
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-      <version>1.6</version>
-      <type>jar</type>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <version>3.1</version>
-      <type>jar</type>
-    </dependency>
-   -->    
 
     <!-- for StatUtil used by PerformanceInfo -->
     <dependency>
@@ -85,14 +49,6 @@
 		<groupId>org.slf4j</groupId>
 		<artifactId>slf4j-api</artifactId>
     </dependency>
-        <!--
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.6.4</version>
-            <scope>provided</scope>
-        </dependency>
-        -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>

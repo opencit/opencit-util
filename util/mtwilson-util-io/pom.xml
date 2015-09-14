@@ -48,6 +48,12 @@
             <artifactId>mtwilson-util-codec</artifactId>
         </dependency>
 
+<!-- for iso8601 date parsing -->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
+
     <!-- to support rfc822 message handling -->
     <!--
     <dependency>
