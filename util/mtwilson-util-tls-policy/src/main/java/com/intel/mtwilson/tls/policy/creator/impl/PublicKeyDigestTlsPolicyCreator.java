@@ -76,7 +76,7 @@ public class PublicKeyDigestTlsPolicyCreator implements TlsPolicyCreator {
                 throw new UnsupportedAlgorithmException(alg);
             }
             for(String publicKeyDigest : tlsPolicyDescriptor.getData()) {
-                Digest digest = new Digest(alg, codec.decode(publicKeyDigest));
+                Digest digest = Digest.algorithm(alg).value(codec.decode(publicKeyDigest));
                 repository.addDigest(digest);
             }
             return repository;

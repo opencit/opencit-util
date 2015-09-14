@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Intel Corporation
  * All rights reserved.
  */
-package test.digest;
+package com.intel.dcsg.cpg.crypto.digest;
 
 import com.intel.dcsg.cpg.crypto.RandomUtil;
 import com.intel.dcsg.cpg.crypto.Sha1Digest;

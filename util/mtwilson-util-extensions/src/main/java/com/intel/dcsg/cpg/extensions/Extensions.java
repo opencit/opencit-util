@@ -220,6 +220,20 @@ public class Extensions {
     }
 
     // never returns null - but may return an empty set if no matches were found
+    /**
+     * Example:
+     * <pre>
+     * List<PasswordHook> hooks = Extensions.findAll(PasswordHook.class);
+     * for(PasswordHook hook : hooks) {
+     *     hook.onAddedPassword(...);
+     *     //hook.onDeletedPassword(...);
+     *     //hook.onUpdatedPassword(...);
+     * }
+     * </pre>
+     * @param <T>
+     * @param extension
+     * @return 
+     */
     public static <T> List<T> findAll(Class<T> extension) {
         log.debug("findAll extension {}", extension.getName());
         ArrayList<T> result = new ArrayList<>();
