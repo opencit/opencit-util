@@ -148,7 +148,7 @@
                                         <ac:var name="feature.id" unset="true"/>
                                     </sequential>
                                 </ac:for>
-\                                <zip destfile="${project.build.directory}/${project.artifactId}-${project.version}-application.zip">
+                                <zip destfile="${project.build.directory}/${project.artifactId}-${project.version}-application.zip">
                                     <fileset dir="${project.build.directory}/application" />
                                 </zip>
                                 <!-- check if the application zip file was generated before attempting to add it to the pom -->
