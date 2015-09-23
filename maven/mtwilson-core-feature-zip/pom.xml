@@ -176,6 +176,7 @@
                         <target>1.7</target>
                         <skip>false</skip>
                         <showDeprecation>true</showDeprecation>
+						<useIncrementalCompilation>false</useIncrementalCompilation>
                     </configuration>
                 </plugin>
                 

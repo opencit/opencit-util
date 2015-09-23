@@ -37,10 +37,10 @@ public class CertificateDigestTlsPolicy extends CertificateTlsPolicy {
         log.debug("CertificateDigestTlsPolicy isCertificateTrusted: {} trusted digests", trustedCertificateDigests.size());
         for (Digest trustedCertificateDigest : trustedCertificateDigests) {
             try {
-                byte[] peerCertificateDigest = MessageDigest.getInstance(trustedCertificateDigest.getAlgorithm()).digest(certificate.getEncoded());
-                log.debug("Peer certificate digest:  {}", peerCertificateDigest);
-                log.debug("Trust certificate digest: {}", trustedCertificateDigest.toByteArray());
-                if (Arrays.equals(trustedCertificateDigest.toByteArray(), peerCertificateDigest)) {
+                byte[] peerCertificateDigestBytes = MessageDigest.getInstance(trustedCertificateDigest.getAlgorithm()).digest(certificate.getEncoded());
+                log.debug("Peer certificate digest:  {}", peerCertificateDigestBytes);
+                log.debug("Trust certificate digest: {}", trustedCertificateDigest.getBytes());
+                if (Arrays.equals(trustedCertificateDigest.getBytes(), peerCertificateDigestBytes)) {
                     log.debug("looks the same, returning true");
                     return true; // server public key is in our trusted public keys repository
                 }
