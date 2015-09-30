@@ -100,7 +100,7 @@ public class TpmKeyParams {
 	 * @return
 	 */
 	public static String esToString(short es, boolean TrouSerSmode) {
-		String returnVal = "";
+		String returnVal;
 		switch (es) {
 		case TPM_ES_NONE:
 			 returnVal = "TPM_ES_NONE";
@@ -134,7 +134,7 @@ public class TpmKeyParams {
 	 * @return
 	 */
 	public static String ssToString(short ss) {
-		String returnVal = "";
+		String returnVal;
 		switch (ss) {
 		case TPM_SS_NONE:
 			returnVal = "TPM_SS_NONE";
