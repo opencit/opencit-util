@@ -27,11 +27,21 @@ public class JunitWebapp {
         webAppContext.setResourceBase("src/main/webapp");       
 //        webAppContext.setClassLoader(getClass().getClassLoader());
         server.setHandler(webAppContext);
+        try {
         server.start();        
+        }
+        catch(Exception e) {
+            throw new JettyStartException(String.valueOf(8080), e);
+        }
     }
     
     @AfterClass
     public static void stop() throws Exception {
+        try {
         server.stop();
+        }
+        catch(Exception e) {
+            throw new JettyStopException(String.valueOf(8080), e);
+        }
     }
 }
