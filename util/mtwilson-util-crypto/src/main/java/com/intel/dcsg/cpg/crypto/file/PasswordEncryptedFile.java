@@ -314,7 +314,7 @@ public class PasswordEncryptedFile {
         boolean keyAlg = (a.getKeyAlgorithm() == null && b.getKeyAlgorithm() == null) || (a.getKeyAlgorithm().equals(b.getKeyAlgorithm()));
         boolean keyLen = (a.getKeyLengthBits() == b.getKeyLengthBits());
         boolean encAlg = (a.getAlgorithm() == null && b.getAlgorithm() == null) || (a.getAlgorithm().equals(b.getAlgorithm()));
-        boolean digAlg = (a.getDigestAlgorithm() == null && b.getDigestAlgorithm() == null) || (DigestUtil.getJavaAlgorithmName(a.getDigestAlgorithm()).equals(DigestUtil.getJavaAlgorithmName(b.getDigestAlgorithm())));
+        boolean digAlg = (a.getDigestAlgorithm() == null && b.getDigestAlgorithm() == null) || (a.getDigestAlgorithm() != null && DigestUtil.getJavaAlgorithmName(a.getDigestAlgorithm()) != null && DigestUtil.getJavaAlgorithmName(a.getDigestAlgorithm()).equals(DigestUtil.getJavaAlgorithmName(b.getDigestAlgorithm())));
         log.debug("Key-Algorithm: {} <=> {}",a.getKeyAlgorithm(),b.getKeyAlgorithm() );
         log.debug("Key length: {} <=> {}",a.getKeyLengthBits(),b.getKeyLengthBits());
         log.debug("Encryption-Algorithm: {} <=> {}",a.getAlgorithm(),b.getAlgorithm());
