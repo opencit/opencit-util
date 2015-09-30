@@ -35,6 +35,7 @@ import org.bouncycastle.jce.provider.*;
 import javax.crypto.*;
 import javax.crypto.spec.*;
 import java.util.BitSet;
+import org.apache.commons.io.IOUtils;
 
 /**
  * <p>The utils class contains functions that fall into two categories: those that provide 
@@ -611,7 +612,9 @@ public class TpmUtils {
 			NoSuchAlgorithmException, 
 			javax.security.cert.CertificateException, 
 			java.security.cert.CertificateException {
-		InputStream certStream = new FileInputStream(filename);
+		try(InputStream certStream = new FileInputStream(filename)) {
+        byte[] certBytes = IOUtils.toByteArray(certStream);
+        /*
 //		byte [] certBytes = new byte[certStream.available()];
 		byte[] certBytes = new byte[2048];
 		try {
@@ -623,8 +626,10 @@ public class TpmUtils {
 		finally{
 				 certStream.close();
 		}
+        */
 		javax.security.cert.X509Certificate cert = javax.security.cert.X509Certificate.getInstance(certBytes);
 		return convertX509Cert(cert);
+        }
 	}
 	/**
 	 * Retrieve a certificate as an X509Certificate object from a byte string, assuming DER encoding.
