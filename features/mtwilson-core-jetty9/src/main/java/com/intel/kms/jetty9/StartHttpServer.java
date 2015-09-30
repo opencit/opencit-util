@@ -115,9 +115,11 @@ public class StartHttpServer implements Runnable {
      * @param pathForwardSlashes
      * @return 
      */
+    /*
     private String path(String pathForwardSlashes) {
         return pathForwardSlashes.replace("/", File.separator);
     }
+    */
     
     /**
      * URLs with a file or jar:file scheme require forward slashes on both Linux
