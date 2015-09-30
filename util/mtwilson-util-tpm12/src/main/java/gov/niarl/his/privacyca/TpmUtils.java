@@ -114,9 +114,12 @@ public class TpmUtils {
 		if (source.available() < 4) {
 			throw new TpmBytestreamResouceException("There is not enough room in the bytestream to extract a UINT32.");
 		}
-		int retval = 0;
+		int retval;
 		byte[] temp = new byte[4];
 		int k =source.read(temp, 0, 4);
+        if( k != 4 ) {
+			throw new TpmBytestreamResouceException("Failed to read UINT32 from stream");
+        }
 		if ((temp[0]&0x80) == 0x80) throw new TpmUnsignedConversionException("Cannot convert UINT32 to signed Integer: too large - would be converted to negative.");
 		retval = (int)((temp[0]<<24&0xff000000) + 
 		         (int) (temp[1]<<16&0x00ff0000) + 
@@ -138,9 +141,12 @@ public class TpmUtils {
 		if (source.available() < 2) {
 			throw new TpmBytestreamResouceException("There is not enough room in the bytestream to extract a UINT32.");
 		}
-		int retval = 0;
+		int retval;
 		byte[] temp = new byte[2];
 		int k = source.read(temp, 0, 2);
+        if( k != 2 ) {
+			throw new TpmBytestreamResouceException("Failed to read UINT16 from stream");
+        }
 		if ((temp[0]&0x80) == 0x80) throw new TpmUnsignedConversionException("Cannot convert UINT16 to signed Short: too large - would be converted to negative.");
 		retval = (int)((temp[0]<<8)&0x0000ff00) + 
 			 	 (int)((temp[1]<<0)&0x000000ff);
@@ -922,7 +928,7 @@ public class TpmUtils {
 	 */
 	public static byte[] sha1hash(byte[] blob)
 			throws NoSuchAlgorithmException{
-		byte[] toReturn = null;
+		byte[] toReturn;
 		MessageDigest md = MessageDigest.getInstance("SHA1");
 		md.update(blob);
 		toReturn = md.digest();
