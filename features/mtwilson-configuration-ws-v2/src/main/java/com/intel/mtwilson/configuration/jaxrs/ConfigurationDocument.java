@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.intel.dcsg.cpg.configuration.Configuration;
 import com.intel.mtwilson.jaxrs2.Document;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Properties;
 
 /**
  *
@@ -35,6 +37,22 @@ public class ConfigurationDocument extends Document {
     public void copyFrom(Configuration source) {
         if( settings == null ) { settings = new ArrayList<>(); }
         for (String key : source.keys()) {
+            String value = source.get(key);
+            this.settings.add(new Setting(key, value));
+        }
+    }
+
+    public void copyFrom(Properties source) {
+        if( settings == null ) { settings = new ArrayList<>(); }
+        for (String key : source.stringPropertyNames()) {
+            String value = source.getProperty(key);
+            this.settings.add(new Setting(key, value));
+        }
+    }
+
+    public void copyFrom(HashMap<String,String> source) {
+        if( settings == null ) { settings = new ArrayList<>(); }
+        for (String key : source.keySet()) {
             String value = source.get(key);
             this.settings.add(new Setting(key, value));
         }
