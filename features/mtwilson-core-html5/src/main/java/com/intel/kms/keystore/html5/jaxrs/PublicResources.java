@@ -27,7 +27,7 @@ import org.apache.commons.io.IOUtils;
  * publicResources/*
  * com/example/*.class
  * </pre>
- * 
+ *
  * Example Maven project structure:
  * <pre>
  * src/main/resources/publicResources
@@ -35,7 +35,7 @@ import org.apache.commons.io.IOUtils;
  *
  * A limitation of this API is discovery or directory listing is not possible,
  * so the caller must know the file path under publicResources in advance.
- * 
+ *
  * To serve files from the filesystem, use the default servlet that comes with
  * Jetty or any other web server.
  *
@@ -70,12 +70,12 @@ public class PublicResources {
 
         String relativePath = request.getPathInfo().replaceFirst("^/resources", "");
         log.debug("Relative path: {}", relativePath);
-        
-        InputStream in = getClass().getResourceAsStream(resourcePath + relativePath); // no path separator because getPathInfo() always has leading slash
-        if (in == null) {
-            throw new WebApplicationException(Status.NOT_FOUND); // resp.setStatus(Response.Status.NOT_FOUND.getStatusCode());
-        }
-        try {
+
+        // no path separator because getPathInfo() always has leading slash
+        try (InputStream in = getClass().getResourceAsStream(resourcePath + relativePath)) {
+            if (in == null) {
+                throw new WebApplicationException(Status.NOT_FOUND); // resp.setStatus(Response.Status.NOT_FOUND.getStatusCode());
+            }
             return IOUtils.toByteArray(in);
         } catch (IOException e) {
             log.error("Cannot retrieve file", e);
