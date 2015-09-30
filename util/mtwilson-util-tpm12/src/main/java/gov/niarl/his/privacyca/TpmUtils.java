@@ -796,7 +796,7 @@ public class TpmUtils {
 	 */
 	public static byte [] createRandomBytes(int numBytes) 
 			throws IOException {
-		Random random = new Random(System.nanoTime());
+		SecureRandom random = new SecureRandom(BigInteger.valueOf(System.nanoTime()).toByteArray()); // previously was new Random(System.nanoTime())
 		//byte [] randomBytes = longToByteArray(random.nextLong());
 		byte [] randomBytes = new byte[numBytes];
 		random.nextBytes(randomBytes);
