@@ -4,6 +4,7 @@
  */
 package com.intel.mtwilson.xml;
 
+import java.io.IOException;
 import java.io.InputStream;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -68,5 +69,37 @@ public class ClasspathResolverTest {
     private String toAbsolutePath(String packageName) {
         return "/"+toPath(packageName);
     }
+    
+    public static class InputStreamHolder {
+        private InputStream inputStream;
+
+        public InputStream getInputStream() {
+            return inputStream;
+        }
+
+        public void setInputStream(InputStream inputStream) {
+            this.inputStream = inputStream;
+        }
+        
+    }
+    
+    @Test
+    public void testCloseTwice() throws IOException {
+        ClasspathResourceResolver resolver = new ClasspathResourceResolver();
+        resolver.setResourcePackage("xsd");
+        InputStreamHolder[] streams = new InputStreamHolder[2];
+        streams[0] = new InputStreamHolder();
+        streams[0].setInputStream(resolver.findResource("XMLSchema.xsd"));
+        streams[1] = new InputStreamHolder();
+        streams[1].setInputStream(resolver.findResource("http://example.com"));
+        for(int i=0; i<streams.length; i++) {
+            InputStream in = streams[i].getInputStream();
+            if( in != null ) { log.debug("Closing inputstream (1)"); in.close(); }
+        }
+        for(int i=0; i<streams.length; i++) {
+            InputStream in = streams[i].getInputStream();
+            if( in != null ) { log.debug("Closing inputstream (2)"); in.close(); }
+        }
+    }    
     
 }
