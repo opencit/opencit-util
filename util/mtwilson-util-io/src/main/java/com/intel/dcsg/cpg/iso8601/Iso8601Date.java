@@ -138,69 +138,6 @@ public class Iso8601Date extends Date {
     }
     
     /**
-     * It is an error to pass an empty string or null value to this method.
-     * 
-     * @param text
-     * @return 
-     * @deprecated
-     */
-    private static Date parseTextDeprecated(String text) {
-        Date date = null;
-        for(SimpleDateFormat f : iso8601DateTimeInputs) {
-            try {
-                date = f.parse(text);
-                log.debug("Matched ISO 8601 datetime input: {}", f.toPattern());
-                return date;
-            }
-            catch(ParseException e) {
-                log.trace("Failed to parse date input {} using pattern {}", text, f.toPattern()); // ignore errors because we can try the next format
-            }
-        }
-        // next try the other date-time formats 
-        Matcher timezoneMatcher = pTimezone.matcher(text);
-        // if no timezone specified, assume server local timezone
-        if( !timezoneMatcher.matches() ) {
-            long offsetMs = Calendar.getInstance().getTimeZone().getRawOffset();
-            long hours = TimeUnit.MILLISECONDS.toHours(offsetMs);
-            long minutes = TimeUnit.MILLISECONDS.toMinutes(offsetMs) - TimeUnit.HOURS.toMinutes(hours);
-            text = text.concat(String.format("%+03d%02d", hours, minutes));
-        }
-        else {
-            Matcher timezoneWithColonMatcher = pTimezoneWithColon.matcher(text);
-            if( timezoneWithColonMatcher.matches() ) {
-                int start = timezoneWithColonMatcher.start(1);
-                text = text.substring(0, start)+text.substring(start).replace(":", "");
-            }
-        }
-        Matcher timezoneWithZMatcher = pTimezoneWithZ.matcher(text);
-        if( timezoneWithZMatcher.matches() ) {
-            int start = timezoneWithZMatcher.start(1);
-            text = text.substring(0, start)+"-0000";
-        }
-        for(SimpleDateFormat f : iso8601DateTimeInputs) {
-            try {
-                Date datetime = f.parse(text);
-                return datetime;
-            }
-            catch(ParseException e) {
-                log.trace("Failed to parse date input {} using pattern {}", text, f.toPattern()); // ignore errors because we can try the next format
-            }
-        }
-        // finally check date-only formats because they don't need a timezone
-        for(SimpleDateFormat f : iso8601DateInputs) {
-            try {
-                date = f.parse(text);
-                log.debug("Matched ISO 8601 date input: {}", f.toPattern());
-                return date;
-            }
-            catch(ParseException e) {
-                log.trace("Failed to parse date input {} using pattern {}", text, f.toPattern()); // ignore errors because we can try the next format
-            }
-        }
-        throw new IllegalArgumentException("Date is not in recognized ISO8601 format: "+text);        
-    }
-    
-    /**
      * @since 0.1.2
      * @param text if null or empty string a null value will be returned
      * @return a new instance of Iso8601Date
