@@ -196,6 +196,9 @@ public class TpmUtils {
 		}
 		byte[] retval = new byte[size];
 		int k = source.read(retval, 0, size);
+        if( k != size ) {
+			throw new TpmBytestreamResouceException(String.format("Failed to read %d bytes from stream", size));
+        }
 		return retval;
 	}
 	/**
