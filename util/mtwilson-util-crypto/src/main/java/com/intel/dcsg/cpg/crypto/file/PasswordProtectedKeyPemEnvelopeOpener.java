@@ -33,10 +33,10 @@ import org.slf4j.LoggerFactory;
  * @author jbuhacoff
  */
 public class PasswordProtectedKeyPemEnvelopeOpener {
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private static final Logger log = LoggerFactory.getLogger(PasswordProtectedKeyPemEnvelopeOpener.class);
     private String password;    
     private SecretKeyFactory secretKeyFactory;
-    private String algorithm;
+//    private String algorithm;
     
     /**
      * 
@@ -101,6 +101,10 @@ public class PasswordProtectedKeyPemEnvelopeOpener {
     public static boolean isCompatible(Pem pem) {
         if( pem.getBanner().equals("SECRET KEY") || pem.getBanner().equals("ENCRYPTED SECRET KEY") || pem.getBanner().equals("ENCRYPTED KEY") ) {
             PemKeyEncryption envelope = PemKeyEncryptionUtil.getEnvelope(pem);
+            if( envelope == null ) {
+                log.debug("PEM does not match known envelope formats");
+                return false;
+            }
             if( envelope.getEncryptionAlgorithm().startsWith("PBEWith") || envelope.getEncryptionAlgorithm().startsWith("PBKDF2With") ) {
                 return true;
             }
