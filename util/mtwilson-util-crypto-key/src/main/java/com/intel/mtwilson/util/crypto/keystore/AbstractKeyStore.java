@@ -71,6 +71,9 @@ public abstract class AbstractKeyStore implements Closeable {
         if( keystoreFile != null ) {
             keystoreResource = new FileResource(keystoreFile); // getInputStream() returns null input stream if file not found 
         }
+        if( keystoreResource == null ) {
+            throw new IllegalArgumentException("Keystore resource not specified");
+        }
         try(InputStream in = keystoreResource.getInputStream()) {
             keystore.load(in, keystorePassword); // input stream will be null when file is not found or if it's an empty ByteArrayResource
         } catch (GeneralSecurityException e) {
