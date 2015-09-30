@@ -133,9 +133,11 @@ public class StartHttpServer implements Runnable {
      * @param pathPlatformSlashes
      * @return
      */
+    /*
     private String jarpath(String pathPlatformSlashes) {
         return pathPlatformSlashes.replace(File.separator, "/");
     }
+    */
 
     /**
      * PROTOTYPE IMPLEMENTATION: Assumes an "html5" feature containing static
