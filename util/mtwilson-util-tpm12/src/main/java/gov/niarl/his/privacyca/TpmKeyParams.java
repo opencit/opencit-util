@@ -55,7 +55,7 @@ public class TpmKeyParams {
 	 * @return
 	 */
 	public static String algToString(int alg) {
-		String returnVal = "";
+		String returnVal;
 		switch (alg) {
 		case TPM_ALG_RSA:
 			returnVal = "TPM_ALG_RSA";
