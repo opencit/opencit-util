@@ -464,7 +464,7 @@ public class TpmUtils {
 	 * @return The Big Integer with the value of the byte array.
 	 */
 	private static BigInteger byteArrayToBigInt(byte[] incoming) {
-		byte [] tempArray = null;
+		byte [] tempArray;
 		if ((incoming[0]&0x80) == 0x80) {
 			tempArray = new byte[incoming.length + 1];
 			tempArray[0] = (byte)0x00;
