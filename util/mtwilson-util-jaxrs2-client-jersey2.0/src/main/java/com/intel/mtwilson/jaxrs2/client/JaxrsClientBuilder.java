@@ -116,7 +116,7 @@ public class JaxrsClientBuilder {
         SimpleKeystore keystore = null;
         String keystorePath = configuration.get("mtwilson.api.keystore", null);
         String keystorePassword = configuration.get("mtwilson.api.keystore.password", null); 
-        if ( keystore != null && keystorePassword != null) {
+        if ( keystorePath != null && keystorePassword != null) {
             FileResource resource = new FileResource(new File(keystorePath));
             keystore = new SimpleKeystore(resource, keystorePassword);
         }
