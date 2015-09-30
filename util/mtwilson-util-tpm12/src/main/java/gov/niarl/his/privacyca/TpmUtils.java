@@ -821,14 +821,13 @@ public class TpmUtils {
 	 * @return The String of the encoded array.
 	 */
 	public static String base64encode(byte [] toEncode, boolean breakLines) {
-		StringBuffer sb =new StringBuffer();
+		StringBuilder sb =new StringBuilder();
 		char[] charArray = new String(Base64.encode(toEncode)).toCharArray();
-		String toReturn = "";
 		for (int i = 0; i < charArray.length; i++){
-			if(breakLines){if((i%64 == 0)) toReturn = sb.append("\n").toString(); }
-			toReturn = sb.append(charArray[i]).toString();
+			if(breakLines){if((i%64 == 0)) sb.append("\n"); }
+			sb.append(charArray[i]);
 		}
-		return toReturn;
+		return sb.toString();
 	}
 	public static byte[] base64decode(String encoded){
 		return Base64.decode(encoded);
