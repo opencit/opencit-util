@@ -215,6 +215,7 @@ public class CertifyKey {
      * @param isBindingKey
      * @throws Exception 
      */
+    /*
     @Deprecated
     private static void validateCertifyKeyData(byte[] tcgCertificate, boolean isBindingKey) 
             throws Exception {
@@ -270,4 +271,5 @@ public class CertifyKey {
         }
         
     }
+    */
 }
