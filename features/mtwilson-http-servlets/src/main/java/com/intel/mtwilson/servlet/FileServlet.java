@@ -7,6 +7,7 @@ package com.intel.mtwilson.servlet;
 //import com.intel.mtwilson.My;
 import com.intel.mtwilson.configuration.ConfigurationFactory;
 import com.intel.dcsg.cpg.configuration.Configuration;
+import com.intel.dcsg.cpg.validation.ValidationUtil;
 import java.io.*;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +21,8 @@ import org.apache.commons.io.IOUtils;
  */
 public class FileServlet extends HttpServlet {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FileServlet.class);
-    
+    public static final String ALLOWED_PATH = "(?:[a-zA-Z0-9_/.]+)"; // just a character set right now, but should be expanded to include structure to exclude .. so we can eliminate the separate check for .. below
+    public static final String ALLOWED_QUERY = "(?:[a-zA-Z0-9_/?#%.]+)"; // just a character set right now, but should be expanded to include structure to exclude .. so we can eliminate the separate check for .. below
     private String directory = null;
     private String prefixTarget = null;
 	private Configuration configuration = null;
@@ -53,6 +55,18 @@ public void doGet(HttpServletRequest request, HttpServletResponse response)
     String path = request.getPathInfo();
     if (path == null) { path = ""; }
     
+    // look for .. early and just return file not found if the pattern is found;  we simply don't support relative paths here to avoid a security vulnerability
+    if( path.contains("..") ) {
+        log.debug("Rejecting path with relative component: {}", path);
+        response.setStatus(400);
+        return;
+    }
+    if( !ValidationUtil.isValidWithRegex(path, ALLOWED_PATH)) {
+        log.debug("Rejecting invalid path: {}", path);
+        response.setStatus(400);
+        return;
+    }
+    
     File file = new File(directory, path);
     
     // prevent client from using .. to get out of our content folder and to arbitrary files
@@ -70,6 +84,11 @@ public void doGet(HttpServletRequest request, HttpServletResponse response)
             response.setStatus(400);
             return;
         }
+    if( !ValidationUtil.isValidWithRegex(path, ALLOWED_QUERY)) {
+        log.debug("Rejecting invalid query string: {}", queryString);
+        response.setStatus(400);
+        return;
+    }
         response.sendRedirect(request.getRequestURI() + "/" + queryString);
         return;
     }
