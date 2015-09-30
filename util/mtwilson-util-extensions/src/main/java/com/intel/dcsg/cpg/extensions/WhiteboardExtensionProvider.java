@@ -283,7 +283,7 @@ public class WhiteboardExtensionProvider implements ExtensionProvider {
         return createFirst(returnType, serviceImplementations, context);
     }
 
-    
+    /*
     @Deprecated
     private static <T,C> T find(Class<T> returnType, Class<?> serviceInterface, C context) {
         String serviceName = serviceInterface.getName();
@@ -301,6 +301,8 @@ public class WhiteboardExtensionProvider implements ExtensionProvider {
         log.debug("There are {} preferences for service {}", preferenceOrder.size(), serviceName);
         return createPreferred(returnType, serviceImplementations, preferenceOrder, context);
     }
+    */
+    
     @Deprecated
     private static <T, C> List<T> findAll(Class<T> returnType, Class<?> serviceInterface, C context) {
         String serviceName = serviceInterface.getName();
