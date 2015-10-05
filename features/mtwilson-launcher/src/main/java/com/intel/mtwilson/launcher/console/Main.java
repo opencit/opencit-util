@@ -87,10 +87,11 @@ public class Main {
      */
     private static Configuration loadApplicationProperties() {
         Configuration defaults = getApplicationDefaultProperties();
-        try (InputStream in = Main.class.getResourceAsStream(APPLICATION_PROPERTIES)) {
-            if (in == null) {
-                return new ReadonlyConfiguration(defaults);
-            }
+        InputStream in = Main.class.getResourceAsStream(APPLICATION_PROPERTIES);
+        if (in == null) {
+            return new ReadonlyConfiguration(defaults);
+        }
+        try {
             Properties properties = new Properties();
             properties.load(in);
             return new ReadonlyConfiguration(new LayeredConfiguration(new PropertiesConfiguration(properties), defaults));
