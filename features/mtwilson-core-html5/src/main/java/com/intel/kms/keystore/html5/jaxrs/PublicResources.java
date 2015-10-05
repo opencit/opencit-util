@@ -77,12 +77,13 @@ public class PublicResources {
             throw new WebApplicationException(Status.NOT_FOUND); // resp.setStatus(Response.Status.NOT_FOUND.getStatusCode());
         }
         try {
-            byte[] content = IOUtils.toByteArray(in);
-            in.close();
-            return content;
+            return IOUtils.toByteArray(in);
         } catch (IOException e) {
             log.error("Cannot retrieve file", e);
             throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+        }
+        finally {
+            try { in.close(); } catch(IOException e) { log.warn("Failed to close InputStream", e); }
         }
     }
 }

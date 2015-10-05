@@ -204,6 +204,7 @@ public class WhiteboardExtensionProvider implements ExtensionProvider {
     }
     */
     
+    /*
     @Deprecated
     private static <T,C> T createFirst(Class<T> returnType, List<Class<?>> serviceImplementations, C context) {
         for(Class<?> item : serviceImplementations) {
@@ -214,6 +215,7 @@ public class WhiteboardExtensionProvider implements ExtensionProvider {
         }
         return null;
     }
+    */
     
     /*
     private static <T> List<T> createAll(Class<T> serviceInterface, List<Class<?>> serviceImplementations) {
