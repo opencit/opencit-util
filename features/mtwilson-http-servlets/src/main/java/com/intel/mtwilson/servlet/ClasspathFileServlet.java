@@ -16,6 +16,7 @@ import org.apache.commons.io.IOUtils;
  * @author jbuhacoff
  */
 public class ClasspathFileServlet extends HttpServlet {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ClasspathFileServlet.class);
 
     /**
      * No trailing slash because getPathInfo() always has a leading slash so
@@ -47,7 +48,7 @@ public class ClasspathFileServlet extends HttpServlet {
                 OutputStream out = resp.getOutputStream();
                 IOUtils.copy(in, out);
             } finally {
-                in.close();
+                try { in.close(); } catch (IOException e) { log.warn("Failed to close InputStream", e); }
             }
         }
     }
