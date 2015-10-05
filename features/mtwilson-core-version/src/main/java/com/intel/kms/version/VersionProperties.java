@@ -18,16 +18,18 @@ public class VersionProperties {
     public static final String VERSION_PROPERTIES_PATH = "/com/intel/mtwilson/version.properties";
 
     public static Properties getVersionProperties() throws IOException {
-        try (InputStream in = VersionProperties.class.getResourceAsStream(VERSION_PROPERTIES_PATH)) {
+        InputStream in = VersionProperties.class.getResourceAsStream(VERSION_PROPERTIES_PATH);        
+        if (in == null) {
+            log.debug("Version properties not found in classpath: {}", VERSION_PROPERTIES_PATH);
+            return  new Properties();
+        }
+        try {
             Properties versionProperties = new Properties();
-            if (in == null) {
-                log.debug("Version properties not found in classpath: {}", VERSION_PROPERTIES_PATH);
-                return versionProperties;
-            }
-            else {
-                versionProperties.load(in);
-                return versionProperties;
-            }
+            versionProperties.load(in);
+            return versionProperties;
+        }
+        finally {
+            in.close();
         }
     }
 }

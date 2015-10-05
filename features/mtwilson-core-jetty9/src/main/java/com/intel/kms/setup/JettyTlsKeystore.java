@@ -123,7 +123,9 @@ public class JettyTlsKeystore extends AbstractSetupTask {
         RsaCredentialX509 credential;
         try {
             credential = keystore.getRsaCredentialX509(TLS_ALIAS, keystorePassword);
-            log.debug("Found TLS key {}", credential.getCertificate().getSubjectX500Principal().getName());
+            if( credential != null ) {
+                log.debug("Found TLS key {}", credential.getCertificate().getSubjectX500Principal().getName());
+            }
         } catch (FileNotFoundException e) {
             log.warn("Keystore does not contain the specified key [{}]", TLS_ALIAS, e);
             validation("Keystore does not contain the specified key %s", TLS_ALIAS);
@@ -132,10 +134,12 @@ public class JettyTlsKeystore extends AbstractSetupTask {
             log.debug("Incorrect password for existing key; will create new key: {}", e.getMessage());
             validation("Key must be recreated");
         }
+        /*
         catch(NullPointerException e) {
             log.debug("Invalid TLS certificate", e);
             validation("Certificate must be recreated");
         }
+        */
     }
 
     @Override
