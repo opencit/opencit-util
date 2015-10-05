@@ -84,7 +84,7 @@ public void doGet(HttpServletRequest request, HttpServletResponse response)
             response.setStatus(400);
             return;
         }
-    if( !ValidationUtil.isValidWithRegex(path, ALLOWED_QUERY)) {
+    if( !ValidationUtil.isValidWithRegex(queryString, ALLOWED_QUERY)) {
         log.debug("Rejecting invalid query string: {}", queryString);
         response.setStatus(400);
         return;
