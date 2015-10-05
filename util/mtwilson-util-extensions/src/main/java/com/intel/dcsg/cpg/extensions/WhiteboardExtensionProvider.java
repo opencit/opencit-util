@@ -263,7 +263,7 @@ public class WhiteboardExtensionProvider implements ExtensionProvider {
     }
 
     
-    
+    /*
     @Deprecated
     private static <T,C> T createPreferred(Class<T> returnType, List<Class<?>> serviceImplementations, List<String> preferenceOrder, C context) {
         for(String preference : preferenceOrder) {
@@ -282,6 +282,7 @@ public class WhiteboardExtensionProvider implements ExtensionProvider {
         // did not find one matching the preference ;so pick any one
         return createFirst(returnType, serviceImplementations, context);
     }
+    */
 
     /*
     @Deprecated
