@@ -19,7 +19,7 @@ public class JunitWebapp {
     private static Server server;
     
     @BeforeClass
-    public static void start() throws Exception {
+    public static void start() throws JettyStartException {
         server = new Server(8080);
         server.setStopAtShutdown(true);
         WebAppContext webAppContext = new WebAppContext();
@@ -36,7 +36,7 @@ public class JunitWebapp {
     }
     
     @AfterClass
-    public static void stop() throws Exception {
+    public static void stop() throws JettyStopException {
         try {
         server.stop();
         }
