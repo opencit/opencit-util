@@ -38,13 +38,16 @@ public class ClasspathFileServlet extends HttpServlet {
         System.out.println("ServerName: " + req.getServerName()); // ServerName: 127.0.0.1
 
         // no path separator because getPathInfo() always has leading slash
-        try (InputStream in = getClass().getResourceAsStream(relativePath + req.getPathInfo())) {
-            if (in == null) {
-                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            } else {
+        InputStream in = getClass().getResourceAsStream(relativePath + req.getPathInfo());
+        if (in == null) {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        } else {
+            try {
                 resp.setStatus(HttpServletResponse.SC_OK);
                 OutputStream out = resp.getOutputStream();
                 IOUtils.copy(in, out);
+            } finally {
+                in.close();
             }
         }
     }
