@@ -126,6 +126,7 @@ public class Directory {
                 String directoryRelativePathUri = directoryRelativePath.replace(File.separator, "/");
 
                 File[] files = file.listFiles();
+                if( files != null ) {
                 for (File directoryFile : files) {
                     DirectoryEntry entry = new DirectoryEntry();
                     entry.name = directoryFile.getName();
@@ -144,7 +145,7 @@ public class Directory {
                         listing.faults.add(new FileAttributeReadFault(fileRelativePath));
                     }
                 }
-
+                }
             } else if (file.isFile()) {
                 String fileRelativePath = file.getAbsolutePath().replace(featureHtml5Path, "").replace(File.separator, "/");
                 String parentRelativePath = file.getParentFile().getAbsolutePath();
