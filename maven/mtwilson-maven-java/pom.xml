@@ -42,14 +42,14 @@
             <dependency>
                 <groupId>com.intel.mtwilson.maven</groupId>
                 <artifactId>mtwilson-maven-bom-coreutil</artifactId>
-                <version>${project.version}</version>
+                <version>${mtwilson.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.intel.mtwilson.maven</groupId>
                 <artifactId>mtwilson-maven-bom-external</artifactId>
-                <version>${project.version}</version>
+                <version>${mtwilson.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
