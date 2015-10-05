@@ -48,11 +48,7 @@ public class ClasspathFileServlet extends HttpServlet {
                 OutputStream out = resp.getOutputStream();
                 IOUtils.copy(in, out);
             } finally {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    log.warn("Failed to close InputStream", e);
-                }
+                try { in.close(); } catch (IOException e) { log.warn("Failed to close InputStream", e); }
             }
         }
     }
