@@ -72,11 +72,14 @@ public class PublicResources {
         log.debug("Relative path: {}", relativePath);
 
         // no path separator because getPathInfo() always has leading slash
-        try (InputStream in = getClass().getResourceAsStream(resourcePath + relativePath)) {
-            if (in == null) {
-                throw new WebApplicationException(Status.NOT_FOUND); // resp.setStatus(Response.Status.NOT_FOUND.getStatusCode());
-            }
-            return IOUtils.toByteArray(in);
+        InputStream in = getClass().getResourceAsStream(resourcePath + relativePath);
+        if (in == null) {
+            throw new WebApplicationException(Status.NOT_FOUND); // resp.setStatus(Response.Status.NOT_FOUND.getStatusCode());
+        }
+        try {
+            byte[] content = IOUtils.toByteArray(in);
+            in.close();
+            return content;
         } catch (IOException e) {
             log.error("Cannot retrieve file", e);
             throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
