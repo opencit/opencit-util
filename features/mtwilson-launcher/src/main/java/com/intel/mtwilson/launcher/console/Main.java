@@ -10,6 +10,7 @@ import com.intel.dcsg.cpg.configuration.Configuration;
 import com.intel.dcsg.cpg.configuration.PropertiesConfiguration;
 import com.intel.dcsg.cpg.configuration.ReadonlyConfiguration;
 import com.intel.mtwilson.Folders;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.LogManager;
@@ -98,6 +99,8 @@ public class Main {
         } catch (Exception e) {
             log.error("Cannot load application.properties", e);
             return defaults;
+        } finally {
+            try { in.close(); } catch(IOException e) { log.warn("Failed to close InputStream", e); }
         }
     }
 
