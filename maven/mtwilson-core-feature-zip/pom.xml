@@ -198,5 +198,13 @@
         </pluginManagement>
     </build>
 
+    <dependencies>
+        <!-- the shiro aspectj library referenced in aspectj plugin above -->
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-aspectj</artifactId>
+            <version>1.2.4</version>
+        </dependency>
+    </dependencies>
 	
 </project>

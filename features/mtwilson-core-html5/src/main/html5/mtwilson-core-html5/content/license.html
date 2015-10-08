@@ -70,7 +70,7 @@ var licenseViewModel = {
 };
 
 
-            resourceLoader.loadJS(['js/knockout.js', 'js/jquery.js'], function() { 
+            resourceLoader.loadJS(['js/knockout.js' /*, 'js/jquery.js'*/], function() { 
                 ko.applyBindings(licenseViewModel, document.getElementById("license"));
             });
             

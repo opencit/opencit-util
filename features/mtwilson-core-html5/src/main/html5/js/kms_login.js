@@ -1,18 +1,3 @@
-// TODO: move this into a separate javascript file, and then into an API that
-//       we can call so the server will tell us about installed plugins
-var KMS_PAGES = [
-    { "href": "navbar.html", "target": "#navbar" },
-    { "href": "dashboard.html", "target": "#main", "target_tab": "dashboard" },  // TODO:  target_tab should be calculated automatically or generated and synchronized with the links ... the links should be generated from this list too...
-    { "href": "settings.html", "target": "#main", "target_tab": "settings" },
-    { "href": "help.html", "target": "#main", "target_tab": "help" },
-    { "href": "logout.html", "target": "#main", "target_tab": "logout" },
-    { "href": "license.html", "target": "#main", "target_tab": "license" },
-    { "href": "/v1/resources/profile.html", "target": "#main", "target_tab": "my_profile" },
-    { "href": "/v1/resources/users.html", "target": "#main", "target_tab": "users" },
-    { "href": "/v1/resources/saml_certificates.html", "target": "#main", "target_tab": "saml_certificates" },
-    { "href": "/v1/resources/tpm_identity_certificates.html", "target": "#main", "target_tab": "tpm_identity_certificates" }
-];
-
 function UserProfile(data) {
     this.username = ko.observable(data.username);
     this.authorizationToken = ko.observable(data.authorizationToken);
@@ -77,70 +62,13 @@ function LoginViewModel() {
                 
                 // load the navbar and the dashboard, and activate the post-login primary view
                 
-                var nextView = self.options.postLoginActivatePage; // "dashboard.html";
+//                var nextView = self.options.postLoginActivatePage; // "dashboard.html";
                 
                 $(document).trigger({
                     type: "mtwilson-core-html5:login:success",
                     message: {"username": self.userProfile.username() },
                     time: new Date()
                 });
-                /*
-                $(document).trigger({
-                    type: "customevent123",
-                    message: "foobar",
-                    time: new Date()
-                });
-                */
-/*                
-                for(var i=0; i<KMS_PAGES.length; i++) {
-                    var viewDescriptor = KMS_PAGES[i]; // { href: ...,  target: "#main",  target_tab: "some-id" }
-                    console.log("post login loading page: %O", viewDescriptor);
-                    var loadOptions = { into: viewDescriptor.target, tab: null, activate: null };
-                    if( viewDescriptor.target_tab ) {
-                        loadOptions.tab = viewDescriptor.target_tab;
-                    }
-                    loadOptions.activate = (nextView === viewDescriptor.href); // automatically activate the page specifeid by the "postLoginActivatePage" option
-                    resourceLoader.loadHTML( viewDescriptor.href , loadOptions );
-                }
-*/                
-/*
-                resourceLoader.loadHTML("navbar.html",
-                        {into: "#navbar"
-                }
-                        
-                        );
-                        
-                resourceLoader.loadHTML("dashboard.html",
-                        {into: "#main",
-                            tab: "dashboard",
-                            activate: true // means switch to this tab as soon as its loaded; same as providing callback: function() { mainViewModel.tab("#login", "#main"); }
-                        });
-                        
-                resourceLoader.loadHTML("settings.html",
-                        {into: "#main",
-                            tab: "settings",
-                            activate: false // don't switch to it right away; load it in background
-                        });
-                resourceLoader.loadHTML("help.html",
-                        {into: "#main",
-                            tab: "help",
-                            activate: false // don't switch to it right away; load it in background
-                        });
-                resourceLoader.loadHTML("profile.html",
-                        {into: "#main",
-                            tab: "my_profile",
-                            activate: false // don't switch to it right away; load it in background
-                        });
-                resourceLoader.loadHTML("logout.html",
-                        {into: "#main",
-                            tab: "logout",
-                            activate: false // don't switch to it right away; load it in background
-                        });
-                resourceLoader.loadHTML("license.html",
-                        {into: "#main",
-                            tab: "license",
-                            activate: false // don't switch to it right away; load it in background
-                        }); */
                         
             },
             error: function(xhr, status, errorMessage) {

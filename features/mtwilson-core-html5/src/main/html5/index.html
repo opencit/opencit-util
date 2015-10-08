@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="author" content="jbuhacoff">
         <meta name="description" content="User interface to the trust-enabled key server">
-        <title>Intel&reg; Cloud Integrity Technology</title>
+        <title data-i18n="nav.browser_window_title">Intel&reg; Cloud Integrity Technology</title>
         <link rel="stylesheet" href="css/bootstrap.css" type="text/css">
         <link rel="stylesheet" href="css/dashboard.css" type="text/css">
         <link rel="stylesheet" href="css/intel.css" type="text/css">
@@ -28,8 +28,8 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-					<div class="navbar-brand-image"><img src="images/intel-logo-white-transparent-84x60.png"></img></div>
-                    <a class="navbar-brand" href="#"><span title="Intel and the Intel logo are trademarks of Intel Corporation in the U.S. and/or other countries."><!--Intel&reg; -->Cloud Integrity Technology</span></a>
+					<div class="navbar-brand-image"><img src="images/intel-logo-white-transparent-84x60.png" alt="Intel"/></div>
+                    <a class="navbar-brand" href="#"><span title="Intel and the Intel logo are trademarks of Intel Corporation in the U.S. and/or other countries." data-i18n="nav.title"><!--Intel&reg; -->Cloud Integrity Technology</span></a>
 <!--
                     <a class="navbar-brand" href="#">Key Server - <span title="Intel and the Intel logo are trademarks of Intel Corporation in the U.S. and/or other countries.">Intel&reg; Cloud Integrity Technology</span></a>
 -->
@@ -86,6 +86,9 @@
         <script src="js/jquery.serializeObject.js"></script>
         <!-- bootstrap -->
         <script src="js/bootstrap.min.js"></script>
+        <!-- i18next -->
+        <script src="js/i18next-1.10.1.min.js"></script>
+        <script src="js/i18n_util.js"></script>
         <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
         <script src="js/ie10-viewport-bug-workaround.js"></script>
 
@@ -123,6 +126,7 @@
 
             var resourceLoader = new ResourceLoader();
             var discovery = new FeatureDiscovery();
+            var localizer = new Localizer();
 
             $(document).ready(function() {
                 //$("#login_content").hide();
@@ -147,6 +151,10 @@
                 // navigation view model defined in kms_nav.js
                 mainViewModel.navigationViewModel = new NavigationViewModel();
                 ko.applyBindings(mainViewModel, document.getElementById("navbar"));
+
+
+                localizer.init();
+
 
                 // define the successful login handlers, which load the html pages and navbar buttons
                 $(document).on("mtwilson-core-html5:login:success.mtwilson-core-html5:navbar", function(e) {
@@ -207,8 +215,6 @@
                         console.log("onready called after extension: %O with context: %O", callback_args, context );
                     });
                 });
-                
-
 
                 
             });
