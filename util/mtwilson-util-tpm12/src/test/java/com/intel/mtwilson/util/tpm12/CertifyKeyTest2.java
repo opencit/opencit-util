@@ -5,6 +5,7 @@
 package com.intel.mtwilson.util.tpm12;
 
 import com.intel.dcsg.cpg.x509.X509Util;
+import gov.niarl.his.privacyca.TpmUtils;
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -43,5 +44,13 @@ public class CertifyKeyTest2 {
        log.debug("Signature extension in certificate is {} byte", signature.length);
        boolean verified = CertifyKey.verifyTpmBindingKeyCertificate(bindingKey, aik.getPublicKey());
        log.debug("Verified? {}", verified);
+    }
+    
+    @Test
+    public void testBase64Encode() {
+        byte[] data = new byte[256];
+        for(int i=0; i<256; i++) { data[i] = (byte)i; }
+        log.debug("base64 without breaklines: {}", TpmUtils.base64encode(data, false));
+        log.debug("base64 with breaklines: {}", TpmUtils.base64encode(data, true));
     }
 }

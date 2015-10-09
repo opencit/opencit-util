@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>License</title>
+        <meta name="author" content="jbuhacoff">
+    </head>
+    <body>
+
+            <div class="row">
+                <div class="col-md-2"></div>
+        <div class="col-md-8" style="margin-top: 10px;">        
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h1>License</h1>
+                </div>
+                <div class="panel-body">
+                    <p>Copyright &copy; 2015 Intel Corporation. All rights reserved.</p>
+                </div>
+
+            </div>
+            
+            <div class="panel panel-default" data-bind="visible: components.length > 0">
+                <div class="panel-heading">
+                    <h1>Credits</h1>
+                </div>
+                <div class="panel-body">
+    <table class="table table-striped">
+        <caption><span data-bind="text: components.length"></span> components</caption>
+        <thead>
+            <tr><th>Work</th><th>Version</th><th>License</th></tr>
+        </thead>
+        <tbody data-bind="foreach: components">
+            <tr><td><a data-bind="text: name, attr: { href: site }"></a></td><td data-bind="text: version"></td><td data-bind="text: license"></td></tr>
+        </tbody>
+    </table>
+                </div>
+
+            </div>
+            
+                <div class="col-md-2"></div>
+        </div>
+            </div>
+    
+        <script type="text/javascript">
+            // script requires: knockout,  kms_login.js  for loginViewModel
+            // style requires: bootstrap, dashboard, intel
+            console.log("license.html script");    
+var licenseViewModel = {
+    components: [
+        { name: "bootstrap", version: "3.3.2", site: "http://getbootstrap.com/", license: "MIT" },
+        { name: "bootstrap admin template", version:"3.0", site: "http://bootstrapzero.com/bootstrap-template/admin", license: "MIT" },
+        { name: "URI.js", version: "1.11.2", site: "http://medialize.github.io/URI.js/", license: "MIT" }, /* version 1.14.1 now available */
+        { name: "base64.js", version:"2.12", site: "https://github.com/dankogai/js-base64", license: "MIT" },
+        { name: "date.js", version:"1.0-alpha1", site: "http://www.datejs.com", license: "MIT" },
+        { name: "handlebars.js", version:"1.1.2", site: "http://handlebarsjs.com/", license: "MIT" }, /* version 2.0 now available */
+        { name: "jquery", version: "1.10.2", site: "http://jquery.com/", license: "MIT" }, /* version 2.1.3 now available */
+        { name: "jquery.json", version: "2.5.1", site: "http://github.com/Krinkle/jquery-json", license: "MIT" },
+        { name: "jquery.serializeObject", version: "2.0.3", site: "https://github.com/hongymagic/jQuery.serializeObject", license: "MIT" },
+        { name: "knockout.js", version: "3.2.0", site: "http://knockoutjs.com/", license: "MIT" },
+        { name: "uuid.js", version: "1.4.2", site: "https://github.com/broofa/node-uuid", license: "MIT" },
+        { name: "html5shiv.js", version: "3.7.2", site: "#unknown", license: "MIT" },
+        { name: "require.js", version: "2.1.16", site: "http://requirejs.org", license: "MIT" },
+        { name: "respond.js", version: "1.4.2", site: "#unknown", license: "MIT" },
+        { name: "ie10-viewport-bug-workaround.js", version: "1.0", site: "http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js", license: "CC BY 3.0" }
+    ],
+    licenses: [
+        { name: "MIT", url: "http://opensource.org/licenses/MIT" },
+        { name: "CC BY 3.0", url: "http://creativecommons.org/licenses/by/3.0/" }
+    ]
+};
+
+
+            resourceLoader.loadJS(['js/knockout.js', 'js/jquery.js'], function() { 
+                ko.applyBindings(licenseViewModel, document.getElementById("license"));
+            });
+            
+        </script>
+    </body>
+</html>

@@ -12,6 +12,8 @@
 </parent>	
 	
     <modules>
+    <module>mtwilson-core-application-zip</module>
+    <module>mtwilson-core-feature-zip</module>
     <module>mtwilson-dist-java-zip</module>
 	<module>mtwilson-feature-zip</module>
     <module>mtwilson-maven-bom-coreutil</module>
@@ -19,7 +21,6 @@
     <module>mtwilson-maven-java</module>
     <!-- <module>mtwilson-maven-package</module>  only used by mtwilson-trusagent, which can just be modified to use the newer mtwilson-maven-package-java-zip-->
 	<module>mtwilson-maven-package-bin-zip</module>
-	<module>mtwilson-maven-package-java-zip</module>
 	<module>mtwilson-maven-package-makeself</module>
     </modules>
 </project>

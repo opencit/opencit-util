@@ -6,19 +6,13 @@ package com.intel.dcsg.cpg.crypto.rfc822;
 
 import com.intel.dcsg.cpg.crypto.Aes;
 import com.intel.dcsg.cpg.crypto.CryptographyException;
-import com.intel.dcsg.cpg.crypto.DigestAlgorithm;
-import com.intel.dcsg.cpg.crypto.Sha256Digest;
 import com.intel.dcsg.cpg.io.ByteArray;
 import com.intel.dcsg.cpg.rfc822.GzipEncoder;
 import com.intel.dcsg.cpg.rfc822.Message;
-import com.intel.dcsg.cpg.rfc822.MessageReader;
-import com.intel.dcsg.cpg.rfc822.MessageWriter;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import javax.crypto.SecretKey;
 import org.apache.commons.codec.binary.Base64;
 

@@ -6,8 +6,8 @@
     <packaging>pom</packaging>
 
 <parent>
-  <groupId>com.intel.mtwilson.maven</groupId>
-  <artifactId>mtwilson-maven-package-java-zip</artifactId>
+    <groupId>com.intel.mtwilson.maven</groupId>
+    <artifactId>mtwilson-core-application-zip</artifactId>
   <version>3.0-SNAPSHOT</version>
   <relativePath/>
 </parent>	

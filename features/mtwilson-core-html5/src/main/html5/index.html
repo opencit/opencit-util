@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="author" content="jbuhacoff">
+        <meta name="description" content="User interface to the trust-enabled key server">
+        <title>Intel&reg; Cloud Integrity Technology</title>
+        <link rel="stylesheet" href="css/bootstrap.css" type="text/css">
+        <link rel="stylesheet" href="css/dashboard.css" type="text/css">
+        <link rel="stylesheet" href="css/intel.css" type="text/css">
+        <link rel="wadl" href="/v1/application.wadl" type="application/xml">
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+          <script src="js/html5shiv.min.js"></script>
+          <script src="js/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+					<div class="navbar-brand-image"><img src="images/intel-logo-white-transparent-84x60.png"></img></div>
+                    <a class="navbar-brand" href="#"><span title="Intel and the Intel logo are trademarks of Intel Corporation in the U.S. and/or other countries."><!--Intel&reg; -->Cloud Integrity Technology</span></a>
+<!--
+                    <a class="navbar-brand" href="#">Key Server - <span title="Intel and the Intel logo are trademarks of Intel Corporation in the U.S. and/or other countries.">Intel&reg; Cloud Integrity Technology</span></a>
+-->
+                </div>
+                <!-- the navbar contents are loaded dynamically and inserted into this div after login -->
+                <div id="navbar">
+                    <!-- 
+                    style="display: none;" data-bind="visible: mainViewModelloginViewModel.userProfile.authenticated"
+                    -->
+                    <!--
+                    Previously was loaded as plugin with this entry in content/main.json:         { "href": "/html5/features/mtwilson-core-html5/navbar.html", "target": "#navbar" } 
+                    Now the div is here and the javascript link is included in this page  to ensure it's ready before other features are discovered.
+                    Probably something can be reworked so the navbar itself becomes an optional, discoverable feature (via init/ready.js) so that
+                    after the navbar itself loads it will then discover features that have nav bar buttons to provide. 
+                    -->
+                        <div class="navbar-collapse collapse" >
+                            <ul class="nav navbar-nav navbar-right"></ul>
+                        </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- as dynamic pages are loaded they will be inserted here with their 
+        unique ids; then it's possible to switch between loaded pages using 
+        the bootstrap tab mechanism -->
+        <div id="main" class="tab-content container-fluid center-block">
+            <div id="splashscreen" class="tab-pane active">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="splashscreen-background-image"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- polyfills -->
+        <script src="js/array_filter.js"></script>        
+        <!-- Placed at the end of the document so the pages load faster -->
+        <!-- infrastructure -->
+        <script src="js/kms_resource_loader.js"></script>
+        <script src="js/kms_discovery.js"></script>
+        <script src="js/kms_nav.js"></script>
+        <!-- <script src="js/require.js"></script>  -->
+        <!-- independent -->
+        <script src="js/uuid.js"></script>
+        <script src="js/base64.js"></script>
+        <script src="js/URI.js"></script>
+        <script src="js/date.js"></script>
+        <script src="js/knockout.js"></script>
+        <script src="js/handlebars.js"></script>
+        <!-- jquery -->
+        <script src="js/jquery.js"></script>
+        <script src="js/jquery.json.min.js"></script>
+        <script src="js/jquery.serializeObject.js"></script>
+        <!-- bootstrap -->
+        <script src="js/bootstrap.min.js"></script>
+        <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+        <script src="js/ie10-viewport-bug-workaround.js"></script>
+
+
+
+        <script type="text/javascript">
+            //console.log("Window.location: %O", window.location); // works on Chrome (displays "Location" object in log), does not work on Windows (displays "%Ohttps://10.1.68.32/v1/resources/index.html# in log)
+            console.log("Window location href %s", window.location.href);
+            console.log("Window location hash %s", window.location.hash);
+            console.log("Window location pathname %s", window.location.pathname);
+            console.log("Window location search %s", window.location.search);
+            console.log("Window location protocol %s host %s port %s", window.location.protocol, window.location.host, window.location.port);
+//            var origin = URI.parse(window.location.href);
+//            var endpoint = URI.build({protocol: origin.protocol, hostname: origin.hostname, port: origin.port, path: "/v1"}); 
+            endpoint = "/v1";
+            console.log("Endpoint: %s", endpoint);
+
+            function MainViewModel() {
+                var self = this;
+                // view models for each page get attached here individually when those pages load
+
+                // activates the specified tab (#id), with optional container name (#id)
+                self.tab = function(tabSelector, containerSelector) {
+                    if (!containerSelector) {
+                        containerSelector = "body";
+                    }
+                    // deactivate current tab in the same tab set (we don't assume it's directly under the containerSelector - it might be nested)
+                    $(containerSelector).find(tabSelector).parent("[class~='tab-content']").find("[class~='tab-pane'][class~='active']").removeClass("active");
+                    // activate new tab
+                    $(containerSelector).find(tabSelector).addClass("active");
+                };
+            }
+
+            var mainViewModel = new MainViewModel();
+
+            var resourceLoader = new ResourceLoader();
+            var discovery = new FeatureDiscovery();
+
+            $(document).ready(function() {
+                //$("#login_content").hide();
+                //$("#dashboard_content").load("dashboard.html");
+                //resourceLoader.loadHTML("dashboard.html", "#dashboard_content");
+                //$("#dashboard_content").show();
+                setTimeout(function() {
+                    resourceLoader.loadHTML("login.html",
+                            {into: "#main",
+                                tab: "login",
+                                activate: true // means switch to this tab as soon as its loaded; same as providing callback: function() { mainViewModel.tab("#login", "#main"); }
+                            });
+                }, 1000); // delay this call by 1 second for quick display of the logo splash screen while the discovery call below loads the rest of the UI
+                
+                
+                // register scripts and stylesheets already loaded as part of the page markup
+                resourceLoader.registerLoadedJS();
+                resourceLoader.registerLoadedCSS();
+
+                ko.applyBindings(mainViewModel); // not much point to this when the main model is empty... 
+
+                // navigation view model defined in kms_nav.js
+                mainViewModel.navigationViewModel = new NavigationViewModel();
+                ko.applyBindings(mainViewModel, document.getElementById("navbar"));
+
+                // define the successful login handlers, which load the html pages and navbar buttons
+                $(document).on("mtwilson-core-html5:login:success.mtwilson-core-html5:navbar", function(e) {
+                    console.log("navbar intercepted login success event: %O", e);
+
+                    // discover navbar buttons
+                    discovery.eachJSON("/mtwilson-core-html5/navbar/main.json", function(json,context) {
+                        console.log("navbar main called with json: %O", json); // looks like { items: [ { "href": url }, ... ] }
+                        console.log("navbar main called after extension: %O", context );
+                        // so here we just want to create a memory model of what the buttons should be...
+                        // when the navbar loads (see content handler) it will bind to this model
+                        // so eventually when both are loaded the buttons will appear in the nav bar
+                        for(var i=0; i<json.items.length; i++) {
+                            console.log("Loading navbar button html from: %s", endpoint+json.items[i].href);
+                            resourceLoader.loadHTML( endpoint+json.items[i].href, function(button) {
+                                console.log("navbar main loaded html button: %O", button);
+                                // button is object like {"url":url,"html":html} defined by resource loader's loadHTML method
+                                mainViewModel.navigationViewModel.items.push(new NavigationBarButton(button));
+                            });
+                        }
+                    });
+
+                });
+
+                $(document).on("mtwilson-core-html5:login:success.mtwilson-core-html5:content", function(e) {
+                    console.log("content intercepted login success event: %O", e);
+
+                    // discover main tabs;   
+                    // for now, default tab is hardcoded to "dashbaord"
+                    var defaultMainTab = "dashboard";
+                    discovery.eachJSON("/mtwilson-core-html5/content/main.json", function(json,context) {
+                        console.log("content called with json: %O", json);
+                        console.log("content called after extension: %O", context );
+                        for(var i=0; i<json.items.length; i++) {
+                            var viewDescriptor = json.items[i];
+                            // by default all pages load into #main, but can override if needed, for example navbar sets target=#navbar
+                            if( !viewDescriptor["target"] ) { viewDescriptor["target"] = "#main"; }
+                            console.log("post login loading page: %O", viewDescriptor);
+                            var loadOptions = { into: viewDescriptor.target, tab: null, activate: null };
+                            if( viewDescriptor["target_tab"] ) {
+                                loadOptions.tab = viewDescriptor.target_tab;
+                            }
+                            loadOptions.activate = (defaultMainTab === viewDescriptor.target_tab); // automatically activate the page specifeid by the "postLoginActivatePage" option
+                            resourceLoader.loadHTML( endpoint+ viewDescriptor.href , loadOptions );
+                        }
+                    });
+
+                });
+
+                $(document).on("mtwilson-core-html5:login:success.mtwilson-core-html5:init", function(e) {
+                    console.log("content intercepted login success event: %O", e);
+                    // discover features that implement "run on load" and invoke them
+                    // this is an "open interface", with no expectation on what the
+                    // features might do, in order to enable new integrations. 
+                    // also a good place for features to declare their event handlers.
+                    // this activity is restricted to AFTER successful login.
+                    discovery.eachJS("/mtwilson-core-html5/init/ready.js", function(callback_args,context) {
+                        console.log("onready called after extension: %O with context: %O", callback_args, context );
+                    });
+                });
+                
+
+
+                
+            });
+        </script>
+
+    </body>
+</html>

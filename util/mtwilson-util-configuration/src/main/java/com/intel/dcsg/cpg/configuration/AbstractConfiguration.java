@@ -52,12 +52,17 @@ public abstract class AbstractConfiguration implements Configuration {
      * @return
      * @throws Exception 
      */
-    public String get(String key, Callable<String> defaultValueCallback) throws Exception {
+    public String get(String key, Callable<String> defaultValueCallback) throws ConfigurationException {
         String value = get(key);
         if (value != null) {
             return value;
         }
-        return defaultValueCallback.call();
+        try {
+            return defaultValueCallback.call();
+        }
+        catch(Exception e) {
+            throw new ConfigurationException(key, e);
+        }
     }
     
     /**

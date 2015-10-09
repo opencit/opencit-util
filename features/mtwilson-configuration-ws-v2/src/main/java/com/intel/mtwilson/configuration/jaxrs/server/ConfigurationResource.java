@@ -51,6 +51,9 @@ public class ConfigurationResource extends AbstractJsonapiResource<Configuration
         ConfigurationDocumentCollection configurations = new ConfigurationDocumentCollection();
         Configuration configuration = retrieve("local");
         ConfigurationDocument settings = new ConfigurationDocument();
+        if( configuration != null ) {
+            settings.copyFrom(configuration.getProperties());
+        }
         configurations.getDocuments().add(settings);
         return configurations;
     }
