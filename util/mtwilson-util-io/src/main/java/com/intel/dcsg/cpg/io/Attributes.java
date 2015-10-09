@@ -105,7 +105,8 @@ public class Attributes implements Copyable {
     }
 
     public void copyFrom(Attributes source) {
-        for (String key : attributes.keySet()) {
+        if( this == source ) { return; }
+        for (String key : source.attributes.keySet()) {
             Object value = source.attributes.get(key);
             if (value instanceof Copyable) {
                 Object copy = ((Copyable)value).copy();

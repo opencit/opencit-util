@@ -34,10 +34,13 @@ public class ConfigurationDocumentRepository implements DocumentRepository<Confi
 
     @Override
     public void store(ConfigurationDocument item) {
+        throw new UnsupportedOperationException("Not supported yet.");
         // currently assuming the only configuration is "main" ; but we need to be able to do this for features too or by "id" which would be subfolder of configuration 
+        /*
         for(Setting setting : item.getSettings()) {
             
         }
+        */
     }
 
     @Override

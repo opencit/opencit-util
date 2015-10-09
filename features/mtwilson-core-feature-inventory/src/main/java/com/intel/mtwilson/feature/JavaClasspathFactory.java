@@ -46,9 +46,11 @@ public class JavaClasspathFactory {
         HashSet<File> jars = new HashSet<>();
         File featureDirectory = new File(Folders.features());
         File[] featureSubdirectories = featureDirectory.listFiles(new DirectoryFilter());
+        if( featureSubdirectories != null ) {
         for (File featureSubdirectory : featureSubdirectories) {
             File featureJavaDirectory = featureSubdirectory.toPath().resolve("java").toFile();
             jars.addAll(findDirectoryJars(featureJavaDirectory));
+        }
         }
         return jars;
     }
@@ -74,11 +76,12 @@ public class JavaClasspathFactory {
         HashSet<File> jars = new HashSet<>();
         if (directory.exists() && directory.isDirectory()) {
             File[] jarFiles = directory.listFiles(new FilenameEndsWithFilter(".jar"));
+            if( jarFiles != null ) {
             for (File jarFile : jarFiles) {
                 log.debug("Adding jar: {}", jarFile.getName());
                 jars.add(jarFile);
             }
-
+            }
         }
         return jars;
     }

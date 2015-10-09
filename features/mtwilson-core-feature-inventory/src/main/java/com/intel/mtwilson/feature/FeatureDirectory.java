@@ -57,6 +57,7 @@ public class FeatureDirectory {
         // start with a list of all the features
         File featureDirectory = new File(Folders.features());
         File[] featureSubdirectories = featureDirectory.listFiles(new DirectoryFilter());
+        if( featureSubdirectories != null ) {
         for (File featureSubdirectory : featureSubdirectories) {
             File featureXmlFile = featureSubdirectory.toPath().resolve("feature.xml").toFile();
             log.debug("feature.xml: {}", featureXmlFile.getAbsolutePath());
@@ -81,7 +82,7 @@ public class FeatureDirectory {
                 log.debug("Feature subdirectory {} does not have feature.xml", featureSubdirectory.getName());
             }
         }
-
+        }
         return results;
     }
 

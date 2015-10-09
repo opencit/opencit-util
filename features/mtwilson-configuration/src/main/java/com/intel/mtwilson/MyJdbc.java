@@ -19,7 +19,7 @@ import java.sql.SQLException;
 public class MyJdbc {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MyJdbc.class);
     private Configuration conf;
-    private MyConfiguration config;
+    private MyConfiguration config = new MyConfiguration(null);
     
     public MyJdbc(MyConfiguration config) {
         conf = new PropertiesConfiguration(config.getProperties("mtwilson.db.protocol", "mtwilson.db.driver", "mtwilson.db.host", "mtwilson.db.port", "mtwilson.db.schema", "mtwilson.db.user", "mtwilson.db.password"));

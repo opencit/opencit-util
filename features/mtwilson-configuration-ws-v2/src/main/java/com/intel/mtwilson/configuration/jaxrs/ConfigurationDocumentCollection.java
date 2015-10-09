@@ -18,7 +18,7 @@ import java.util.List;
  */
 @JacksonXmlRootElement(localName="configuration_collection")
 public class ConfigurationDocumentCollection extends DocumentCollection<ConfigurationDocument> {
-    private ArrayList<ConfigurationDocument> documents;
+    private ArrayList<ConfigurationDocument> documents = new ArrayList<>();
     
     @Override
     public List<ConfigurationDocument> getDocuments() {

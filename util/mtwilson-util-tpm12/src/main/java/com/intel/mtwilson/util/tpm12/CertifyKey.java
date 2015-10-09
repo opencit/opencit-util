@@ -215,6 +215,7 @@ public class CertifyKey {
      * @param isBindingKey
      * @throws Exception 
      */
+    /*
     @Deprecated
     private static void validateCertifyKeyData(byte[] tcgCertificate, boolean isBindingKey) 
             throws Exception {
@@ -233,10 +234,10 @@ public class CertifyKey {
             log.debug("@certifyKey@ *key flags: {}", certifiedKey.getTpmKeyFlags());
             log.debug("@certifyKey@ *auth data usage: {}", certifiedKey.getTpmAuthDataUsage());
             log.debug("@certifyKey@ *Alg params:: ");
-            log.debug("@certifyKey@ *Alg id:  {}, enc scheme: {}, sig scheme: {}; parm size: {}",
+            log.debug("@certifyKey@ *Alg id:  {}, enc scheme: {}, sig scheme: {}; sub-parms: {}",
                     certifiedKey.getKeyParms().getAlgorithmId(), certifiedKey.getKeyParms().getEncScheme(), 
                     certifiedKey.getKeyParms().getSigScheme(), 
-                    Hex.encodeHexString(certifiedKey.getKeyParms().getSubParams().toByteArray())); //TpmUtils.byteArrayToHexString(certifiedKey.getKeyParms().getSubParams().toByteArray()));      
+                    (certifiedKey.getKeyParms().getSubParams() == null ? "null" : Hex.encodeHexString(certifiedKey.getKeyParms().getSubParams().toByteArray()))); //TpmUtils.byteArrayToHexString(certifiedKey.getKeyParms().getSubParams().toByteArray()));      
             
             if ( isBindingKey && certifiedKey.getKeyParms().getEncScheme() != TPM_ES_RSAESOAEP_SHA1_MGF1) {
                 log.error("Invalid encryption scheme used. Using {} scheme instead of RSA.", certifiedKey.getKeyParms().getEncScheme());
@@ -270,4 +271,5 @@ public class CertifyKey {
         }
         
     }
+    */
 }
