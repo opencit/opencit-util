@@ -27,7 +27,7 @@
                         </div>
                         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
                         <div class="form-group has-error">
-                            <p style="color: red" data-bind="text: error, visible: error"></p>
+                            <p style="color: red" data-bind="html: error, visible: error"></p>
                         </div>
                     </form>
                 </div>
@@ -40,7 +40,7 @@
             // script requires:  kms_login.js  for loginViewModel
             // style requires: bootstrap, dashboard, intel
             console.log("login.html script");
-            resourceLoader.loadJS(['js/knockout.js' /*, 'js/jquery.js'*/, 'js/kms_login.js'], function() { 
+            resourceLoader.loadJS(['js/knockout.js' /*, 'js/jquery.js'*/, 'js/kms_login.js', 'js/URI.js'], function() { 
                 console.log("login.html: loaded scripts");
                 mainViewModel.loginViewModel = new LoginViewModel();
                 ko.applyBindings(mainViewModel, document.getElementById("login"));

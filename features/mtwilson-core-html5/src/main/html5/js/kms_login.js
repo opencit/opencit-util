@@ -26,6 +26,17 @@ function LoginViewModel() {
         console.log("Endpoint: %s", endpoint);
         //            console.log("Search keys 1: %O", ko.toJSON(searchCriteriaItem)); //   results in error: InvalidStateError: Failed to read the 'selectionDirection' property from 'HTMLInputElement': The input element's type ('hidden') does not support selection
         console.log("Login request to %s: %O", endpoint+"/login", ko.toJSON(self.loginRequest)); // attempting to serialize loginRequestItem produces errors, probably because it represents the entire form
+        //
+        // Prevent insecure non-TLS login requests 
+        var uri = new URI();
+        console.log("Login request is via %s", uri.protocol());
+        if( uri.protocol() !== "https" ) {
+            var httpsUri = new URI();
+            httpsUri.protocol("https");
+            self.loginRequest.error("Login via http is insecure, use <a href='"+httpsUri.toString()+"'>https</a>");
+            return false;
+        }
+        //
 //                    console.log("Login request form: %O", loginFormElement); // we could use jquery validation with the form element
         $.ajax({
             type: "POST",
