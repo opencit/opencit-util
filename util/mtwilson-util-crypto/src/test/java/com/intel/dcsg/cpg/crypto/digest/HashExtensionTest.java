@@ -11,6 +11,7 @@ import com.intel.dcsg.cpg.io.UUID;
 import com.intel.dcsg.cpg.net.IPv4Address;
 import com.intel.dcsg.cpg.io.ByteArray;
 import java.nio.charset.Charset;
+import org.apache.shiro.codec.Hex;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -49,4 +50,13 @@ public class HashExtensionTest {
         log.debug("nonce+ip+uuid 2 = {}", nonce_ip_uuid.toHexString());        
     }
     
+    @Test
+    public void testExtendSha1VMwareEventLogForPcr18() {
+        Digest pcr = Digest.sha1().zero();
+        String[] eventLog = new String[] { /* tboot */ "77cb5fca42ded132b6ef5c596b79a340136fffa0" };
+        for(String event : eventLog) {
+            pcr = pcr.extend(Hex.decode(event));
+        }
+        log.info("Final PCR value: {}", pcr.toHex()); // fccd05fa2dd977c8104e7a7e93f3d6824d2241a9
+    }
 }
