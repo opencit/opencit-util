@@ -46,7 +46,11 @@
                     after the navbar itself loads it will then discover features that have nav bar buttons to provide. 
                     -->
                         <div class="navbar-collapse collapse" >
-                            <ul class="nav navbar-nav navbar-right"></ul>
+                            <!-- sort(navigationViewModel.navbarButtonSort -->
+                            <ul class="nav navbar-nav navbar-right" data-bind="foreach: navigationViewModel.items">
+                                <!-- ko html -->
+                                <!-- /ko -->
+                            </ul>
                         </div>
                 </div>
             </div>
@@ -105,6 +109,8 @@
 //            var endpoint = URI.build({protocol: origin.protocol, hostname: origin.hostname, port: origin.port, path: "/v1"}); 
             endpoint = "/v1";
             console.log("Endpoint: %s", endpoint);
+            
+            
 
             function MainViewModel() {
                 var self = this;
@@ -124,11 +130,26 @@
 
             var mainViewModel = new MainViewModel();
 
-            var resourceLoader = new ResourceLoader();
-            var discovery = new FeatureDiscovery();
-            var localizer = new Localizer();
+            var resourceLoader;
+            var discovery;
+            var localizer;
 
             $(document).ready(function() {
+
+            resourceLoader = new ResourceLoader();
+            discovery = new FeatureDiscovery();
+            localizer = new Localizer();
+        
+                // this can be moved to a separate feature (together with the similar block in login.html)
+                var uri = new URI();
+                console.log("Application request is via %s", uri.protocol());
+                if( uri.protocol() !== "https" ) {
+                    var httpsUri = new URI();
+                    httpsUri.protocol("https");
+                    window.location.replace(httpsUri.toString());
+                }
+        
+        
                 //$("#login_content").hide();
                 //$("#dashboard_content").load("dashboard.html");
                 //resourceLoader.loadHTML("dashboard.html", "#dashboard_content");
@@ -146,12 +167,13 @@
                 resourceLoader.registerLoadedJS();
                 resourceLoader.registerLoadedCSS();
 
+
+                //resourceLoader.loadJS(['js/URI.js' /*, 'js/jquery.js' */], function() {
+                    // navigation view model defined in kms_nav.js
+                    mainViewModel.navigationViewModel = new NavigationViewModel();
+                    //ko.applyBindings(mainViewModel, document.getElementById("navbar"));
+                //});
                 ko.applyBindings(mainViewModel); // not much point to this when the main model is empty... 
-
-                // navigation view model defined in kms_nav.js
-                mainViewModel.navigationViewModel = new NavigationViewModel();
-                ko.applyBindings(mainViewModel, document.getElementById("navbar"));
-
 
                 localizer.init();
 
