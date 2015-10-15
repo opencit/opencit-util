@@ -54,10 +54,10 @@ public class HashExtensionTest {
     @Test
     public void testExtendSha1VMwareEventLogForPcr18() throws DecoderException {
         Digest pcr = Digest.sha1().zero();
-        String[] eventLog = new String[] { /* tboot */ "77cb5fca42ded132b6ef5c596b79a340136fffa0" };
+        String[] eventLog = new String[] { /* tboot */ "ac701606df906e65926886035b95302522334050" }; // vcenter reports module value ac701606df906e65926886035b95302522334050
         for(String event : eventLog) {
             pcr = pcr.extend(Hex.decodeHex(event.toCharArray()));
         }
-        log.info("Final PCR value: {}", pcr.toHex()); // fccd05fa2dd977c8104e7a7e93f3d6824d2241a9
+        log.info("Final PCR value: {}", pcr.toHex()); // vcenter reports 77cb5fca42ded132b6ef5c596b79a340136fffa0, but we get 2425da136835b51df17d036b1aa4a24015ed335e
     }
 }

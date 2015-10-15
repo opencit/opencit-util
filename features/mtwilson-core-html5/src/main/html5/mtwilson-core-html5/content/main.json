@@ -1,6 +1,5 @@
 {
     "items": [
-        { "href": "/html5/features/mtwilson-core-html5/mtwilson-core-html5/content/help.html", "target_tab": "help" },
         { "href": "/html5/features/mtwilson-core-html5/logout.html", "target_tab": "logout" },
         { "href": "/html5/features/mtwilson-core-html5/mtwilson-core-html5/content/license.html", "target_tab": "license" }
     ]

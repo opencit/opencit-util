@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature xmlns="urn:mtwilson:feature:1.0">
+<id>com.intel.mtwilson.core.help</id>
+<version>0.1-SNAPSHOT</version>
+<name>Help</name>
+<provider><name>Intel Corporation</name></provider>
+<description>Help page</description>
+<license><copyright>2015 Intel Corporation</copyright><url>http://intel.com</url></license>
+</feature>

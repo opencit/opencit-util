@@ -130,15 +130,41 @@
 
             var mainViewModel = new MainViewModel();
 
-            var resourceLoader;
-            var discovery;
-            var localizer;
+            var resourceLoader;///   MOVE INTO NAMESPACE
+            var discovery;///   MOVE INTO NAMESPACE
+            var localizer;///   MOVE INTO NAMESPACE
+            
+            var settings; ///   MOVE INTO NAMESPACE
 
             $(document).ready(function() {
 
             resourceLoader = new ResourceLoader();
             discovery = new FeatureDiscovery();
             localizer = new Localizer();
+            
+            function Configuration() {
+                var self = this;
+                self.data = [];  // original array of  [ { name: x, value: y }, ... ] pairs we get from server
+                self.map = {}; // data converted to a map of { name: value, ... }
+                self.init = function(settings) {
+                    self.data = settings;
+                    // convert the array of name,value objects to a map of name:value pairs
+                    for(var i=0; i<settings.length; i++) {
+                        self.map[settings[i].name] = settings[i].value;
+                    }
+                };
+                self.get = function(name) {
+                    return self.map[name];
+                };
+                self.set = function(name,value) {
+                    self.map[name] = value;  // ALSO,  SEND TO SERVER
+                };
+                self.keys = function() {
+                    return Object.keys(self.map);
+                };
+                self.isEditable = function() { return true; } //  true/false here should be linked to whether we have access to change server settings...
+            }
+            var configuration = new Configuration();
         
                 // this can be moved to a separate feature (together with the similar block in login.html)
                 var uri = new URI();
@@ -176,37 +202,175 @@
                 ko.applyBindings(mainViewModel); // not much point to this when the main model is empty... 
 
                 localizer.init();
+                
 
+                // after successful login we can load the settings
+                $(document).on("mtwilson-core-html5:login:success.mtwilson-configuration-settings-ws-v2", function(e) {
+                    console.log("settings intercepted login success event: %O", e);
 
-                // define the successful login handlers, which load the html pages and navbar buttons
-                $(document).on("mtwilson-core-html5:login:success.mtwilson-core-html5:navbar", function(e) {
-                    console.log("navbar intercepted login success event: %O", e);
-
-                    // discover navbar buttons
-                    discovery.eachJSON("/mtwilson-core-html5/navbar/main.json", function(json,context) {
-                        console.log("navbar main called with json: %O", json); // looks like { items: [ { "href": url }, ... ] }
-                        console.log("navbar main called after extension: %O", context );
-                        // so here we just want to create a memory model of what the buttons should be...
-                        // when the navbar loads (see content handler) it will bind to this model
-                        // so eventually when both are loaded the buttons will appear in the nav bar
-                        for(var i=0; i<json.items.length; i++) {
-                            console.log("Loading navbar button html from: %s", endpoint+json.items[i].href);
-                            resourceLoader.loadHTML( endpoint+json.items[i].href, function(button) {
-                                console.log("navbar main loaded html button: %O", button);
-                                // button is object like {"url":url,"html":html} defined by resource loader's loadHTML method
-                                mainViewModel.navigationViewModel.items.push(new NavigationBarButton(button));
+                    // assume settings API is present - this will need to be edited later to use discovery , and use the settings javascript API provided by settings feature, which should include caching so it doesn'ta ctually make multiple queries to server
+                    $.ajax({
+                        type: "GET",
+                        url: endpoint + "/configuration-settings",
+                        headers: {'Accept': 'application/json'},
+                        success: function(responseJsonContent, status, xhr) {
+                            
+                            configuration.init(responseJsonContent.settings);
+                            
+                            $(document).trigger({
+                                type: "mtwilson-configuration-settings-ws-v2:settings:data",
+                                data: responseJsonContent.settings,
+                                time: new Date()
+                            });
+                            
+                        },
+                        error: function(xhr, status, errorMessage) {
+                            $(document).trigger({
+                                type: "mtwilson-configuration-settings-ws-v2:settings:error",
+                                message: errorMessage,
+                                time: new Date()
                             });
                         }
+                        
                     });
 
                 });
+    
+    
+    
+                    // given the buttons in the json, loaded with query in context, insert the buttons into the navbar sorted using fnSort (a function)
+                    // fnSort is a function that accepts the feature name and returns the insert position (index starting at zero for far left)
+                    var insertButtonsIntoNavbar = function(csv, hometab) {
+                        if( csv === undefined ) { csv = ""; }
+                        var sortOrder = csv.split(",");
+                        for(var i=0; i<sortOrder.length; i++) {
+                            sortOrder[i] = sortOrder[i].trim();
+                        }
+                        
+                        var navbarButtonsArray = [];
+                        // if we already have buttons inserted into the navbar,  add them to the navbarButtonsArray so we consider them when placing new buttons
+                        $("#navbar ul.nav li").each(function(index,element) {
+                            console.log("insertButtonsIntoNavbar DETECTED EXISTING BUTTON: %s", $(element).attr("data-navbar-feature"));
+                            navbarButtonsArray.push($(element).attr("data-navbar-feature"));
+                        });
+                        
+                        // discover navbar buttons
+                        discovery.eachJSON("/mtwilson-core-html5/navbar/main.json", function(json,context) {
+                            // first make sure that we don't already have this feature inserted...
+                            var existingIndexOf = navbarButtonsArray.indexOf(context.entry.feature);
+                            if( existingIndexOf > -1 ) { console.log("insertButtonsIntoNavbarFeature %s is already in navbar", context.entry.feature); return; }
+                            
+                            var indexOfThisFeature = sortOrder.indexOf(context.entry.feature);
+                            
+                            if( indexOfThisFeature < 0 ) {
+                                // not in the list - so it would go in the "more" or "..." section
+                                console.log("insertButtonsIntoNavbarFeature: feature %s is not in sort order, should go in 'more' section", context.entry.feature);
+                            }
+                            
+                            // get all the currently loaded buttons and find the insertion point for this button
+                            console.log("insertButtonsIntoNavbar indexOfThisFeature %s", indexOfThisFeature);
+                            // each feature providing buttons may have one or more buttons in the json, we add them all (in order) into the navbar at the position specified by fnSort
+                            for(var i=0; i<json.items.length; i++) {
+                                console.log("Loading navbar button html from: %s", endpoint+json.items[i].href);
+                                resourceLoader.loadHTML( endpoint+json.items[i].href, function(button) {
+                                    console.log("insertButtonsIntoNavbar navbar main loaded html button: %O", button);
+                                    // button is object like {"url":url,"html":html} defined by resource loader's loadHTML method
+                                    //mainViewModel.navigationViewModel.items.push(new NavigationBarButton(button));
+                                    // before setting the html, we extract the <li> from the <body><ul>...</ul></body> received from server
+                                    //console.log("Adding navigation button with html: %s", data.html);
+                                    // first add it as a script element
+                                    var buttonHtmlScriptElement = $(document.createElement("script"));
+                                    buttonHtmlScriptElement.attr("type", "application/html");
+                                    buttonHtmlScriptElement.append(button.html);
+                                    buttonHtmlScriptElement.find("li").attr("data-navbar-feature", context.entry.feature);
+                                    var buttonHtml = buttonHtmlScriptElement.find("ul").html();
+                                    buttonHtmlScriptElement.remove();
+                                    console.log("insertButtonsIntoNavbar Filtered navigation button html to list item: %s", buttonHtml);
+                                    //this.html = ko.observable(buttonHtml);
+                                    var insertedButton = false;
+                                    var navbarButtons = $("#navbar ul.nav li[data-navbar-feature]");
+                                    console.log("insertButtonsIntoNavbarFeature navbarButtons length %d: %O", navbarButtons.length, navbarButtons);
+                                    for(var i=0; i<navbarButtons.length && !insertedButton; i++) {
+                                        console.log("insertButtonsIntoNavbarFeature INDEX IS %s", i);
+                                        var comparisonFeatureName = $(navbarButtons[i]).attr("data-navbar-feature");
+                                        console.log("insertButtonsIntoNavbarFeature navbbar button: %s",comparisonFeatureName);
+                                        var comparisonFeatureIndex = sortOrder.indexOf(comparisonFeatureName);
+                                        if( comparisonFeatureIndex > indexOfThisFeature ) {
+                                            console.log("insertButtonsIntoNavbarFeature FOUND insertion point for %s before %s", context.entry.feature, comparisonFeatureName );
+                                            // the first feature that is AFTER this feature is where we stop, and insert before it
+                                            $(navbarButtons[i]).before(buttonHtml);
+                                            insertedButton = true;
+                                        }
+                                    }
+                                    if( !insertedButton ) {
+                                        // didn't find any element that goes after this one, so put this one at the end
+                                        $("#navbar ul.nav").append(buttonHtml);
+                                    }
+                                    
+        
+                                    var activeTab = $("#navbar ul.nav li.active a[href]").first()[0];
+                                    console.log("ACTIVE TAB ALREADY? %O", activeTab);
+                                    // now the button has been inserted, check if it's the hometab to be automatically activated
+                                    
+                                    if( hometab ) {
+                                        console.log("CHOOSING HOME TAB %s", hometab);
+                                        console.log("tabs are: %O", $('#navbar ul.nav li a[href="#' + hometab + '"]'));
+                                        
+                                        // first make sure there isn't already an active tab selected (user clicked or we already picked a first one)
+                                        if( ! activeTab ) {
+                                            console.log("NO ACTIVE TAB, CHOOSING CONFIGURED HOMETAB");
+                                            $('#navbar ul.nav li a[href="#' + hometab + '"]').first().tab('show');
+                                        }
+                                        
+                                    }
+                                    else {
+                                        // if no hometab is configured, select the first tab
+                                        if( ! activeTab ) {
+                                            console.log("NO ACTIVE TAB, CHOOSING FIRST ONE");
+                                            $('#navbar ul.nav li a[href]').first().tab('show');
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                        
+                    };
+                    
 
-                $(document).on("mtwilson-core-html5:login:success.mtwilson-core-html5:content", function(e) {
-                    console.log("content intercepted login success event: %O", e);
+                                // responseJsonContent looks like this:  { "settings": [ { name: "a", value: "b" }, ... ] }
+                            // search through the settings for the one we need
+
+                // define the successful login handlers, which load the html pages and navbar buttons
+                $(document).on("mtwilson-configuration-settings-ws-v2:settings:data.mtwilson-core-html5:navbar", function(e) {
+                    console.log("navbar intercepted settings data event: %O", e);
+
+                            var buttonOrder = configuration.get("mtwilson.navbar.buttons");
+                            var hometab = configuration.get("mtwilson.navbar.hometab");  
+                            if( buttonOrder ) {
+                                // sort the buttons with 
+                                insertButtonsIntoNavbar( buttonOrder, hometab  );
+                            }
+                            else {
+                            // no setting, so insert buttons without specified order
+                                insertButtonsIntoNavbar();
+                            }
+                });
+                $(document).on("mtwilson-configuration-settings-ws-v2:settings:error.mtwilson-core-html5:navbar", function(e) {
+                    console.log("navbar intercepted settings error event: %O", e);
+                            // cannot load setting, so insert buttons without specified order
+                                insertButtonsIntoNavbar();
+                });
+
+
+
+                $(document).on("mtwilson-configuration-settings-ws-v2:settings:data.mtwilson-core-html5:content", function(e) {
+                    console.log("content intercepted settings data event: %O", e);
 
                     // discover main tabs;   
                     // for now, default tab is hardcoded to "dashbaord"
-                    var defaultMainTab = "dashboard";
+                    var hometab = configuration.get("mtwilson.navbar.hometab");  
+//                    var defaultMainTab = selectHomeTab();
+                    console.log("defaultMainTab = %s", hometab);
                     discovery.eachJSON("/mtwilson-core-html5/content/main.json", function(json,context) {
                         console.log("content called with json: %O", json);
                         console.log("content called after extension: %O", context );
@@ -219,12 +383,28 @@
                             if( viewDescriptor["target_tab"] ) {
                                 loadOptions.tab = viewDescriptor.target_tab;
                             }
-                            loadOptions.activate = (defaultMainTab === viewDescriptor.target_tab); // automatically activate the page specifeid by the "postLoginActivatePage" option
+                            console.log("CHECKING HOME TAB %s against %s", hometab, viewDescriptor.target_tab);
+                            loadOptions.activate = (hometab === viewDescriptor.target_tab); // automatically activate the page specifeid by the "postLoginActivatePage" option
                             resourceLoader.loadHTML( endpoint+ viewDescriptor.href , loadOptions );
                         }
                     });
 
                 });
+
+
+/*
+                // when settings come in, we can activate the configured home tab, UNLESS  user has already activated a tab
+                $(document).on("mtwilson-configuration-settings-ws-v2:settings:data.mtwilson-core-html5:hometab", function(e) {
+                    console.log("main page hometab intercepted settings data event: %O", e);
+                    var quiet = $("#navbar ul.nav li.active").first().find("a[href]");
+                    console.log("QUIET SETTING = %O", quiet);
+                    var defaultMainTab = selectHomeTab();
+                    console.log("CHOOISING NEW NMAIN TAG %s", defaultMainTab);
+                    console.log("tabs are: %O", $('#navbar ul.nav li a[href="#' + defaultMainTab + '"]'));
+                    $('#navbar ul.nav li a[href="#' + defaultMainTab + '"]').first().tab('show');
+                    
+                });                
+                */
 
                 $(document).on("mtwilson-core-html5:login:success.mtwilson-core-html5:init", function(e) {
                     console.log("content intercepted login success event: %O", e);
