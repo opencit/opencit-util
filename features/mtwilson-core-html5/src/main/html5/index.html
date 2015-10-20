@@ -271,6 +271,10 @@
                             console.log("insertButtonsIntoNavbar indexOfThisFeature %s", indexOfThisFeature);
                             // each feature providing buttons may have one or more buttons in the json, we add them all (in order) into the navbar at the position specified by fnSort
                             for(var i=0; i<json.items.length; i++) {
+                                if( indexOfThisFeature < 0 ) {
+                                    console.log("Skipping navbar button %s from %s because not in list", context.entry.feature, endpoint+json.items[i].href);
+                                    continue;
+                                }
                                 console.log("Loading navbar button html from: %s", endpoint+json.items[i].href);
                                 resourceLoader.loadHTML( endpoint+json.items[i].href, function(button) {
                                     console.log("insertButtonsIntoNavbar navbar main loaded html button: %O", button);
@@ -302,8 +306,8 @@
                                             insertedButton = true;
                                         }
                                     }
-                                    if( !insertedButton ) {
-                                        // didn't find any element that goes after this one, so put this one at the end
+                                    if( !insertedButton && indexOfThisFeature > -1 ) {
+                                        // didn't find any element that goes after this one, but it's in the button list, so put it at the end
                                         $("#navbar ul.nav").append(buttonHtml);
                                     }
                                     
