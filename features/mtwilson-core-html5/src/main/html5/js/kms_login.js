@@ -70,6 +70,20 @@ function LoginViewModel() {
                         jqxhr.setRequestHeader("Authorization", "Token "+authorizationToken);
                     //}
                 });
+                $(document).ajaxError(function(jqxhr, status, errorMessage){
+                    console.log("Triggered ajaxError handler.");
+                    console.log("Resource request failed with status: %O", status); // "error"
+                    console.log("Resource request failed failed with message: %O", errorMessage); 
+                    console.log("Resource request failed: %O", jqxhr);
+                    //document.location.href = self.options.postLogoutRedirect;
+                    if( status.status === 401 ) {
+                        console.log("Request unauthorized; logging out");
+                        self.logout();
+                    }
+                    else {
+                        console.log("Server response: %s", status.statusText);
+                    }
+                });
                 
                 
                 // load the navbar and the dashboard, and activate the post-login primary view
