@@ -7,6 +7,7 @@ package com.intel.kms.login.token;
 import com.intel.mtwilson.shiro.EncryptedTokenContent;
 import com.intel.dcsg.cpg.authz.token.TokenFactory;
 import com.intel.dcsg.cpg.configuration.Configuration;
+import com.intel.dcsg.cpg.configuration.PropertiesConfiguration;
 import com.intel.dcsg.cpg.crypto.RandomUtil;
 import com.intel.mtwilson.configuration.ConfigurationFactory;
 import com.intel.mtwilson.jaxrs2.mediatype.DataMediaType;
@@ -65,6 +66,7 @@ import org.apache.shiro.subject.Subject;
 public class PasswordLogin {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PasswordLogin.class);
     public static String LOGIN_TOKEN_EXPIRES_MINUTES = "login.token.expires.minutes";
+    public static String LOGIN_REQUIRES_TLS = "login.requires.tls";
     
 //    private TokenFactory factory;
 //    @RequiresGuest  // causes it to fail when someone is already logged in, which is not convenient because then user has to close browser and "forget" credentials if they want to log in again (for example if they reloaded entry point)
@@ -88,6 +90,22 @@ public class PasswordLogin {
         log.debug("loginRequest username {} password {}", loginForm.getUsername(), loginForm.getPassword());
         log.debug("request from {}", request.getRemoteHost());
 
+        // load configuration
+        Configuration configuration;
+        try {
+            configuration = ConfigurationFactory.getConfiguration();
+        }
+        catch(IOException e) {
+            log.warn("Cannot load configuration, using defaults", e);
+            configuration = new PropertiesConfiguration();
+        }
+        
+        boolean requireTls = Boolean.valueOf(configuration.get(LOGIN_REQUIRES_TLS, "true"));
+        if( requireTls && !request.isSecure()) {
+            log.info("Denying non-TLS login request");
+            throw new WebApplicationException(Status.UNAUTHORIZED);
+        }
+        
         // authenticate the user with JdbcPasswordRealm and PasswordCredentialsMatcher (configured in shiro.ini)
         Subject currentUser = SecurityUtils.getSubject();
 //        if( !currentUser.isAuthenticated() ) { // shouldn't need this because we have @RequiresGuest annotation...
@@ -120,7 +138,7 @@ public class PasswordLogin {
         
         String tokenValue = RandomUtil.randomBase64String(32); // new random token value
         Date notBefore = new Date(); // token is valid starting right now
-        Date notAfter = getExpirationDate(notBefore);
+        Date notAfter = getExpirationDate(notBefore, configuration);
         Integer used = 0; // new token
         Integer usedMax = null; // for logins we don't set a usage limit, just an expiration date
         TokenCredential tokenCredential = new TokenCredential(tokenValue, notBefore, notAfter, used, usedMax);
@@ -138,16 +156,8 @@ public class PasswordLogin {
         return passwordLoginResponse;
     }
     
-    private Date getExpirationDate(Date start) {
-        Integer loginTokenExpiresMinutes;
-        try {
-            Configuration config = ConfigurationFactory.getConfiguration();
-            loginTokenExpiresMinutes = Integer.valueOf(config.get(LOGIN_TOKEN_EXPIRES_MINUTES, "30"));
-        }
-        catch(IOException e) {
-            log.warn("Cannot load configuration, using 30 minute login expiration", e);
-            loginTokenExpiresMinutes = 30;
-        }
+    private Date getExpirationDate(Date start, Configuration config) {
+        Integer loginTokenExpiresMinutes = Integer.valueOf(config.get(LOGIN_TOKEN_EXPIRES_MINUTES, "30"));
         Calendar c = Calendar.getInstance();
         c.setTime(start);        
         c.add(Calendar.MINUTE, loginTokenExpiresMinutes);

@@ -91,3 +91,12 @@ table.data-table td {
 ul.navbar-right {
 	margin-top: 11px; /* center the navbar (height 50px) in the new 72px high banner */
 }
+
+
+.checkbox p, .radio p {
+  min-height: 20px;
+  padding-left: 20px;
+  margin-bottom: 0;
+  font-weight: normal;
+  color: #ccc;
+}

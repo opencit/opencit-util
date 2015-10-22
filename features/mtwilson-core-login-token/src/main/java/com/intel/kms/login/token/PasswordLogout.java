@@ -16,6 +16,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 
 /**
  * Invalidates an authorization token immediately. 
@@ -38,15 +40,20 @@ public class PasswordLogout {
 //        logoutRequest(request, response, passwordLogoutRequest);
         log.debug("Successfully processed logout request with auth token {}.", passwordLogoutRequest.getAuthorizationToken());
         
-        response.setStatus(204);
+        logoutRequest(request, response, passwordLogoutRequest);
     }
     
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, DataMediaType.APPLICATION_YAML, DataMediaType.TEXT_YAML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, DataMediaType.APPLICATION_YAML, DataMediaType.TEXT_YAML})
     public void logoutRequest(@Context final HttpServletRequest request, @Context final HttpServletResponse response, PasswordLogoutRequest passwordLogoutRequest) throws GeneralSecurityException {
+        
         log.debug("logoutRequest token {}", passwordLogoutRequest.getAuthorizationToken());
         log.debug("request from {}", request.getRemoteHost());
+        
+        Subject currentUser = SecurityUtils.getSubject();
+        currentUser.logout();
+        
         response.setStatus(204);
     }    
     

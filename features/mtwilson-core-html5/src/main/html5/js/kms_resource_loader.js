@@ -69,13 +69,14 @@ function ResourceLoader() {
                         console.log("ResourceLoader.writeHTML into exists %s", intoElement.into);
                         // the "id" option will create or reuse a specific element in the container
                         if (intoElement.hasOwnProperty("tab")) {
-                            var tabSelector = "#" + intoElement.tab;
-                            var identityElement = element.children(tabSelector);
+                            //var tabSelector = "#" + intoElement.tab;
+                            var tabIdAttrSelector = '[id="'+intoElement.tab+'"]';
+                            var identityElement = element.children(tabIdAttrSelector);
                             if (!identityElement.length) {
                                 // no element with that id exists, so create it
                                 console.log("ResourceLoader.writeHTML creating tab %s", intoElement.tab);
                                 element.append("<div id='" + intoElement.tab + "' class='tab-pane'></div>");
-                                identityElement = element.children(tabSelector);
+                                identityElement = element.children(tabIdAttrSelector);
                             }
                             // now we know the identified element exists,
                             // so replace its content
@@ -84,7 +85,7 @@ function ResourceLoader() {
                             // and check if called asked to auto-activate the tab
                             if (intoElement.hasOwnProperty('activate')) {
                                 if (intoElement.activate) {
-                                    mainViewModel.tab(tabSelector, intoElement.into);
+                                    mainViewModel.tab(tabIdAttrSelector, intoElement.into);
                                 }
                             }
                         }

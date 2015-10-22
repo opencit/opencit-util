@@ -25,6 +25,10 @@ function NavigationViewModel() {
 //                self.userProfile = ko.observable(new UserProfile({}));
                 // operations
                 
+                self.navbarButtonSort = function(left,right) {
+                    
+                };
+                
             }
 
 

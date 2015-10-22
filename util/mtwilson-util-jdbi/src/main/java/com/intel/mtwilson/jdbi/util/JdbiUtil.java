@@ -15,9 +15,10 @@ public class JdbiUtil {
     private static DBI dbi = null;
     
     public static DBI getDBI(Connection connection) {
-        if (dbi == null) {
-            dbi = new DBI(new ExistingConnectionFactory(connection));
-        }
+//        if (dbi == null) {
+//            dbi = new DBI(new ExistingConnectionFactory(connection));
+//        }
+        dbi = new DBI(new ExistingConnectionFactory(connection));   //previously created DBI object was causing issues in cit-3.0-beta2-sprint2; therefore forced creation of new object
         return dbi;
     }
 }
