@@ -80,7 +80,9 @@ public class MultivaluedHashMap<K,V> {
     public void put(MultivaluedHashMap<K,V> other) {
         for(K k : other.keys()) {
             List<V> list = other.get(k);
-            put(k, list);
+            if( list != null ) {
+                put(k, list);
+            }
         }
     }
     
@@ -92,7 +94,9 @@ public class MultivaluedHashMap<K,V> {
     public void put(Map<K,V> other) {
         for(K k : other.keySet()) {
             V item = other.get(k);
-            put(k,item);
+            if( item != null ) {
+                put(k,item);
+            }
         }
     }
     
