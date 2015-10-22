@@ -13,6 +13,7 @@
             <xs:element name="provider" type="providerType" minOccurs="1" maxOccurs="1"/>
             <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1"/>
             <xs:element name="license" type="licenseType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="extends" type="extendsType" minOccurs="0" maxOccurs="1"/>
             <xs:element name="includes" type="includesType" minOccurs="0" maxOccurs="1"/>
             <xs:element name="requires" type="requiresType" minOccurs="0" maxOccurs="1"/>
             <xs:element name="conflicts" type="conflictsType" minOccurs="0" maxOccurs="1"/>
@@ -34,6 +35,12 @@
         </xs:sequence>        
     </xs:complexType>
 
+    <xs:complexType name="extendsType">
+        <xs:sequence>
+            <xs:element name="feature-ref" type="featureRefType" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>        
+    </xs:complexType>
+    
     <xs:complexType name="includesType">
         <xs:choice minOccurs="1">
         <xs:sequence>

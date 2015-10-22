@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My Profile</title>
+        <meta name="author" content="jbuhacoff">
+    </head>
+    <body>
+
+            <div class="row">
+                <div class="col-md-2"></div>
+        <div class="col-md-8" style="margin-top: 10px;">        
+            <div class="panel panel-default" data-bind="with: profileViewModel">
+                <div class="panel-heading">
+                    <h1>My Profile</h1>
+                </div>
+                <div class="panel-body" data-bind="with: myProfile">
+                    <!--
+                     <p>TBD: show permissions for this user, name, email address for notifications, etc.</p>
+                    -->
+                    <h2>Login</h2>
+                    <dl>
+                        <dt>Username</dt>
+                        <dd data-bind="text: username"></dd>
+                    </dl>
+                    <h2>Contact</h2>
+                    <dl>
+                        <dt>First Name</dt>
+                        <dd data-bind="text: contact.first_name"></dd>
+                        <dt>Last Name</dt>
+                        <dd data-bind="text: contact.last_name"></dd>
+                        <dt>Email Address</dt>
+                        <dd data-bind="text: contact.email_address"></dd>
+                    </dl>
+                    <h2>Transfer Key</h2>
+                    <textarea data-bind="value: transfer_key_pem" cols="80" rows="10" placeholder="My transfer public key, in PEM format" disabled></textarea>
+
+                </div>
+
+            </div>
+                <div class="col-md-2"></div>
+        </div>
+            </div>
+    
+        <script type="text/javascript">
+            // script requires:  kms_login.js  for loginViewModel
+            // style requires: bootstrap, dashboard, intel
+            console.log("profile.html script");
+            resourceLoader.loadJS(['js/knockout.js', 'js/jquery.js', '/v1/resources/js/kms_users.js', '/v1/resources/js/kms_profile.js'], function() {
+                console.log("profile.html: loaded scripts");
+                // add our view models to the main view model defined by index.html
+                mainViewModel.profileViewModel = new ProfileViewModel();
+                ko.applyBindings(mainViewModel, document.getElementById("my_profile"));
+                    console.log("profile.html: user logged in as %s", mainViewModel.loginViewModel.userProfile.username()() );
+                mainViewModel.profileViewModel.loadProfile({ username: mainViewModel.loginViewModel.userProfile.username()() });
+            });
+        </script>
+    </body>
+</html>
