@@ -29,7 +29,12 @@ public class ExecUtil {
         command.addArguments(args);
         return executeQuietly(command);
     }
-
+	public static Result executeQuoted(String executable, String... args) throws ExecuteException, IOException {
+        CommandLine command = new CommandLine(executable);
+        command.addArguments(args, false);
+        return execute(command);
+    }
+    
     public static Result execute(CommandLine command) throws ExecuteException, IOException {
         DefaultExecutor executor = new DefaultExecutor();
         ByteArrayOutputStream stdout=new ByteArrayOutputStream();
