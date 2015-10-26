@@ -35,6 +35,7 @@ import org.bouncycastle.jce.provider.*;
 import javax.crypto.*;
 import javax.crypto.spec.*;
 import java.util.BitSet;
+import org.apache.commons.io.IOUtils;
 
 /**
  * <p>The utils class contains functions that fall into two categories: those that provide 
@@ -114,9 +115,12 @@ public class TpmUtils {
 		if (source.available() < 4) {
 			throw new TpmBytestreamResouceException("There is not enough room in the bytestream to extract a UINT32.");
 		}
-		int retval = 0;
+		int retval;
 		byte[] temp = new byte[4];
 		int k =source.read(temp, 0, 4);
+        if( k != 4 ) {
+			throw new TpmBytestreamResouceException("Failed to read UINT32 from stream");
+        }
 		if ((temp[0]&0x80) == 0x80) throw new TpmUnsignedConversionException("Cannot convert UINT32 to signed Integer: too large - would be converted to negative.");
 		retval = (int)((temp[0]<<24&0xff000000) + 
 		         (int) (temp[1]<<16&0x00ff0000) + 
@@ -138,9 +142,12 @@ public class TpmUtils {
 		if (source.available() < 2) {
 			throw new TpmBytestreamResouceException("There is not enough room in the bytestream to extract a UINT32.");
 		}
-		int retval = 0;
+		int retval;
 		byte[] temp = new byte[2];
 		int k = source.read(temp, 0, 2);
+        if( k != 2 ) {
+			throw new TpmBytestreamResouceException("Failed to read UINT16 from stream");
+        }
 		if ((temp[0]&0x80) == 0x80) throw new TpmUnsignedConversionException("Cannot convert UINT16 to signed Short: too large - would be converted to negative.");
 		retval = (int)((temp[0]<<8)&0x0000ff00) + 
 			 	 (int)((temp[1]<<0)&0x000000ff);
@@ -190,6 +197,9 @@ public class TpmUtils {
 		}
 		byte[] retval = new byte[size];
 		int k = source.read(retval, 0, size);
+        if( k != size ) {
+			throw new TpmBytestreamResouceException(String.format("Failed to read %d bytes from stream", size));
+        }
 		return retval;
 	}
 	/**
@@ -464,7 +474,7 @@ public class TpmUtils {
 	 * @return The Big Integer with the value of the byte array.
 	 */
 	private static BigInteger byteArrayToBigInt(byte[] incoming) {
-		byte [] tempArray = null;
+		byte [] tempArray;
 		if ((incoming[0]&0x80) == 0x80) {
 			tempArray = new byte[incoming.length + 1];
 			tempArray[0] = (byte)0x00;
@@ -602,7 +612,9 @@ public class TpmUtils {
 			NoSuchAlgorithmException, 
 			javax.security.cert.CertificateException, 
 			java.security.cert.CertificateException {
-		InputStream certStream = new FileInputStream(filename);
+		try(InputStream certStream = new FileInputStream(filename)) {
+        byte[] certBytes = IOUtils.toByteArray(certStream);
+        /*
 //		byte [] certBytes = new byte[certStream.available()];
 		byte[] certBytes = new byte[2048];
 		try {
@@ -614,8 +626,10 @@ public class TpmUtils {
 		finally{
 				 certStream.close();
 		}
+        */
 		javax.security.cert.X509Certificate cert = javax.security.cert.X509Certificate.getInstance(certBytes);
 		return convertX509Cert(cert);
+        }
 	}
 	/**
 	 * Retrieve a certificate as an X509Certificate object from a byte string, assuming DER encoding.
@@ -790,7 +804,7 @@ public class TpmUtils {
 	 */
 	public static byte [] createRandomBytes(int numBytes) 
 			throws IOException {
-		Random random = new Random(System.nanoTime());
+		SecureRandom random = new SecureRandom(BigInteger.valueOf(System.nanoTime()).toByteArray()); // previously was new Random(System.nanoTime())
 		//byte [] randomBytes = longToByteArray(random.nextLong());
 		byte [] randomBytes = new byte[numBytes];
 		random.nextBytes(randomBytes);
@@ -815,14 +829,13 @@ public class TpmUtils {
 	 * @return The String of the encoded array.
 	 */
 	public static String base64encode(byte [] toEncode, boolean breakLines) {
-		StringBuffer sb =new StringBuffer();
+		StringBuilder sb =new StringBuilder();
 		char[] charArray = new String(Base64.encode(toEncode)).toCharArray();
-		String toReturn = "";
 		for (int i = 0; i < charArray.length; i++){
-			if(breakLines){if((i%64 == 0)) toReturn = sb.append("\n").toString(); }
-			toReturn = sb.append(charArray[i]).toString();
+			if(breakLines){if((i%64 == 0)) sb.append("\n"); }
+			sb.append(charArray[i]);
 		}
-		return toReturn;
+		return sb.toString();
 	}
 	public static byte[] base64decode(String encoded){
 		return Base64.decode(encoded);
@@ -922,7 +935,7 @@ public class TpmUtils {
 	 */
 	public static byte[] sha1hash(byte[] blob)
 			throws NoSuchAlgorithmException{
-		byte[] toReturn = null;
+		byte[] toReturn;
 		MessageDigest md = MessageDigest.getInstance("SHA1");
 		md.update(blob);
 		toReturn = md.digest();
@@ -1059,10 +1072,10 @@ public class TpmUtils {
 	 * @return The HMAC blob suitable to be used for passing as a TCS parameter
 	 * @throws Exception
 	 */
-	public static byte[] HMAC(byte[] authBlob, byte[] xH1concat) throws Exception{
-		Mac mac = Mac.getInstance("HmacSha1");
+	public static byte[] HMAC(byte[] authBlob, byte[] xH1concat) throws NoSuchAlgorithmException, InvalidKeyException {
+		Mac mac = Mac.getInstance("HmacSha1"); // throws NoSuchAlgorithmException
 		SecretKey key = new SecretKeySpec(authBlob, "HmacSha1");
-		mac.init(key);
+		mac.init(key); // throws InvalidKeyException
 		mac.update(xH1concat);
 		return mac.doFinal();
 	}

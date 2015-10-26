@@ -145,6 +145,25 @@ Lu3ibINeRux4Nql10rXNW6LpJpg3Kdo=
         assertEquals(content, decryptedContent);
     }
     
+    /**
+     * Tries to decrypt a file using different protection than was used to
+     * encrypt it; results in java.lang.IllegalArgumentException: "Specified protection parameters do not match encrypted data header"
+     * @throws IOException 
+     */
+    @Test(expected=IllegalArgumentException.class)
+    public void testEqualProtection() throws IOException {
+        PasswordProtection protection1 = PasswordProtectionBuilder.factory().aes(128).digestAlgorithm("SHA-256").keyAlgorithm("PBKDF2WithHmacSHA1").mode("CBC").padding("PKCS5Padding").build();
+        String content = "hello world";
+        String password = "password";
+        ByteArrayResource resource = new ByteArrayResource();
+        PasswordEncryptedFile enc1 = new PasswordEncryptedFile(resource, password, protection1);
+        enc1.saveString(content);
+        PasswordProtection protection2 = PasswordProtectionBuilder.factory().aes(256).digestAlgorithm(null).keyAlgorithm("PBKDF2WithHmacSHA1").mode("CBC").padding("PKCS5Padding").build();
+        PasswordEncryptedFile enc2 = new PasswordEncryptedFile(resource, password, protection2);
+        String decryptedContent = enc2.loadString();
+        log.debug("decrypted: {}",decryptedContent);
+    }
+    
     @Test
     public void testEncryptText2() throws Exception {
         PasswordProtection protection = PasswordProtectionBuilder.factory().aes(256).block().sha256().pbkdf2WithHmacSha1().saltBytes(8).iterations(1000).build();

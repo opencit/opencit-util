@@ -204,6 +204,7 @@ public class WhiteboardExtensionProvider implements ExtensionProvider {
     }
     */
     
+    /*
     @Deprecated
     private static <T,C> T createFirst(Class<T> returnType, List<Class<?>> serviceImplementations, C context) {
         for(Class<?> item : serviceImplementations) {
@@ -214,6 +215,7 @@ public class WhiteboardExtensionProvider implements ExtensionProvider {
         }
         return null;
     }
+    */
     
     /*
     private static <T> List<T> createAll(Class<T> serviceInterface, List<Class<?>> serviceImplementations) {
@@ -263,7 +265,7 @@ public class WhiteboardExtensionProvider implements ExtensionProvider {
     }
 
     
-    
+    /*
     @Deprecated
     private static <T,C> T createPreferred(Class<T> returnType, List<Class<?>> serviceImplementations, List<String> preferenceOrder, C context) {
         for(String preference : preferenceOrder) {
@@ -282,8 +284,9 @@ public class WhiteboardExtensionProvider implements ExtensionProvider {
         // did not find one matching the preference ;so pick any one
         return createFirst(returnType, serviceImplementations, context);
     }
+    */
 
-    
+    /*
     @Deprecated
     private static <T,C> T find(Class<T> returnType, Class<?> serviceInterface, C context) {
         String serviceName = serviceInterface.getName();
@@ -301,6 +304,8 @@ public class WhiteboardExtensionProvider implements ExtensionProvider {
         log.debug("There are {} preferences for service {}", preferenceOrder.size(), serviceName);
         return createPreferred(returnType, serviceImplementations, preferenceOrder, context);
     }
+    */
+    
     @Deprecated
     private static <T, C> List<T> findAll(Class<T> returnType, Class<?> serviceInterface, C context) {
         String serviceName = serviceInterface.getName();

@@ -220,6 +220,20 @@ public class Extensions {
     }
 
     // never returns null - but may return an empty set if no matches were found
+    /**
+     * Example:
+     * <pre>
+     * List<PasswordHook> hooks = Extensions.findAll(PasswordHook.class);
+     * for(PasswordHook hook : hooks) {
+     *     hook.onAddedPassword(...);
+     *     //hook.onDeletedPassword(...);
+     *     //hook.onUpdatedPassword(...);
+     * }
+     * </pre>
+     * @param <T>
+     * @param extension
+     * @return 
+     */
     public static <T> List<T> findAll(Class<T> extension) {
         log.debug("findAll extension {}", extension.getName());
         ArrayList<T> result = new ArrayList<>();
@@ -266,6 +280,7 @@ public class Extensions {
         @Override
         public T create(Class<?> clazz) throws ReflectiveOperationException, ClassCastException {
             Constructor constructor = ReflectionUtil.getNoArgConstructor(clazz);
+            if( constructor == null ) { return null; }
             Object instance = constructor.newInstance();
             T implementation = (T)instance;
             return implementation;
@@ -281,6 +296,7 @@ public class Extensions {
         @Override
         public T create(Class<?> clazz) throws ReflectiveOperationException, ClassCastException {
             Constructor constructor = ReflectionUtil.getOneArgConstructor(clazz, arg.getClass());
+            if( constructor == null ) { return null; }
             Object instance = constructor.newInstance(arg);
             T implementation = (T) instance;
             return implementation;
@@ -311,7 +327,10 @@ public class Extensions {
                 log.debug("findAll trying {} from provider {}", item.name, item.provider.getClass().getName());
                 Class<?> clazz = Class.forName(item.name);
                 if( filter.accept(clazz)) {
-                    result.add(factory.create(clazz));
+                    T instance = factory.create(clazz);
+                    if( instance != null ) {
+                    result.add(instance);
+                    }
                 }
             } catch (ReflectiveOperationException | ClassCastException e) {
                 log.debug("Cannot instantiate implementation class {}", item.name, e);
@@ -398,6 +417,7 @@ public class Extensions {
                 Class<?> clazz = Class.forName(item.name);
                 if( context == null ) {
                     Constructor constructor = ReflectionUtil.getNoArgConstructor(clazz);
+                    if( constructor == null ) { continue; }
                     Object instance = constructor.newInstance();
                     T implementation = (T)instance;
                     result.add(implementation);
@@ -409,6 +429,7 @@ public class Extensions {
                         if( Filter.class.isAssignableFrom(clazz)) {
                             log.debug("Implementation {} is a filter", clazz.getName());
                             constructor = ReflectionUtil.getNoArgConstructor(clazz);
+                            if( constructor == null ) { continue; }
                             Object instance = constructor.newInstance();
                             Filter filter = (Filter)instance;
                             if( filter.accept(context) ) {
@@ -444,6 +465,7 @@ public class Extensions {
                 Class<?> clazz = Class.forName(item.name);
                 if( context == null ) {
                     Constructor constructor = ReflectionUtil.getNoArgConstructor(clazz);
+                    if( constructor == null ) { continue; }
                     Object instance = constructor.newInstance();
                     result.add(instance);
                 }
@@ -454,6 +476,7 @@ public class Extensions {
                          if( Filter.class.isAssignableFrom(clazz)) {
                             log.debug("Implementation {} is a filter", clazz.getName());
                             constructor = ReflectionUtil.getNoArgConstructor(clazz);
+                            if( constructor == null ) { continue; }
                             Object instance = constructor.newInstance();
                             Filter filter = (Filter)instance;
                             if( filter.accept(context) ) {

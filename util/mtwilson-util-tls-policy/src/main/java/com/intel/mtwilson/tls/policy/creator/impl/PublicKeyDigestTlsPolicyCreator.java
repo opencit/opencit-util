@@ -76,7 +76,7 @@ public class PublicKeyDigestTlsPolicyCreator implements TlsPolicyCreator {
                 throw new UnsupportedAlgorithmException(alg);
             }
             for(String publicKeyDigest : tlsPolicyDescriptor.getData()) {
-                Digest digest = new Digest(alg, codec.decode(publicKeyDigest));
+                Digest digest = Digest.algorithm(alg).value(codec.decode(publicKeyDigest));
                 repository.addDigest(digest);
             }
             return repository;
@@ -97,12 +97,16 @@ public class PublicKeyDigestTlsPolicyCreator implements TlsPolicyCreator {
         if(tlsPolicyDescriptor.getMeta() == null) {
             throw new IllegalArgumentException("TLS policy descriptor metadata cannot be null.");
         }
-        if( tlsPolicyDescriptor.getMeta().get("digestEncoding") != null && !tlsPolicyDescriptor.getMeta().get("digestEncoding").isEmpty() ) {
-            metadata.digestEncoding = tlsPolicyDescriptor.getMeta().get("digestEncoding");
+        
+        String digestEncoding = tlsPolicyDescriptor.getMeta().get("digestEncoding");
+        if( digestEncoding != null && !digestEncoding.isEmpty() ) {
+            metadata.digestEncoding = digestEncoding;
         }
-        if( tlsPolicyDescriptor.getMeta().get("digestAlgorithm") != null && !tlsPolicyDescriptor.getMeta().get("digestAlgorithm").isEmpty() ) {
-            metadata.digestAlgorithm = tlsPolicyDescriptor.getMeta().get("digestAlgorithm");
+        String digestAlgorithm = tlsPolicyDescriptor.getMeta().get("digestAlgorithm");
+        if( digestAlgorithm != null && !digestAlgorithm.isEmpty() ) {
+            metadata.digestAlgorithm = digestAlgorithm;
         }
+        
         return metadata;
     }
     

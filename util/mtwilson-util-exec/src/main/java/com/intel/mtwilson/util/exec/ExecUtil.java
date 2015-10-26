@@ -19,17 +19,32 @@ import org.apache.commons.exec.ShutdownHookProcessDestroyer;
 public class ExecUtil {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExecUtil.class);
     
-    public static Result execute(String executable, String... args) throws ExecuteException, IOException {
+    /**
+     * Executes given command without modifying quotes if available. 
+     * @param executable
+     * @param args
+     * @return
+     * @throws ExecuteException
+     * @throws IOException 
+     */
+    public static Result executeQuoted(String executable, String... args) throws ExecuteException, IOException {
+        CommandLine command = new CommandLine(executable);
+        command.addArguments(args, false);
+        return execute(command);
+    }
+	
+	public static Result execute(String executable, String... args) throws ExecuteException, IOException {
         CommandLine command = new CommandLine(executable);
         command.addArguments(args);
         return execute(command);
     }
+	
     public static Result executeQuietly(String executable, String... args) throws IOException {
         CommandLine command = new CommandLine(executable);
         command.addArguments(args);
         return executeQuietly(command);
     }
-
+	    
     public static Result execute(CommandLine command) throws ExecuteException, IOException {
         DefaultExecutor executor = new DefaultExecutor();
         ByteArrayOutputStream stdout=new ByteArrayOutputStream();

@@ -6,27 +6,17 @@ package com.intel.dcsg.cpg.crypto.rfc822;
 
 import com.intel.dcsg.cpg.crypto.Aes;
 import com.intel.dcsg.cpg.crypto.CryptographyException;
-import com.intel.dcsg.cpg.crypto.DigestAlgorithm;
-import com.intel.dcsg.cpg.crypto.Sha256Digest;
 import com.intel.dcsg.cpg.io.ByteArray;
-import com.intel.dcsg.cpg.rfc822.GzipEncoder;
 import com.intel.dcsg.cpg.rfc822.Message;
 import com.intel.dcsg.cpg.rfc822.MessageReader;
 import com.intel.dcsg.cpg.rfc822.Rfc822Header;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Map;
 import javax.crypto.SecretKey;
-import javax.mail.internet.ContentType;
-import javax.mail.internet.ParameterList;
-import javax.mail.internet.ParseException;
-import org.apache.commons.codec.binary.Base64;
 
 /**
  * Given String or byte[] input and an encryption key, generates a message/rfc822 entity with the encrypted input,

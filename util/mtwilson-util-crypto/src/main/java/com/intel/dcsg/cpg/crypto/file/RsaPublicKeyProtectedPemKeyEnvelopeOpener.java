@@ -26,6 +26,8 @@ import javax.crypto.Cipher;
  * @author jbuhacoff
  */
 public class RsaPublicKeyProtectedPemKeyEnvelopeOpener {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RsaPublicKeyProtectedPemKeyEnvelopeOpener.class);
+
     private PrivateKey privateKey;
     private String privateKeyId;
     
@@ -101,6 +103,10 @@ public class RsaPublicKeyProtectedPemKeyEnvelopeOpener {
     public static boolean isCompatible(Pem pem) {
         if( pem.getBanner().equals("SECRET KEY") || pem.getBanner().equals("ENCRYPTED SECRET KEY") || pem.getBanner().equals("ENCRYPTED KEY") ) {
             PemKeyEncryption envelope = PemKeyEncryptionUtil.getEnvelope(pem);
+            if( envelope == null ) {
+                log.debug("PEM does not match known envelope formats");
+                return false;
+            }
             if( envelope.getEncryptionAlgorithm().startsWith("RSA") ) {
                 return true;
             }
