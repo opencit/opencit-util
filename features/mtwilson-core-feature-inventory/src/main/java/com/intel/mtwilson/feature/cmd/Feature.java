@@ -78,28 +78,33 @@ public class Feature extends AbstractCommand implements Command {
             }
         }
     }
-    
+
     private FeatureType readFeatureXmlFromZip(File zip) throws IOException, JAXBException, XMLStreamException {
-        ZipFile zipfile = new ZipFile(zip);
-        ZipEntry featureXmlEntry = zipfile.getEntry("feature.xml");
-        if( featureXmlEntry == null ) {
-            throw new IllegalArgumentException("feature.xml missing from zip");
+        try (ZipFile zipfile = new ZipFile(zip)) {
+            ZipEntry featureXmlEntry = zipfile.getEntry("feature.xml");
+            if (featureXmlEntry == null) {
+                throw new IllegalArgumentException("feature.xml missing from zip");
+            }
+            InputStream in = zipfile.getInputStream(featureXmlEntry);
+            if (in == null) {
+                throw new IllegalArgumentException("feature.xml cannot be read from zip");
+            }
+            try {
+                String featureXml = IOUtils.toString(in, Charset.forName("UTF-8"));
+                JAXB jaxb = new JAXB();
+                FeatureType feature = jaxb.read(featureXml, FeatureType.class);
+                return feature;
+            } catch (IOException | JAXBException | XMLStreamException e) {
+                in.close();
+            }
         }
-        try (InputStream in = zipfile.getInputStream(featureXmlEntry)) {
-            String featureXml = IOUtils.toString(in, Charset.forName("UTF-8"));
-            JAXB jaxb = new JAXB();
-            FeatureType feature = jaxb.read(featureXml, FeatureType.class);
-            return feature;
-        }
-        finally {
-            zipfile.close();
-        }
+        throw new IllegalArgumentException("feature.xml cannot be read");
     }
 
     private void add(String pathToFeatureZip) throws IOException, JAXBException, XMLStreamException {
         log.debug("Feature zip: {}", pathToFeatureZip);
         File zip = new File(pathToFeatureZip);
-        if( zip.exists() && zip.isFile() ) {
+        if (zip.exists() && zip.isFile()) {
             // first extract the feature id from the zip file
             FeatureType feature = readFeatureXmlFromZip(zip);
             unzip(zip, new File(Folders.features(feature.getId())));
