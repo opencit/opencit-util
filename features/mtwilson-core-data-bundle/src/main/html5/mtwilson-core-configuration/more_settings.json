@@ -1,0 +1,5 @@
+{
+    "items": [
+        { "label": "Upload Settings", "target_tab": "upload_configuration_data_bundle" }
+    ]
+}
