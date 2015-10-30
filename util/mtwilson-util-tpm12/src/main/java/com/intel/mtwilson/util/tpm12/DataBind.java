@@ -75,14 +75,19 @@ public class DataBind {
     protected static final TpmVersion VERSION_1_1 = new TpmVersion( (byte)0x01, (byte)0x01, (byte)0x00, (byte)0x00 );
 
     /**
-     * From trousers-0.3.13/src/include/tss/compat11b.h:
+     * From trousers-0.3.13/src/include/tss/compat11b.h and tss/tpm.h:
      * <pre>
      * typedef BYTE TPM_PAYLOAD_TYPE;
      * #define TPM_PT_BIND ((BYTE)0x02)
+     * #define TPM_PT_SEAL ((BYTE)0x05)
      * </pre>
+     * 
+     * NOTE: you can bind to a remote TPM's public key, but only a TPM can
+     * seal data with PCR values for itself.
      */
     protected static enum TpmPayloadType {
-        TPM_PT_BIND( (byte)0x02 );
+        TPM_PT_BIND( (byte)0x02 ),
+        TPM_PT_SEAL( (byte)0x05 );
         public final byte value;
         private TpmPayloadType(byte value) { this.value = value; }
         public byte[] toByteArray() { return new byte[] { value }; }

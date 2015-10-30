@@ -76,11 +76,13 @@ public class X509Util {
      * @param certificate
      * @return
      */
+    /*
     public static byte[] sha1fingerprint(X509Certificate certificate) throws NoSuchAlgorithmException, CertificateEncodingException {
         MessageDigest hash = MessageDigest.getInstance("SHA-1");
         byte[] digest = hash.digest(certificate.getEncoded());
         return digest;
     }
+    */
     
     /**
      * Converts an X509 Certificate to PEM encoding, with lines up to 76 characters long.

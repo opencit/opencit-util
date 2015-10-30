@@ -55,11 +55,11 @@ public class FirstCertificateTrustDelegate implements TrustDelegate {
         // basic check that the certificate format is something we can work with
         String fingerprint;
         try {
-            fingerprint = Hex.encodeHexString(X509Util.sha1fingerprint(certificate));
-            log.debug("acceptUnknownCertificate SHA1 Fingerprint: {}", fingerprint);
+            fingerprint = Hex.encodeHexString(X509Util.sha256fingerprint(certificate));
+            log.debug("acceptUnknownCertificate SHA-256 Fingerprint: {}", fingerprint);
         }
         catch(NoSuchAlgorithmException | CertificateEncodingException e) { 
-            log.error("Cannot obtain SHA1 fingerprint for certificate", e); 
+            log.error("Cannot obtain SHA-256 fingerprint for certificate", e); 
             return false;
         }
         
