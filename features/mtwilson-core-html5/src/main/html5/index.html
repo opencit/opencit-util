@@ -46,10 +46,7 @@
                     after the navbar itself loads it will then discover features that have nav bar buttons to provide. 
                     -->
                         <div class="navbar-collapse collapse" >
-                            <!-- sort(navigationViewModel.navbarButtonSort -->
-                            <ul class="nav navbar-nav navbar-right" data-bind="foreach: navigationViewModel.items">
-                                <!-- ko html -->
-                                <!-- /ko -->
+                            <ul class="nav navbar-nav navbar-right">
                             </ul>
                         </div>
                 </div>
@@ -75,7 +72,6 @@
         <!-- infrastructure -->
         <script src="js/kms_resource_loader.js"></script>
         <script src="js/kms_discovery.js"></script>
-        <script src="js/kms_nav.js"></script>
         <!-- <script src="js/require.js"></script>  -->
         <!-- independent -->
         <script src="js/uuid.js"></script>
@@ -195,8 +191,6 @@
 
 
                 //resourceLoader.loadJS(['js/URI.js' /*, 'js/jquery.js' */], function() {
-                    // navigation view model defined in kms_nav.js
-                    mainViewModel.navigationViewModel = new NavigationViewModel();
                     //ko.applyBindings(mainViewModel, document.getElementById("navbar"));
                 //});
                 ko.applyBindings(mainViewModel); // not much point to this when the main model is empty... 
@@ -279,7 +273,6 @@
                                 resourceLoader.loadHTML( endpoint+json.items[i].href, function(button) {
                                     console.log("insertButtonsIntoNavbar navbar main loaded html button: %O", button);
                                     // button is object like {"url":url,"html":html} defined by resource loader's loadHTML method
-                                    //mainViewModel.navigationViewModel.items.push(new NavigationBarButton(button));
                                     // before setting the html, we extract the <li> from the <body><ul>...</ul></body> received from server
                                     //console.log("Adding navigation button with html: %s", data.html);
                                     // first add it as a script element
@@ -334,6 +327,25 @@
                                             $('#navbar ul.nav li a[href]').first().tab('show');
                                         }
                                     }
+                                    
+                                    
+                                    $('#navbar ul.nav li a').each(function() { 
+                                        var self = $(this);
+                                        if( self.attr("data-click-handler") !== "customized" ) {
+                                            console.log("NEW ACTION");
+                                            self.click(function(e) {
+                                                e.preventDefault();
+                                                $(this).tab("show");
+                                                var href = $(this).attr("href");
+                                                $(".tab-pane").removeClass("active");
+                                                $(href).addClass("active");
+                                                console.log("NEW ACTION CLICK");
+                                            });
+                                            self.attr("data-click-handler", "customized");
+                                        }
+                                    });
+                                    
+                                    
                                 });
                             }
                         });

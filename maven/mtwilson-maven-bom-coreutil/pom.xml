@@ -26,6 +26,19 @@
                 <artifactId>mtwilson-configuration</artifactId>
                 <version>3.0-SNAPSHOT</version>
             </dependency>
+
+			<dependency>
+		  <groupId>com.intel.mtwilson.core</groupId>
+			<artifactId>mtwilson-core-help</artifactId>
+		  <version>0.1-SNAPSHOT</version>
+            </dependency>
+
+			<dependency>
+		  <groupId>com.intel.mtwilson.core</groupId>
+			<artifactId>mtwilson-core-data-bundle</artifactId>
+		  <version>0.1-SNAPSHOT</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.intel.mtwilson.integration</groupId>
                 <artifactId>mtwilson-password-vault</artifactId>

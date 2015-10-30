@@ -84,7 +84,7 @@ public class ConsoleTrustDelegate implements TrustDelegate {
         System.out.println("Serial number: "+certificate.getSerialNumber().toString());
         
         try {
-            System.out.println("SHA1 Fingerprint: "+Hex.encodeHexString(X509Util.sha1fingerprint(certificate)));
+            System.out.println("SHA1 Fingerprint: "+Hex.encodeHexString(X509Util.sha256fingerprint(certificate)));
         }
         catch(Exception e) { 
             error("Cannot obtain SHA1 fingerprint for certificate", e); 

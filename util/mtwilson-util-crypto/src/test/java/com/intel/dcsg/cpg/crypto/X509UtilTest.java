@@ -180,4 +180,37 @@ public class X509UtilTest {
         
         }
     
+    @Test
+    public void testDecodePemCertificate3a() throws CertificateException {
+        String pem3 = "-----BEGIN CERTIFICATE-----  MIICvTCCAaWgAwIBAgIGAVAAxUs6MA0GCSqGSIb3DQEBBQUAMBsxGTAXBgNVBAMTEG10d2lsc29u  LXBjYS1haWswHhcNMTUwOTI0MTkxMjIxWhcNMjUwOTIzMTkxMjIxWjAAMIIBIjANBgkqhkiG9w0B  AQEFAAOCAQ8AMIIBCgKCAQEAruRDsUf7ukja+xR0T39QdbGilsCw3aufEqSWS6U0K3WnRyBrZtgz  j0z5kuh3SG4emCwXsVzfCAY/VIk/gtFX+ZSlMAUGk7pxaaMrlKHZbn7dMPQbuft5Wx8BMaMPTxaR  sDWw0xrSEX0Aq6mdIPpf2JRoGLwcs3rrN9KbHo+xumdgYgwUTztF7LGon2fjpr3cLhgffMBDNNss  Cr5t9WhYV/n2uWadYyE5+hRJQr1bs9vBxric2LGgvmvhlP+MAhGp7dSkaTiEz5QeueG557vLEsvD  1UP63iK9vXk8Vj5gj5Pd9efG81F2mauubJwqxikK1KMu8EsCuE/v1bL2xTbDNwIDAQABoyIwIDAe  BgNVHREBAf8EFDASgRBISVMgSWRlbnRpdHkgS2V5MA0GCSqGSIb3DQEBBQUAA4IBAQBwmQoqOXdF  J3Qfem/9i/eVF8VMeIV3CdPmoCPnClvWMdkKe6BtoOCguF/QIRD4Ydo9NxiHtHdavnlM4WVCgQ6J  IXmgJ4qDiXx7juZZBF0Qt+p2NnXxWnIH+QW0YT+5RSM24sjRIPwgFo1raHq+YyFFb4Z00uVuH2u2  NRmouDKD43bzX11pBovLuM5re2oMUxmpOFtV2lacCilJ6f4c9vYdji6o+p0Nkhbmv5kMaoAEWxM6  IV82ZtR3YwbXDUw8lkMpEFMmj9wNJLRVsGBRvcJfZpxl663L5Ar4cckvpRGCzSnwM9yFFnZOngKb  Em/CIFF2aKMzwYN9ZMNY5FEtlBJE  -----END CERTIFICATE----- ";
+        List<X509Certificate> certs = X509Util.decodePemCertificates(pem3);
+        log.debug("got {} certs", certs.size()); // ZERO!
+        for(X509Certificate cert : certs) { log.debug("cert: {}", cert.getSubjectX500Principal().getName());
+        
+        }
+    }
+    @Test
+    public void testDecodePemCertificate3b() throws CertificateException {
+        String pem3 = "-----BEGIN CERTIFICATE-----\n" +
+"MIICvTCCAaWgAwIBAgIGAVAAxUs6MA0GCSqGSIb3DQEBBQUAMBsxGTAXBgNVBAMTEG10d2lsc29u\n" +
+"LXBjYS1haWswHhcNMTUwOTI0MTkxMjIxWhcNMjUwOTIzMTkxMjIxWjAAMIIBIjANBgkqhkiG9w0B\n" +
+"AQEFAAOCAQ8AMIIBCgKCAQEAruRDsUf7ukja+xR0T39QdbGilsCw3aufEqSWS6U0K3WnRyBrZtgz\n" +
+"j0z5kuh3SG4emCwXsVzfCAY/VIk/gtFX+ZSlMAUGk7pxaaMrlKHZbn7dMPQbuft5Wx8BMaMPTxaR\n" +
+"sDWw0xrSEX0Aq6mdIPpf2JRoGLwcs3rrN9KbHo+xumdgYgwUTztF7LGon2fjpr3cLhgffMBDNNss\n" +
+"Cr5t9WhYV/n2uWadYyE5+hRJQr1bs9vBxric2LGgvmvhlP+MAhGp7dSkaTiEz5QeueG557vLEsvD\n" +
+"1UP63iK9vXk8Vj5gj5Pd9efG81F2mauubJwqxikK1KMu8EsCuE/v1bL2xTbDNwIDAQABoyIwIDAe\n" +
+"BgNVHREBAf8EFDASgRBISVMgSWRlbnRpdHkgS2V5MA0GCSqGSIb3DQEBBQUAA4IBAQBwmQoqOXdF\n" +
+"J3Qfem/9i/eVF8VMeIV3CdPmoCPnClvWMdkKe6BtoOCguF/QIRD4Ydo9NxiHtHdavnlM4WVCgQ6J\n" +
+"IXmgJ4qDiXx7juZZBF0Qt+p2NnXxWnIH+QW0YT+5RSM24sjRIPwgFo1raHq+YyFFb4Z00uVuH2u2\n" +
+"NRmouDKD43bzX11pBovLuM5re2oMUxmpOFtV2lacCilJ6f4c9vYdji6o+p0Nkhbmv5kMaoAEWxM6\n" +
+"IV82ZtR3YwbXDUw8lkMpEFMmj9wNJLRVsGBRvcJfZpxl663L5Ar4cckvpRGCzSnwM9yFFnZOngKb\n" +
+"Em/CIFF2aKMzwYN9ZMNY5FEtlBJE\n" +
+"-----END CERTIFICATE-----";
+        List<X509Certificate> certs = X509Util.decodePemCertificates(pem3);
+        log.debug("got {} certs", certs.size()); // ONE!
+        for(X509Certificate cert : certs) { log.debug("cert: {}", cert.getSubjectX500Principal().getName());
+        
+        }
+    }
+    
 }
