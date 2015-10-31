@@ -4,6 +4,7 @@
  */
 package com.intel.mtwilson.util.archive;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -19,7 +20,7 @@ import org.apache.commons.io.FileUtils;
  * 
  * @author jbuhacoff
  */
-public class TarGzipBuilder {
+public class TarGzipBuilder implements Closeable {
     private GzipCompressorOutputStream gzip;
     private TarArchiveOutputStream tar;
     
@@ -49,6 +50,7 @@ public class TarGzipBuilder {
         add(filename, content.getBytes(Charset.forName("UTF-8")));
     }
     
+    @Override
     public void close() throws IOException {
         tar.close();
     }

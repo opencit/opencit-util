@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature xmlns="urn:mtwilson:feature:1.0">
+<id>mtwilson-core-data-bundle</id>
+<version>0.1-SNAPSHOT</version>
+<name>Data Bundle</name>
+<provider><name>Intel Corporation</name></provider>
+<description>Data bundle</description>
+<license><copyright>2015 Intel Corporation</copyright><url>http://intel.com</url></license>
+</feature>
