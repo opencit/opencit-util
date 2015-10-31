@@ -7,12 +7,14 @@ package com.intel.mtwilson.shiro.file.cmd;
 import com.intel.dcsg.cpg.console.Command;
 import com.intel.dcsg.cpg.console.input.Input;
 import com.intel.dcsg.cpg.crypto.RandomUtil;
+import com.intel.dcsg.cpg.extensions.Extensions;
 import com.intel.mtwilson.Folders;
 import com.intel.mtwilson.shiro.file.LoginDAO;
 import org.apache.commons.configuration.Configuration;
 import com.intel.mtwilson.shiro.file.model.UserPassword;
 import com.intel.mtwilson.shiro.file.model.UserPermission;
 import com.intel.mtwilson.crypto.password.PasswordUtil;
+import com.intel.mtwilson.shiro.file.UserEventHook;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -76,6 +78,7 @@ public class Password implements Command {
     public void execute(String[] args) throws Exception {
         File userFile = new File(Folders.configuration()+File.separator+"users.txt");
         File permissionFile = new File(Folders.configuration()+File.separator+"permissions.txt");
+        List<UserEventHook> hooks = Extensions.findAll(UserEventHook.class);
         
         // store or replace the user record
         log.debug("Loading users and permissions");
@@ -112,6 +115,12 @@ public class Password implements Command {
             removeUser(username);
             removePermissions(username);
             log.info("Removed username {}", username);
+            
+            //Hook for Deleting KMS User Profile
+            for(UserEventHook hook: hooks){
+                hook.afterDeleteUser(username); 
+            }
+            
             return;
         }
         
@@ -124,9 +133,15 @@ public class Password implements Command {
         userPassword.setSalt(RandomUtil.randomByteArray(8));
         byte[] hashedPassword = PasswordUtil.hash(password.getBytes(Charset.forName("UTF-8")), userPassword);
         userPassword.setUsername(username);
-        userPassword.setPasswordHash(hashedPassword);
+        userPassword.setPasswordHash(hashedPassword);  
         removeUser(username);
         dao.createUser(userPassword);
+        
+        //Hook for creating KMS User Profile  
+        for(UserEventHook hook: hooks){
+            hook.afterCreateUser(username); 
+        }
+            
         log.info("Created user {}", username);
         
         String newPermissions = getPermissions(args);
@@ -142,6 +157,7 @@ public class Password implements Command {
         UserPassword existingUser = dao.findUserByName(username);
         if( existingUser != null ) {
             dao.deleteUserByName(username);
+            //Possibly place hook for KMS Updating User Profile if ever needed
         }
     }
     private void removePermissions(String username) throws IOException {
