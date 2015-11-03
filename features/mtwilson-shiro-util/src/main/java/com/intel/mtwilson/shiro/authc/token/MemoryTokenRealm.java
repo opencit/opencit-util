@@ -4,6 +4,7 @@
  */
 package com.intel.mtwilson.shiro.authc.token;
 
+import com.intel.mtwilson.shiro.Username;
 import com.intel.mtwilson.shiro.UsernameWithPermissions;
 import java.util.Collection;
 import java.util.HashMap;
@@ -84,15 +85,17 @@ public class MemoryTokenRealm extends AuthorizingRealm {
             throw new AccountException("Token must be provided");
         }
         log.debug("doGetAuthenticationInfo for token {}", tokenValue);
+        TokenRecord tokenRecord;
         TokenCredential tokenCredential;
         try {
-            //TokenRecord existing = database.findByTokenValue(tokenValue);
-            tokenCredential = database.findCredentialByTokenValue(tokenValue);
-            if( tokenCredential == null ) {
+            tokenRecord = database.findByTokenValue(tokenValue);
+//            tokenCredential = database.findCredentialByTokenValue(tokenValue);
+            if( tokenRecord == null ) {
                 log.debug("doGetAuthenticationInfo token value not found in database: {}", tokenValue);
                 return null;
             }
-            if( !tokenCredential.getValue().equals(tokenValue) ) {
+            tokenCredential = tokenRecord.getCredential();
+            if( tokenCredential == null || !tokenCredential.getValue().equals(tokenValue) ) {
                 log.debug("doGetAuthenticationInfo found record but token value does not match: {}", tokenValue);
                 return null;
             }
@@ -104,6 +107,9 @@ public class MemoryTokenRealm extends AuthorizingRealm {
         
         SimplePrincipalCollection principals = new SimplePrincipalCollection();
         principals.add(new Token(tokenCredential.getValue()), getName());
+        principals.add(new Username(tokenRecord.getUsername()), getName());
+        principals.add(new UsernameWithPermissions(tokenRecord.getUsername(), tokenRecord.getPermissions()), getName());
+        log.debug("Added Username principal: {}", tokenRecord.getUsername());
 
         TokenAuthenticationInfo info = new TokenAuthenticationInfo();
         info.setPrincipals(principals);

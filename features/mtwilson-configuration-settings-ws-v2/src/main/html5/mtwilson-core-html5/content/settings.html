@@ -53,7 +53,7 @@
 
         </div>
 
-        <div class="row">
+        <div class="row" data-bind="with: settingsViewModel, visible: settingsViewModel.moreSettings().length > 0">
             <div class="col-md-2"></div>
             <div class="col-md-8" style="margin-top: 10px;">        
                 <div class="panel panel-default">
@@ -61,9 +61,9 @@
                         <h1>More Settings</h1>
                     </div>
                     <div class="panel-body">
-                        <p><a href="#saml_certificates" data-toggle="tab">SAML Certificates</a></p>
-                        <p><a href="#tpm_identity_certificates" data-toggle="tab">TPM Identity Certificates</a></p>
-                        <p><a href="#users" data-toggle="tab">Users</a></p>
+                        <ul data-bind="foreach: moreSettings().sort(sortBy('label'))" class="list-unstyled">
+                            <li><a data-toggle="tab" data-bind="text: label, attr: { href: targetTabHref }"></a></li>
+                        </ul>
                     </div>
 
                 </div>
@@ -137,12 +137,25 @@
              }
              */
             console.log("settings.html script");
+            var moreSettingsArray = [];
+            
             resourceLoader.loadJS(['js/knockout.js', 'js/jquery.js', 'js/kms_settings.js'], function() {
                 console.log("settings.html: loaded scripts");
                 // add our view models to the main view model defined by index.html
                 mainViewModel.settingsViewModel = new SettingListViewModel();
                 ko.applyBindings(mainViewModel, document.getElementById("settings"));
                 mainViewModel.settingsViewModel.searchSettings({});
+                
+                
+                // load "more settings" extensions
+                discovery.eachJSON("/mtwilson-core-configuration/more_settings.json", function(json,context) { 
+                    // check we don't already have this link in moreSettingsArray
+                    var existingIndexOf = moreSettingsArray.indexOf(context.entry.feature);
+                    if( existingIndexOf > -1 ) { console.log("more setting link %s is already in more settings", context.entry.feature); return; }
+                    for(var i=0; i<json.items.length; i++) {
+                        mainViewModel.settingsViewModel.addMoreSettingLink( json.items[i] );
+                    }
+                });
             });
 
         </script>

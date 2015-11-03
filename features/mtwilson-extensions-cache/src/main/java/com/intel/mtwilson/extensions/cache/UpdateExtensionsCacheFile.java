@@ -172,6 +172,18 @@ public class UpdateExtensionsCacheFile extends LocalSetupTask {
             fileIncludeFilter = new FileNameContains(containsKeywords);
             getConfiguration().set("mtwilson.extensions.fileIncludeFilter.contains", fileIncludeFilterContains); // set it again in configuration to ensure it gets saved in the config file during initial setup
         }
+        
+        // default is to only scan com.intel packages; applications can override with a configuration setting
+        String includePackagesStartsWith = getConfiguration().get("mtwilson.extensions.packageIncludeFilter.startsWith", "com.intel");
+        String[] includeStartsWithKeywords = StringUtils.split(includePackagesStartsWith, ", ");
+        getConfiguration().set("mtwilson.extensions.packageIncludeFilter.startsWith", includePackagesStartsWith);
+        setIncludePackages(Arrays.asList(includeStartsWithKeywords));
+        
+        // default is to exclude java and javax packages; applications can override with a configuration setting
+        String excludePackagesStartsWith = getConfiguration().get("mtwilson.extensions.packageExcludeFilter.startsWith", "java, javax");
+        String[] excludeStartsWithKeywords = StringUtils.split(excludePackagesStartsWith, ", ");
+        getConfiguration().set("mtwilson.extensions.packageExcludeFilter.startsWith", excludePackagesStartsWith);
+        setExcludePackages(Arrays.asList(excludeStartsWithKeywords));
     }
 
     @Override
@@ -240,6 +252,7 @@ public class UpdateExtensionsCacheFile extends LocalSetupTask {
         Scanner scanner = new Scanner(new Registrar[] { new ImplementationRegistrar(), new AnnotationRegistrar(V2.class), new AnnotationRegistrar(V1.class), new AnnotationRegistrar(RPC.class), new AnnotationRegistrar(Background.class), new AnnotationRegistrar(Provider.class) });
         scanner.setIncludePackages(getIncludePackages());
         scanner.setExcludePackages(getExcludePackages());
+        // the setting mtwilson.extensions.fileIncludeFilter.contains or mtwilson.extensions.fileIncludeFilter.class affects which files are returned from getJarFiles() for us to scan
         for(File jarFile : getJarFiles()) {
             try {
                 JarClassIterator it = new JarClassIterator(jarFile, new JarFileClassLoader(jarFile)); // throws IOException
