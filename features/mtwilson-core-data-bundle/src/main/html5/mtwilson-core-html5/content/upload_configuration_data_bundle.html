@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Upload Configuration Data Bundle</title>
+        <meta name="author" content="jbuhacoff">
+    </head>
+    <body>
+
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8" style="margin-top: 10px;">        
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h1>Upload Configuration Data Bundle</h1>
+                    </div>
+                    <div class="panel-body">
+                        <form id="uploadConfigurationDataBundleForm">
+                            <fieldset>
+                                <p>Choose a data bundle from your computer and submit this form to upload it to the server and import the data.</p>
+                                <label for="uploadConfigurationDataBundleForm_file">Data Bundle</label>
+                                <input type="file" id="uploadConfigurationDataBundleForm_file" name="file">
+                                <br>
+                                <input type="submit" class="btn btn-primary"  value="Upload"/>
+                                <p class="error" style="display: none;" id="uploadConfigurationDataBundleForm_error">There was a problem with the upload</p>
+                                <p class="success" style="display: none;" id="uploadConfigurationDataBundleForm_success">Data imported successfully</p>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2"></div>
+
+        </div>
+
+        <!--        
+                <script src="js/kms_settings.js"></script>
+        -->    
+        <script type="text/javascript">
+            /*
+             var endpoint = "/v1";
+             function MainViewModel() {
+             var self = this;
+             self.keysViewModel = new KeyListViewModel();
+             self.settingsViewModel = new SettingListViewModel();
+             }
+             */
+            console.log("upload_configuration_data_bundle.html script");
+            resourceLoader.loadJS(['js/knockout.js', 'js/jquery.js', 'js/kms_settings.js'], function() {
+                console.log("upload_configuration_data_bundle.html: loaded scripts");
+                // add our view models to the main view model defined by index.html
+                /*
+                mainViewModel.settingsViewModel = new SettingListViewModel();
+                ko.applyBindings(mainViewModel, document.getElementById("settings"));
+                mainViewModel.settingsViewModel.searchSettings({});
+                */
+               
+                $("form#uploadConfigurationDataBundleForm").submit(function() {
+                    var formData = new FormData($(this)[0]);
+                    $.ajax({
+                        url: endpoint + "/databundle",
+                        type: 'POST',
+                        data: formData,
+                        async: false,
+                        success: function(data) {
+                            $('#uploadConfigurationDataBundleForm_error').hide();
+                            $('#uploadConfigurationDataBundleForm_success').show();
+                        },
+                        error: function(errorThrown) {
+                            $('#uploadConfigurationDataBundleForm_error').show();
+                            $('#uploadConfigurationDataBundleForm_success').hide();
+                        },
+                        cache: false,
+                        contentType: false,
+                        processData: false
+                    });
+                    return false;
+                });
+               
+            });
+
+        </script>
+
+    </body>
+</html>

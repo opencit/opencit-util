@@ -15,8 +15,12 @@ function sortBy(propertyName) {
     }
     return function(a,b) {
         var result = 0;
-        if( a[propertyName] < b[propertyName]) { result = -1; }
-        if( a[propertyName] > b[propertyName]) { result = 1; }
+        var propA = a[propertyName];
+        var propB = b[propertyName];
+        var valueA = (typeof(propA) === "function" ? propA() : propA);
+        var valueB = (typeof(propB) === "function" ? propB() : propB);
+        if( valueA < valueB) { result = -1; }
+        if( valueA > valueB) { result = 1; }
         return result * sortOrder;
     };
 }
@@ -33,10 +37,18 @@ function sortBy(propertyName) {
                 this.offset = ko.observable();
             }
 
+            function MoreSettingLink(data) {
+                var self = this;
+                self.label = ko.observable(data.label);
+                self.target_tab = ko.observable(data.target_tab);
+                self.targetTabHref = ko.pureComputed(function() { return "#" + self.target_tab(); });
+            }
+
             function SettingListViewModel() {
                 var self = this;
                 //data
                 self.settings = ko.observableArray([]);
+                self.moreSettings = ko.observableArray([]);
                 self.editSettingRequest = ko.observable(new Setting({}));
                 self.deleteSettingRequest = ko.observable(new Setting({}));
                 self.searchCriteria = ko.observable(new SettingSearchCriteria());
@@ -153,5 +165,11 @@ function sortBy(propertyName) {
                             $('#deleteSettingModalDialog').modal('hide');
                         }
                     });
+                };
+                
+                
+                self.addMoreSettingLink = function(moreSettingLinkItem) {
+                    var item = new MoreSettingLink(moreSettingLinkItem);
+                    self.moreSettings.push(item);
                 };
             }
