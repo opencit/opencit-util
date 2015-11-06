@@ -6,6 +6,7 @@ package com.intel.mtwilson.util.exec;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Map;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
@@ -54,6 +55,19 @@ public class ExecUtil {
         executor.setStreamHandler(psh);
         log.debug("Executing command: {} with arguments: {}", command.getExecutable(), command.getArguments());
         int exitCode = executor.execute(command);
+        Result result = new Result(exitCode, stdout.toString(), stderr.toString());
+        return result;
+    }
+    
+    public static Result execute(CommandLine command, Map environment) throws ExecuteException, IOException {
+        DefaultExecutor executor = new DefaultExecutor();
+        ByteArrayOutputStream stdout=new ByteArrayOutputStream();
+        ByteArrayOutputStream stderr=new ByteArrayOutputStream();
+        PumpStreamHandler psh=new PumpStreamHandler(stdout, stderr);
+        executor.setProcessDestroyer(new ShutdownHookProcessDestroyer());
+        executor.setStreamHandler(psh);
+        log.debug("Executing command: {} with arguments: {}", command.getExecutable(), command.getArguments());
+        int exitCode = executor.execute(command, environment);
         Result result = new Result(exitCode, stdout.toString(), stderr.toString());
         return result;
     }
