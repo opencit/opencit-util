@@ -54,9 +54,14 @@ public class ExecUtil {
         executor.setProcessDestroyer(new ShutdownHookProcessDestroyer());
         executor.setStreamHandler(psh);
         log.debug("Executing command: {} with arguments: {}", command.getExecutable(), command.getArguments());
-        int exitCode = executor.execute(command);
-        Result result = new Result(exitCode, stdout.toString(), stderr.toString());
-        return result;
+        int exitCode = 1;
+        try {
+            exitCode = executor.execute(command);
+            return new Result(exitCode, stdout.toString(), stderr.toString());
+        } catch (ExecuteException ee) {
+            log.error("Error while executing command: {}", command.toString(), ee);
+            return new Result(exitCode, stdout.toString(), stderr.toString());
+        }
     }
     
     public static Result execute(CommandLine command, Map environment) throws ExecuteException, IOException {
@@ -67,9 +72,14 @@ public class ExecUtil {
         executor.setProcessDestroyer(new ShutdownHookProcessDestroyer());
         executor.setStreamHandler(psh);
         log.debug("Executing command: {} with arguments: {}", command.getExecutable(), command.getArguments());
-        int exitCode = executor.execute(command, environment);
-        Result result = new Result(exitCode, stdout.toString(), stderr.toString());
-        return result;
+        int exitCode = 1;
+        try {
+            exitCode = executor.execute(command, environment);
+            return new Result(exitCode, stdout.toString(), stderr.toString());
+        } catch (ExecuteException ee) {
+            log.error("Error while executing command: {}", command.toString(), ee);
+            return new Result(exitCode, stdout.toString(), stderr.toString());
+        }
     }
 
     public static Result executeQuietly(CommandLine command) throws IOException {
