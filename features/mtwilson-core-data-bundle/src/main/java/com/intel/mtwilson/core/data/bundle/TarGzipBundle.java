@@ -66,7 +66,7 @@ public class TarGzipBundle implements Bundle {
                         }
                         int entrySize = (int) entry.getSize();
 //                        log.debug("entry size: {}", entrySize);
-                        int blockSize = tar.getRecordSize();
+//                        int blockSize = tar.getRecordSize();
 //                        log.debug("record size: {}", blockSize);
                         byte[] content = new byte[entrySize];
                         int offset = 0;
