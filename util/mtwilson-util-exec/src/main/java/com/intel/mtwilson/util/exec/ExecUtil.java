@@ -6,6 +6,7 @@ package com.intel.mtwilson.util.exec;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Map;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
@@ -53,9 +54,32 @@ public class ExecUtil {
         executor.setProcessDestroyer(new ShutdownHookProcessDestroyer());
         executor.setStreamHandler(psh);
         log.debug("Executing command: {} with arguments: {}", command.getExecutable(), command.getArguments());
-        int exitCode = executor.execute(command);
-        Result result = new Result(exitCode, stdout.toString(), stderr.toString());
-        return result;
+        int exitCode = 1;
+        try {
+            exitCode = executor.execute(command);
+            return new Result(exitCode, stdout.toString(), stderr.toString());
+        } catch (ExecuteException ee) {
+            log.error("Error while executing command: {}", command.toString(), ee);
+            return new Result(exitCode, stdout.toString(), stderr.toString());
+        }
+    }
+    
+    public static Result execute(CommandLine command, Map environment) throws ExecuteException, IOException {
+        DefaultExecutor executor = new DefaultExecutor();
+        ByteArrayOutputStream stdout=new ByteArrayOutputStream();
+        ByteArrayOutputStream stderr=new ByteArrayOutputStream();
+        PumpStreamHandler psh=new PumpStreamHandler(stdout, stderr);
+        executor.setProcessDestroyer(new ShutdownHookProcessDestroyer());
+        executor.setStreamHandler(psh);
+        log.debug("Executing command: {} with arguments: {}", command.getExecutable(), command.getArguments());
+        int exitCode = 1;
+        try {
+            exitCode = executor.execute(command, environment);
+            return new Result(exitCode, stdout.toString(), stderr.toString());
+        } catch (ExecuteException ee) {
+            log.error("Error while executing command: {}", command.toString(), ee);
+            return new Result(exitCode, stdout.toString(), stderr.toString());
+        }
     }
 
     public static Result executeQuietly(CommandLine command) throws IOException {
