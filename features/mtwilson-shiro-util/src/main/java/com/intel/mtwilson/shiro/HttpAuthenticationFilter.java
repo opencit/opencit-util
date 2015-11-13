@@ -26,6 +26,7 @@ public abstract class HttpAuthenticationFilter extends AuthenticationFilter {
     private String challengeHeaderName = "WWW-Authenticate";    
     private String authenticationScheme = null; // for example X509, BASIC, DIGEST
     private String applicationName = "Mt Wilson";
+    private boolean sendChallenge = true;
 
     public void setApplicationName(String applicationName) {
         this.applicationName = applicationName;
@@ -59,6 +60,26 @@ public abstract class HttpAuthenticationFilter extends AuthenticationFilter {
         return challengeHeaderName;
     }
     
+    /**
+     * Disabling this setting will skip sending the WWW-Authenticate header. 
+     * By default this setting is enabled.
+     * The example configuration below will send 401 Unauthorized but will
+     * not send WWW-Authenticate:
+     * <pre>
+authcPassword=com.intel.mtwilson.shiro.authc.password.PasswordAuthenticationFilter
+authcPassword.sendChallenge=false
+     * </pre>
+     * 
+     * @param sendChallenge 
+     */
+    public void setSendChallenge(boolean sendChallenge) {
+        this.sendChallenge = sendChallenge;
+    }
+
+    public boolean isSendChallenge() {
+        return sendChallenge;
+    }
+    
 
     /**
      * Looks for an Authorization header (the name can be set with 
@@ -81,18 +102,20 @@ public abstract class HttpAuthenticationFilter extends AuthenticationFilter {
             log.debug("isAuthenticationRequest did not find {} header", authorizationHeaderName);
             return false;
         }
-        if( headerValue.startsWith(authenticationScheme)) {
+        if( headerValue.toUpperCase().startsWith(authenticationScheme.toUpperCase()+" ")) {
             return true;
         }
         return false;
     }
     
     protected void sendChallenge(ServletRequest request, ServletResponse response) {
-        log.debug("sending challenge header {} to {}", challengeHeaderName, request.getRemoteAddr());
         HttpServletResponse httpResponse = WebUtils.toHttp(response);
         httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        String authcHeader = authenticationScheme + " realm=\"" + getApplicationName() + "\"";
-        httpResponse.addHeader(challengeHeaderName, authcHeader);
+        if( sendChallenge ) {
+            log.debug("sending challenge header {} to {}", challengeHeaderName, request.getRemoteAddr());
+            String authcHeader = authenticationScheme + " realm=\"" + getApplicationName() + "\"";
+            httpResponse.addHeader(challengeHeaderName, authcHeader);
+        }
     }
 
     @Override

@@ -65,7 +65,7 @@ public class TokenAuthenticationFilter extends HttpAuthenticationFilter {
         if( terms.length == 0 ) {
             throw new IllegalArgumentException("Authorization header is empty");
         }
-        if (!"Token".equals(terms[0])) {
+        if (!"TOKEN".equals(terms[0].toUpperCase())) {
             throw new IllegalArgumentException("Authorization type is not Token");
         }
         if( terms.length != 2 ) {
