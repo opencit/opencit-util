@@ -23,13 +23,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -182,9 +185,53 @@ public class Directory {
     }
     
     private String getContentLink(String feature, String path) {
+        log.debug("getContentLink feature:{}, path:{}", feature, path);
+        if( path.startsWith("public") ) {
+            return String.format("/html5/public/%s/%s", feature, path.substring("public/".length()));
+        }
         return String.format("/html5/features/%s/%s", feature, path);
     }
 
+    
+    private void logRequest(HttpServletRequest request) {
+        log.debug("RequestURI: " + request.getRequestURI());  //  RequestURI: /v1/resources/index.html
+        log.debug("ContextPath: " + request.getContextPath()); // ContextPath:  (empty)
+        log.debug("PathInfo: " + request.getPathInfo()); // PathInfo: /resources/index.html     (because this servlet is rooted at /file so this is relative to servlet)
+        log.debug("PathTranslated: " + request.getPathTranslated());  // PathTranslated: null unless jetty has a default servlet with a directory configured (look for jetty.hypertext variable) and if it's configured then it would be configuredPath/resources/index.html
+        log.debug("RemoteAddr: " + request.getRemoteAddr()); // RemoteAddr: 127.0.0.1
+        log.debug("Scheme: " + request.getScheme()); // Scheme: https
+        log.debug("ServletPath: " + request.getServletPath()); // ServletPath: /v1  (the Jersey servlet path)
+        log.debug("ServerName: " + request.getServerName()); // ServerName: 127.0.0.1
+    }
+    
+    private boolean isValidFileRequest(String rootPath, File file) {
+        return 
+                // check absolute path to protect against tricks like .. to escape the html5 directory
+                file.getAbsolutePath().startsWith(rootPath+File.separator) 
+                // check if target file exists
+                && file.exists() 
+                // we don't provide directory listings from this feature
+                && !file.isDirectory();
+    }
+
+    
+    public byte[] getBytes(String basedir, String relativePath) {
+        log.debug("Combined path: {}{}", basedir, relativePath);
+        File file = new File(basedir + File.separator + relativePath);
+        log.debug("Absolute path: {}", file.getAbsolutePath());
+        
+        if( !isValidFileRequest(basedir, file) ) {
+            throw new NotFoundException();
+        }
+        
+        try (FileInputStream in = new FileInputStream(file)) {
+            return IOUtils.toByteArray(in);
+        } catch (IOException e) {
+            log.error("Cannot retrieve file", e);
+            throw new ServerErrorException(Response.serverError().build());
+        }        
+    }
+    
     /**
      * Downside of having this API here is that it repeats (with less quality)
      * the same logic as standard static file download servlets... the only
@@ -201,52 +248,76 @@ public class Directory {
      * @param response
      * @return 
      */
+    @Path("/resources/{featureId}/{path:.+}")
+    @GET
+    @Produces(MediaType.WILDCARD)
+    public byte[] getResource(@PathParam("featureId") String featureId, @PathParam("path") String path, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+        log.debug("getResource JAX-RS path: {}", path);
+        logRequest(request);
+
+        String relativePath = FilenameUtils.normalize(request.getPathInfo(), true).replaceFirst(String.format("^/html5/resources/%s/", featureId), "");
+        log.debug("Relative path: {}", relativePath);
+        
+        String featureHtml5Path = Folders.features(featureId) + File.separator + "html5";
+        
+        return getBytes(featureHtml5Path, relativePath);
+    }
+    
+    
+    /**
+     * @deprecated api path /features/{featureId}/{path} will be removed in a later release
+     * @param featureId
+     * @param path
+     * @param request
+     * @param response
+     * @return 
+     */
     @Path("/features/{featureId}/{path:.+}")
     @GET
     @Produces(MediaType.WILDCARD)
     public byte[] getFile(@PathParam("featureId") String featureId, @PathParam("path") String path, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        log.debug("JAX-RS path: {}", path);
-        log.debug("RequestURI: " + request.getRequestURI());  //  RequestURI: /v1/resources/index.html
-        log.debug("ContextPath: " + request.getContextPath()); // ContextPath:  (empty)
-        log.debug("PathInfo: " + request.getPathInfo()); // PathInfo: /resources/index.html     (because this servlet is rooted at /file so this is relative to servlet)
-        log.debug("PathTranslated: " + request.getPathTranslated());  // PathTranslated: null unless jetty has a default servlet with a directory configured (look for jetty.hypertext variable) and if it's configured then it would be configuredPath/resources/index.html
-        log.debug("RemoteAddr: " + request.getRemoteAddr()); // RemoteAddr: 127.0.0.1
-        log.debug("Scheme: " + request.getScheme()); // Scheme: https
-        log.debug("ServletPath: " + request.getServletPath()); // ServletPath: /v1  (the Jersey servlet path)
-        log.debug("ServerName: " + request.getServerName()); // ServerName: 127.0.0.1
+        log.debug("getFile JAX-RS path: {}", path);
+        logRequest(request);
 
         String relativePath = FilenameUtils.normalize(request.getPathInfo(), true).replaceFirst(String.format("^/html5/features/%s/", featureId), "");
         log.debug("Relative path: {}", relativePath);
-
-        String featureHtml5Path = Folders.features(featureId) + File.separator + "html5";
-
-        log.debug("Combined path: {}{}", featureHtml5Path, relativePath);
-        File file = new File(featureHtml5Path + File.separator + relativePath);
-        log.debug("Absolute path: {}", file.getAbsolutePath());
-
-        // protect against tricks like .. to escape the html5 directory
-        if (!file.getAbsolutePath().startsWith(featureHtml5Path)) {
-            throw new WebApplicationException(Status.NOT_FOUND); // resp.setStatus(Response.Status.NOT_FOUND.getStatusCode());
-        }
-
-        // check if target file exists
-        if (!file.exists()) {
-            throw new WebApplicationException(Status.NOT_FOUND); // resp.setStatus(Response.Status.NOT_FOUND.getStatusCode());
-        }
-
-        // we don't provide directory listings from this feature
-        if (file.isDirectory()) {
-            throw new WebApplicationException(Status.NOT_FOUND); // resp.setStatus(Response.Status.NOT_FOUND.getStatusCode());
-        }
         
-        try (FileInputStream in = new FileInputStream(file)) {
-            return IOUtils.toByteArray(in);
-        } catch (IOException e) {
-            log.error("Cannot retrieve file", e);
-            throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-        }
+        String featureHtml5Path = Folders.features(featureId) + File.separator + "html5";
+        
+        return getBytes(featureHtml5Path, relativePath);
     }
 
+    /**
+     * Provides a mechanism for making specific resources publicly
+     * accessible (no authorization requird) under a single path prefix
+     * for all features, which simplifies the security configuration.
+     * 
+     * For a resource with a URL like http://server/v1/public/featureId/resourceA
+     * the file would be found under /opt/application/features/featureId/html5/public/resourceA
+     * 
+     * @param featureId
+     * @param path
+     * @param request
+     * @param response
+     * @return 
+     */
+    @Path("/public/{featureId}/{path:.+}")
+    @GET
+    @Produces(MediaType.WILDCARD)
+    public byte[] getPublicResource(@PathParam("featureId") String featureId, @PathParam("path") String path, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+
+        
+        log.debug("getPublicResource JAX-RS path: {}", path);
+        logRequest(request);
+        
+        String relativePath = FilenameUtils.normalize(request.getPathInfo(), true).replaceFirst(String.format("^/html5/public/%s/", featureId), "");
+        log.debug("Relative path: {}", relativePath);
+
+        String featureHtml5Path = Folders.features(featureId) + File.separator + "html5" + File.separator + "public";
+
+        return getBytes(featureHtml5Path, relativePath);
+    }
+    
     public static class DirectoryListing {
 
         public ArrayList<DirectoryEntry> entries = new ArrayList<>();

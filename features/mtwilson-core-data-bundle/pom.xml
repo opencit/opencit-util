@@ -13,6 +13,14 @@
         <relativePath/>
     </parent>
 
+    <description>
+        This feature depends on jersey-media-multipart.jar so if using the
+        mtwilson-core-extensions-cache, ensure that the configuration setting 
+        "mtwilson.extensions.fileIncludeFilter.contains" includes the value
+        "jersey-media-multipart" and that the configuration setting
+        "mtwilson.extensions.packageIncludeFilter.startsWith" includes the value
+        "org.glassfish.jersey.media.multipart".
+    </description>
     <dependencies>  
         
         <dependency>

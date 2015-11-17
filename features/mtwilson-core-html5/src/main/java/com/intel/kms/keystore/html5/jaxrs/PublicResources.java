@@ -20,6 +20,8 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.commons.io.IOUtils;
 
 /**
+ * Serves static content that does not require authorization to access.
+ * 
  * Serves static content from classpath resources. The resources must be under a
  * "publicResources" directory in order to be found. Example jar structure:
  * <pre>
@@ -35,6 +37,10 @@ import org.apache.commons.io.IOUtils;
  *
  * A limitation of this API is discovery or directory listing is not possible,
  * so the caller must know the file path under publicResources in advance.
+ * Also, because classpath resources are not namespaces according to which
+ * jar they came from, resources should be located under a path that is 
+ * namespaced, for example src/main/resources/publicResources/featureId/resourceA
+ * which would be accessed via a URL like http://server/app/resources/featureId/resourceA
  *
  * To serve files from the filesystem, use the default servlet that comes with
  * Jetty or any other web server.
