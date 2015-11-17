@@ -113,9 +113,9 @@
                                         <property name="makeself.name.with.distro" value="${makeself.name}-${os.flavor}"/>
                                 
                                         <!-- package directory contains everything that should be included in the installer -->
-                                        <mkdir dir="${project.build.directory}/${makeself.name.with.distro}"/>
+                                        <mkdir dir="${project.build.directory}/${makeself.name}"/>
                                         <chmod perm="700">
-                                            <fileset dir="${project.build.directory}/${makeself.name.with.distro}">
+                                            <fileset dir="${project.build.directory}/${makeself.name}">
                                                 <include name="**/*.sh"/>
                                                 <include name="**/*.bin"/>
                                                 <include name="**/*.pl"/>
@@ -127,7 +127,7 @@
                                             <arg value="--follow"/>
                                             <arg value="--nocomp"/>
                                             <!-- <arg value=" - - n o t e m p "/>  makeself needs an option to clean up the non-/tmp dir so disabling until we have that -->
-                                            <arg value="${project.build.directory}/${makeself.name.with.distro}"/>
+                                            <arg value="${project.build.directory}/${makeself.name}"/>
                                             <arg value="${project.build.directory}/${makeself.name.with.distro}.bin"/>
                                             <arg value="${makeself.name.with.distro}"/>
                                             <arg value="bash"/>
