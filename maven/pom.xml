@@ -22,5 +22,6 @@
     <!-- <module>mtwilson-maven-package</module>  only used by mtwilson-trusagent, which can just be modified to use the newer mtwilson-maven-package-java-zip-->
 	<module>mtwilson-maven-package-bin-zip</module>
 	<module>mtwilson-maven-package-makeself</module>
+    <module>mtwilson-maven-package-makeself-distro</module>
     </modules>
 </project>
