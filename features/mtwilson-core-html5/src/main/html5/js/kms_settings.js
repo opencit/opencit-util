@@ -113,6 +113,11 @@ function sortBy(propertyName) {
                         }
                     });
                 };
+				
+				self.confirmEditSetting = function(editSettingItem) {
+                    console.log("Confirm edit setting: %O", editSettingItem); // editKeyItem a Key object
+                    self.editSettingRequest(editSettingItem);
+                };
                 
                 self.editSetting = function(editSettingItem) {
                     console.log("Edit setting: %O", editSettingItem);
