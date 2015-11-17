@@ -270,7 +270,14 @@
                                     continue;
                                 }
                                 console.log("Loading navbar button html from: %s", endpoint+json.items[i].href);
-                                resourceLoader.loadHTML( endpoint+json.items[i].href, function(button) {
+                                resourceLoader.loadHTML( endpoint+json.items[i].href, 
+                                    /*
+                                     * 
+                                     * @param {object} button like { url: url, html: self.html[url] }
+                                     * @param {object} buttonContext like { context: context, descriptor: json, index: i, item: json.items[i] }
+                                     * @returns {undefined} ignored
+                                     */
+                                    function(button, buttonContext) {
                                     console.log("insertButtonsIntoNavbar navbar main loaded html button: %O", button);
                                     // button is object like {"url":url,"html":html} defined by resource loader's loadHTML method
                                     // before setting the html, we extract the <li> from the <body><ul>...</ul></body> received from server
@@ -280,6 +287,7 @@
                                     buttonHtmlScriptElement.attr("type", "application/html");
                                     buttonHtmlScriptElement.append(button.html);
                                     buttonHtmlScriptElement.find("li").attr("data-navbar-feature", context.entry.feature);
+                                    buttonHtmlScriptElement.find("li").attr("data-navbar-feature-button-index", buttonContext.index);
                                     var buttonHtml = buttonHtmlScriptElement.find("ul").html();
                                     buttonHtmlScriptElement.remove();
                                     console.log("insertButtonsIntoNavbar Filtered navigation button html to list item: %s", buttonHtml);
@@ -292,11 +300,21 @@
                                         var comparisonFeatureName = $(navbarButtons[i]).attr("data-navbar-feature");
                                         console.log("insertButtonsIntoNavbarFeature navbbar button: %s",comparisonFeatureName);
                                         var comparisonFeatureIndex = sortOrder.indexOf(comparisonFeatureName);
+                                        // following block is first-level sort: among all features, ensure they are in same order specified by configuration setting
                                         if( comparisonFeatureIndex > indexOfThisFeature ) {
                                             console.log("insertButtonsIntoNavbarFeature FOUND insertion point for %s before %s", context.entry.feature, comparisonFeatureName );
                                             // the first feature that is AFTER this feature is where we stop, and insert before it
                                             $(navbarButtons[i]).before(buttonHtml);
                                             insertedButton = true;
+                                        }
+                                        // following block is second-level sort: within buttons from the same feature, ensure they are in same order specified in main.json
+                                        else if( comparisonFeatureIndex === indexOfThisFeature ) {
+                                            // found another button from same feature, so compare the button index order
+                                            var comparisonFeatureButtonIndex = $(navbarButtons[i]).attr("data-navbar-feature-button-index");
+                                            if( comparisonFeatureButtonIndex > buttonContext.index ) {
+                                                $(navbarButtons[i]).before(buttonHtml);
+                                                insertedButton = true;
+                                            }
                                         }
                                     }
                                     if( !insertedButton && indexOfThisFeature > -1 ) {
@@ -346,7 +364,9 @@
                                     });
                                     
                                     
-                                });
+                                },  // end of loadHTML callback function
+                                // extra callback args provided to loadHTML callback function as second buttonContext parameter:
+                                { context: context, descriptor: json, index: i, item: json.items[i] });
                             }
                         });
                         
