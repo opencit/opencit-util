@@ -65,8 +65,6 @@ import org.apache.shiro.subject.Subject;
 @Path("/login")
 public class PasswordLogin {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PasswordLogin.class);
-    public static String LOGIN_TOKEN_EXPIRES_MINUTES = "login.token.expires.minutes";
-    public static String LOGIN_REQUIRES_TLS = "login.requires.tls";
     
 //    private TokenFactory factory;
 //    @RequiresGuest  // causes it to fail when someone is already logged in, which is not convenient because then user has to close browser and "forget" credentials if they want to log in again (for example if they reloaded entry point)
@@ -100,7 +98,7 @@ public class PasswordLogin {
             configuration = new PropertiesConfiguration();
         }
         
-        boolean requireTls = Boolean.valueOf(configuration.get(LOGIN_REQUIRES_TLS, "true"));
+        boolean requireTls = Boolean.valueOf(configuration.get(LoginTokenUtils.LOGIN_REQUIRES_TLS, "true"));
         if( requireTls && !request.isSecure()) {
             log.info("Denying non-TLS login request");
             throw new WebApplicationException(Status.UNAUTHORIZED);
@@ -128,7 +126,7 @@ public class PasswordLogin {
 //        Collection<UserId> userIds = principals.byType(UserId.class);
 //        Collection<LoginPasswordId> loginPasswordIds = principals.byType(LoginPasswordId.class);
 
-        UsernameWithPermissions usernameWithPermissions = getFirstElementFromCollection(usernames);
+        UsernameWithPermissions usernameWithPermissions = LoginTokenUtils.getFirstElementFromCollection(usernames);
 //        UserId userId = getFirstElementFromCollection(userIds);
 //        LoginPasswordId loginPasswordId = getFirstElementFromCollection(loginPasswordIds);
         if ( usernameWithPermissions == null /* || userId == null || loginPasswordId == null */ ) {
@@ -138,7 +136,7 @@ public class PasswordLogin {
         
         String tokenValue = RandomUtil.randomBase64String(32); // new random token value
         Date notBefore = new Date(); // token is valid starting right now
-        Date notAfter = getExpirationDate(notBefore, configuration);
+        Date notAfter = LoginTokenUtils.getExpirationDate(notBefore, configuration);
         Integer used = 0; // new token
         Integer usedMax = null; // for logins we don't set a usage limit, just an expiration date
         TokenCredential tokenCredential = new TokenCredential(tokenValue, notBefore, notAfter, used, usedMax);
@@ -156,21 +154,5 @@ public class PasswordLogin {
         return passwordLoginResponse;
     }
     
-    private Date getExpirationDate(Date start, Configuration config) {
-        Integer loginTokenExpiresMinutes = Integer.valueOf(config.get(LOGIN_TOKEN_EXPIRES_MINUTES, "30"));
-        Calendar c = Calendar.getInstance();
-        c.setTime(start);        
-        c.add(Calendar.MINUTE, loginTokenExpiresMinutes);
-        return c.getTime();
-    }
     
-    private <T> T getFirstElementFromCollection(Collection<T> collection) {
-        if( collection != null ) {
-            Iterator<T> iterator = collection.iterator();
-            if (iterator.hasNext()) {
-                return iterator.next();
-            }
-        }
-        return null;
-    }
 }
