@@ -4,14 +4,19 @@
  */
 package com.intel.kms.login.token;
 
+import com.intel.dcsg.cpg.configuration.Configuration;
+import com.intel.dcsg.cpg.configuration.PropertiesConfiguration;
 import com.intel.dcsg.cpg.crypto.RandomUtil;
+import com.intel.mtwilson.configuration.ConfigurationFactory;
 import com.intel.mtwilson.jaxrs2.mediatype.DataMediaType;
 import com.intel.mtwilson.launcher.ws.ext.V2;
 import com.intel.mtwilson.shiro.UsernameWithPermissions;
 import com.intel.mtwilson.shiro.authc.token.MemoryTokenRealm;
 import com.intel.mtwilson.shiro.authc.token.TokenCredential;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.NotAuthorizedException;
@@ -19,6 +24,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.shiro.SecurityUtils;
@@ -58,7 +64,8 @@ public class LoginTokensJaxrs {
      *   "data": [{
      *     "token": "KrSX3iIbitCqInUqLY6Tjnq2xyfFTZUpykV11o3Wpgw=",
      *     "attributes": {
-     *        "not_before": 1447868402090,
+     *        "not_before": 1447869315451,
+     *        "not_after": 1447871115451,
      *        "not_more_than": 1
      *     }
      *   }]
@@ -72,8 +79,24 @@ public class LoginTokensJaxrs {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, DataMediaType.APPLICATION_YAML, DataMediaType.TEXT_YAML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, DataMediaType.APPLICATION_YAML, DataMediaType.TEXT_YAML})
     @RequiresPermissions("login_token:create")
-    public CreateLoginTokenResponse createLoginToken(CreateLoginTokenRequest createLoginTokenRequest) {
+    public CreateLoginTokenResponse createLoginToken(CreateLoginTokenRequest createLoginTokenRequest, @Context final HttpServletRequest httpRequest) {
         if( createLoginTokenRequest == null ) { log.error("Login token request data is missing"); throw new BadRequestException(); }
+        
+        // load configuration
+        Configuration configuration;
+        try {
+            configuration = ConfigurationFactory.getConfiguration();
+        }
+        catch(IOException e) {
+            log.warn("Cannot load configuration, using defaults", e);
+            configuration = new PropertiesConfiguration();
+        }
+        
+        boolean requireTls = Boolean.valueOf(configuration.get(LoginTokenUtils.LOGIN_REQUIRES_TLS, "true"));
+        if( requireTls && !httpRequest.isSecure()) {
+            log.info("Denying non-TLS login request");
+            throw new WebApplicationException(Response.noContent().status(Response.Status.UNAUTHORIZED).build());
+        }
         
         Subject currentUser = SecurityUtils.getSubject();
         if (!currentUser.isAuthenticated()) {
@@ -94,13 +117,20 @@ public class LoginTokensJaxrs {
         // a caller may request more than one token at a time;  we return tokens in the same order but also we include the original parameters to ensure the caller knows which token can do what...
         CreateLoginTokenResponse createLoginTokenResponse = new CreateLoginTokenResponse();
         for(LoginTokenAttributes attributes : createLoginTokenRequest.getData()) {
-            if( attributes.getNotBefore() == null ) { attributes.setNotBefore(new Date()); }
+            Date notBefore = attributes.getNotBefore();
+            Date notAfter = attributes.getNotAfter();
+            Integer notMoreThan = attributes.getNotMoreThan();
+            
+            if( notBefore == null ) { notBefore = new Date(); }
+            if( notAfter == null ) { notAfter = LoginTokenUtils.getExpirationDate(notBefore, configuration); }
+            
             String tokenValue = RandomUtil.randomBase64String(32); // new random token value
-            
-            TokenCredential tokenCredential = new TokenCredential(tokenValue, attributes.getNotBefore(), attributes.getNotAfter(), 0, attributes.getNotMoreThan());
-            
+            TokenCredential tokenCredential = new TokenCredential(tokenValue, notBefore, notAfter, 0, notMoreThan);
             database.add(tokenCredential, usernameWithPermissions);
             
+            attributes.setNotBefore(notBefore);
+            attributes.setNotAfter(notAfter);
+            attributes.setNotMoreThan(notMoreThan);
             LoginTokenDescriptor loginTokenDescriptor = new LoginTokenDescriptor(tokenCredential.getValue(), attributes);
             createLoginTokenResponse.getData().add(loginTokenDescriptor);
         }
