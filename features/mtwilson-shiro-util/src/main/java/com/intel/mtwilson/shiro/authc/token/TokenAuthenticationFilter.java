@@ -4,6 +4,7 @@
  */
 package com.intel.mtwilson.shiro.authc.token;
 
+import com.intel.dcsg.cpg.http.Query;
 import com.intel.mtwilson.shiro.authc.x509.*;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +12,9 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.web.util.WebUtils;
 import com.intel.mtwilson.shiro.HttpAuthenticationFilter;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Handles authentication via an HTTP Authorization header with the "Token" 
@@ -33,13 +37,32 @@ import com.intel.mtwilson.shiro.HttpAuthenticationFilter;
  * @author jbuhacoff
  */
 public class TokenAuthenticationFilter extends HttpAuthenticationFilter {
-
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(X509AuthenticationFilter.class);
+    public static final String AUTHENTICATION_SCHEME = "Token";
+    public static final String AUTHENTICATION_SCHEME_UC = "TOKEN";
 
     public TokenAuthenticationFilter() {
         super();
-        setAuthenticationScheme("Token");
+        setAuthenticationScheme(AUTHENTICATION_SCHEME);
     }
+
+    @Override
+    protected boolean isAuthenticationRequest(ServletRequest request) {
+        HttpServletRequest httpRequest = WebUtils.toHttp(request);
+        return isHeaderAuthenticationRequest(httpRequest);
+    }
+    
+    private boolean isHeaderAuthenticationRequest(HttpServletRequest httpRequest) {
+        String authorizationHeaderName = getAuthorizationHeaderName();
+        if( authorizationHeaderName != null ) {
+            String authorizationHeaderValue = httpRequest.getHeader(authorizationHeaderName);
+            if( authorizationHeaderValue != null ) {
+                return authorizationHeaderValue.toUpperCase().startsWith(AUTHENTICATION_SCHEME_UC+" ");
+            }
+        }
+        return false;
+    }
+    
 
     @Override
     protected AuthenticationToken createToken(ServletRequest request) {
@@ -57,25 +80,30 @@ public class TokenAuthenticationFilter extends HttpAuthenticationFilter {
     }
 
     private Token getToken(HttpServletRequest httpRequest) {
-        String authorizationText = httpRequest.getHeader(getAuthorizationHeaderName());
-        log.debug("Parsing authorization header: {}", authorizationText);
-        
+        Token tokenFromHeader = getTokenFromHeader(httpRequest);
+        if( tokenFromHeader != null ) {
+            log.debug("Using token from header");
+            return tokenFromHeader;
+        }
+        throw new IllegalArgumentException("No token in request");
+    }
+    
+    private Token getTokenFromHeader(HttpServletRequest httpRequest) {
+        String authorizationHeader = httpRequest.getHeader(getAuthorizationHeaderName());
+        log.debug("Parsing authorization header: {}", authorizationHeader);
         // splitting on spaces should yield "Token" followed by a literal
-        String[] terms = authorizationText.split(" ");
-        if( terms.length == 0 ) {
-            throw new IllegalArgumentException("Authorization header is empty");
-        }
-        if (!"TOKEN".equals(terms[0].toUpperCase())) {
-            throw new IllegalArgumentException("Authorization type is not Token");
-        }
-        if( terms.length != 2 ) {
-            throw new IllegalArgumentException("Authorization header format invalid for Token");
-        }
-        if( terms[1].isEmpty() ) {
-            throw new IllegalArgumentException("Authorization token is missing");
-        }
-        log.debug("Got token {}", terms[1]);
-        return new Token(terms[1]);
+        if( authorizationHeader != null ) {
+            String[] terms = authorizationHeader.split(" ");
+            if( terms.length == 2 && AUTHENTICATION_SCHEME_UC.equals(terms[0].toUpperCase()) && !terms[1].isEmpty() ) {
+                String tokenFromHeader = terms[1];
+                log.debug("Got token from header: {}", tokenFromHeader);
+                return new Token(tokenFromHeader);
+            }
+            else {
+                log.debug("Authorization header is not token");
+            }
+        }        
+        return null;
     }
 
 }

@@ -5,11 +5,14 @@
 package com.intel.dcsg.cpg.http;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,4 +79,22 @@ public class Query {
             throw new RuntimeException(e); // java runtime guarantees availability of utf-8 so this will never happen
         }
     }
+    
+    public static Map<String, List<String>> parse(URL url) throws UnsupportedEncodingException {
+        return parse(url.getQuery());
+    }
+    public static Map<String, List<String>> parse(String query) throws UnsupportedEncodingException {
+      final Map<String, List<String>> parameters = new LinkedHashMap<>();
+      final String[] pairs = query.split("&");
+      for (String pair : pairs) {
+        final int separator = pair.indexOf("=");
+        final String key = separator > 0 ? URLDecoder.decode(pair.substring(0, separator), "UTF-8") : pair;
+        if (!parameters.containsKey(key)) {
+          parameters.put(key, new LinkedList<String>());
+        }
+        final String value = separator > 0 && pair.length() > separator + 1 ? URLDecoder.decode(pair.substring(separator + 1), "UTF-8") : null;
+        parameters.get(key).add(value);
+      }
+      return parameters;
+    }    
 }
