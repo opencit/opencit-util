@@ -143,6 +143,11 @@
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-net</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-http</artifactId>
+        </dependency>
+
 
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>

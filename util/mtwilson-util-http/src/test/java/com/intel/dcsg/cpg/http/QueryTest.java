@@ -4,6 +4,11 @@
  */
 package com.intel.dcsg.cpg.http;
 
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
 import org.junit.Test;
 import static org.junit.Assert.*;
 /**
@@ -38,5 +43,13 @@ public class QueryTest {
     public void testEmptyQuery() {
         MutableQuery query = new MutableQuery();
         assertEquals("", query.toString());
+    }
+    
+    @Test
+    public void testParseQuery() throws UnsupportedEncodingException, MalformedURLException {
+        Map<String,List<String>> parameters = Query.parse(new URL("http://localhost/path?key1=value1&key2=value2a&key2=value2b"));
+        assertEquals("value1", parameters.get("key1").get(0));
+        assertEquals("value2a", parameters.get("key2").get(0));
+        assertEquals("value2b", parameters.get("key2").get(1));
     }
 }
