@@ -242,37 +242,15 @@ public class StartHttpServer implements Runnable {
             if (keystorePassword != null) {
                 sslConnectionFactory.setKeyStorePassword(new String(keystorePassword.toCharArray()));
             }
-            sslConnectionFactory.setIncludeProtocols("TLSv1", "TLSv1.1", "TLSv1.2");
-            sslConnectionFactory.setExcludeCipherSuites(
-                "SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA",
-                "SSL_DHE_DSS_WITH_DES_CBC_SHA",
-                "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA",
-                "SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA",
-                "SSL_DHE_RSA_WITH_DES_CBC_SHA",
-                "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA",
-                "SSL_RSA_EXPORT_WITH_RC4_40_MD5",
-                "SSL_RSA_WITH_DES_CBC_SHA",
-                "SSL_RSA_WITH_RC4_128_MD5",
-                "SSL_RSA_WITH_RC4_128_SHA",
-                "TLS_DHE_DSS_WITH_AES_128_CBC_SHA",
-                "TLS_DHE_DSS_WITH_AES_128_CBC_SHA256",
-                "TLS_DHE_DSS_WITH_AES_256_CBC_SHA",
-                "TLS_DHE_DSS_WITH_AES_256_CBC_SHA256",
-                "TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA",
-                "TLS_DHE_RSA_WITH_AES_128_CBC_SHA",
-                "TLS_DHE_RSA_WITH_AES_128_CBC_SHA256",
-                "TLS_DHE_RSA_WITH_AES_256_CBC_SHA",
-                "TLS_DHE_RSA_WITH_AES_256_CBC_SHA256",
-                "TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA",
-                "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
-                "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
-                "TLS_ECDHE_RSA_WITH_RC4_128_SHA",
-                "TLS_RSA_WITH_3DES_EDE_CBC_SHA",
-                "TLS_RSA_WITH_AES_128_CBC_SHA",
-                "TLS_RSA_WITH_AES_128_CBC_SHA256",
-                "TLS_RSA_WITH_RC4_128_MD5",
-                "TLS_RSA_WITH_RC4_128_SHA"
+//            sslConnectionFactory.setIncludeProtocols("TLSv1", "TLSv1.1", "TLSv1.2");
+            sslConnectionFactory.setExcludeProtocols("SSL", "SSLv2", "SSLv2Hello", "SSLv3");
+            sslConnectionFactory.setIncludeCipherSuites(
+                    "TLS_DHE_RSA.*", "TLS_ECDHE.*"
             );
+            sslConnectionFactory.setExcludeCipherSuites(
+                    ".*NULL.*", ".*RC4.*", ".*MD5.*", ".*DES.*", ".*DSS.*"
+            );
+            sslConnectionFactory.setRenegotiationAllowed(false);
             ServerConnector https = new ServerConnector(jetty, new ConnectionFactory[]{new SslConnectionFactory(sslConnectionFactory, "http/1.1"), new HttpConnectionFactory(httpsConfiguration)});
             https.setPort(getHttpsPort());
             log.debug("{}={}", JettyPorts.JETTY_SECURE_PORT, https.getPort());
