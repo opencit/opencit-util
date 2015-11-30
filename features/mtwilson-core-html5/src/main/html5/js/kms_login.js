@@ -48,6 +48,7 @@ function LoginViewModel() {
             data: ko.toJSON(self.loginRequest), //$("#loginForm").serialize(), 
             success: function(data, status, xhr) {
                 console.log("Login results: %O", data);
+                document.getElementById("loginButton").disabled = true;
                 /*
                  * Example:
                  * {"authorization_token":"G4zpaAK426bZNqMTGGGbWVMiYJnd04Iy5DK75J1iVb4="}
@@ -98,6 +99,7 @@ function LoginViewModel() {
                         
             },
             error: function(xhr, status, errorMessage) {
+                document.getElementById("loginButton").disabled = false; 
                 console.log("Login failed with status: %s", status); // "error"
                 console.log("Login failed with message: %s", errorMessage); // "Unauthorized" which is same as xhr.statusText (the http status message)
                 console.log("Login failed: %O", xhr);
