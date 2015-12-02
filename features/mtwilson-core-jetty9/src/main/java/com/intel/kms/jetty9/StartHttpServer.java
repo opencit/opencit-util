@@ -248,7 +248,8 @@ public class StartHttpServer implements Runnable {
                     "TLS_DHE_RSA.*", "TLS_ECDHE.*"
             );
             sslConnectionFactory.setExcludeCipherSuites(
-                    ".*NULL.*", ".*RC4.*", ".*MD5.*", ".*DES.*", ".*DSS.*"
+                    ".*NULL.*", ".*RC4.*", ".*MD5.*", ".*DES.*", ".*DSS.*",
+                    "TLS_DHE_RSA_WITH_AES_128_CBC_SHA"
             );
             sslConnectionFactory.setRenegotiationAllowed(false);
             ServerConnector https = new ServerConnector(jetty, new ConnectionFactory[]{new SslConnectionFactory(sslConnectionFactory, "http/1.1"), new HttpConnectionFactory(httpsConfiguration)});
