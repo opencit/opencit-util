@@ -1,3 +1,12 @@
+/*
+ * login.js - supporting javascript for login with username and password to obtain
+ *            an authorization token and send it automatically with subsequent
+ *            AJAX requests
+ *
+ * Dependencies:
+ * jQuery, knockout
+ */
+
 function UserProfile(data) {
     this.username = ko.observable(data.username);
     this.authorizationToken = ko.observable(data.authorizationToken);
@@ -17,7 +26,6 @@ function LoginViewModel() {
     self.loginRequest = new LoginRequest({});
     self.userProfile = new UserProfile({});
     self.options = {
-        "postLoginActivatePage": "dashboard.html",  // dashboard should be the first view we show after login; dashboard can then load the "run once" or "are there notifications" code.
         "postLogoutRedirect": "index.html" //  where to send user after logout is done
     };
 
@@ -86,12 +94,10 @@ function LoginViewModel() {
                 });
                 
                 
-                // load the navbar and the dashboard, and activate the post-login primary view
-                
-//                var nextView = self.options.postLoginActivatePage; // "dashboard.html";
-                
+                // inform the application that we just logged on successfully,
+                // application will switch to next screen
                 $(document).trigger({
-                    type: "mtwilson-core-html5:login:success",
+                    type: "mtwilson-core-html5:init:ready", // was:  mtwilson-core-html5:login:success
                     message: {"username": self.userProfile.username() },
                     time: new Date()
                 });

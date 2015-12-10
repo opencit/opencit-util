@@ -1,5 +1,5 @@
 /*
- * kms_discovery.js
+ * discovery.js
  * 
  * Discovers features that implement a specified extension point.
  * Provides a list of URLs that must be loaded, either through resource loader
@@ -61,7 +61,7 @@ function FeatureDiscovery() {
      * @returns {undefined}
      */
     self.each = function(path, callback, options) {
-        if( !options ) { options = {}; }
+        if( !options ) { options = { "callback_args": null }; }
         var directoryCallbackContext = { "path": path, "callback": callback, "callback_args": options["callback_args"] };
         self.directory({"feature":null,"path":path}, (function(context) { return function(obj) { 
             var criteria = obj.query;
@@ -161,14 +161,14 @@ function FeatureDiscovery() {
     self.eachJSON = function(path, callback, options) {
         if( !path ) { throw new Error("Discovery: path is required"); }
         if( !callback || typeof(callback) !== "function" ) { throw new Error("Discovery: callback function is required"); }
-        if( !options ) { options = {}; }
-        var eachCallbackContext = { "path": path, "callback": callback, "callback_args": options["callback_args"] };
+        if( !options ) { options = { "callback_args": null }; }
+        var eachCallbackContext = { "path": path, "callback": callback, "callback_args": options["callback_args"], "options": options };
         self.each(path, (function(context) { return function(entry, entryCallbackContext) {
             // context includes "query", "directory", "callback", and optional "callback_args"
             console.log("eachJSON received entry: %O", entry);
             var link = self.getDownloadLink(entry);
             if( link ) {
-                var loadCallbackContext = { "path": context["path"], "query": entryCallbackContext["query"], "directory": entryCallbackContext["directory"], "entry": entry, "callback_args": context["callback_args"] };
+                var loadCallbackContext = { "path": context["path"], "query": entryCallbackContext["query"], "directory": entryCallbackContext["directory"], "entry": entry, "callback_args": context["callback_args"], "options": entryCallbackContext["options"] };
                 /*
                  * The loadJSON callback receives an array of { "url": url, "content": content } but in this case we know that
                  * the caller is asking for a callback for each JSON result to be invoked separately, so we simplify the callback
@@ -183,21 +183,21 @@ function FeatureDiscovery() {
                 };
                 resourceLoader.loadJSON([endpoint+link["href"]], callback, { "callback_args": loadCallbackContext } );
             }
-        }; } )(eachCallbackContext));
+        }; } )(eachCallbackContext), options);
     };
     
     self.eachJS = function(path, callback, options) {
         if( !path ) { throw new Error("Discovery: path is required"); }
         if( !callback || typeof(callback) !== "function" ) { throw new Error("Discovery: callback function is required"); }
-        if( !options ) { options = {}; }
-        var eachCallbackContext = { "path": path, "callback": callback, "callback_args": options["callback_args"] };
+        if( !options ) { options = { "callback_args": null }; }
+        var eachCallbackContext = { "path": path, "callback": callback, "callback_args": options["callback_args"], "options": options };
         self.each(path, (function(context) { return function(entry, entryCallbackContext) {
             // context includes "query", "directory", "callback", and optional "callback_args"
             console.log("eachJS received entry: %O", entry);
             var link = self.getDownloadLink(entry);
             if( link ) {
                 // the "path" is already present in entryCallbackContext["query"]["path"], so maybe not necessary to include it separately, but it's the first arg to the each method, and there's a possibility in the future the query might have different args
-                var loadCallbackContext = { "path": context["path"], "query": entryCallbackContext["query"], "directory": entryCallbackContext["directory"], "entry": entry, "callback_args": context["callback_args"] };
+                var loadCallbackContext = { "path": context["path"], "query": entryCallbackContext["query"], "directory": entryCallbackContext["directory"], "entry": entry, "callback_args": context["callback_args"], "options": entryCallbackContext["options"] };
                 /*
                  * The loadJS callback receives an array of { "url": url, "content": content } but in this case we know that
                  * the caller is asking for a callback for each JSON result to be invoked separately, so we simplify the callback
@@ -212,7 +212,7 @@ function FeatureDiscovery() {
                 };
                 resourceLoader.loadJS([endpoint+link["href"]], callback, loadCallbackContext);
             }
-        }; } )(eachCallbackContext));
+        }; } )(eachCallbackContext), options);
        
     };
     
@@ -230,7 +230,7 @@ function FeatureDiscovery() {
             if( urls.length > 0 ) {
                 console.log("discovery.allJSON calling resource loader for %s urls", urls.length);
                 // the "wait for all to load then invoke callback" feature is actually in loadJS, when we provide an array of urls to load
-                resourceLoader.loadJSON(urls, (function(arg1){ return function() { callback(arg1); } })(obj));
+                resourceLoader.loadJSON(urls, (function(arg1){ return function() { callback(arg1); } })(context));
             }            
         });
     };
@@ -291,6 +291,16 @@ function FeatureDiscovery() {
     self.directory = function(directoryFilterCriteria, callback) {
         if( !directoryFilterCriteria ) { throw new Error("Discovery: search criteria required"); }
         if( !callback || typeof(callback) !== "function" ) { throw new Error("Discovery: callback function is required"); }
+        
+        // adjust filter criteria for public resource requests;  shorthand is to use /public prefix in the URL and needs to be converted to public:true and no /public prefix in URL
+        var isPublic = false;
+        if( typeof directoryFilterCriteria["path"] === "string" && directoryFilterCriteria["path"].startsWith("/public") ) {
+            isPublic = true;
+            directoryFilterCriteria["path"] = directoryFilterCriteria["path"].substr("/public".length);
+            directoryFilterCriteria["public"] = true;
+            console.log("edited path for public resource discovery: %s", directoryFilterCriteria["path"]);
+        }
+        
         console.log("discovery.directory with endpoint %s and criteria %O", endpoint, ko.toJSON(directoryFilterCriteria));
         var hash = self.hash(directoryFilterCriteria);
         console.log("hash of criteria: %s", hash);
@@ -300,7 +310,7 @@ function FeatureDiscovery() {
         }
         $.ajax({
             type: "GET",
-            url: endpoint + "/html5/directory",
+            url: endpoint + ( isPublic ? "/html5/public/directory" : "/html5/directory" ),
             //accept: "application/json",
             headers: {'Accept': 'application/json'},
             data: directoryFilterCriteria,

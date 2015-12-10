@@ -4,6 +4,11 @@
  */
 package com.intel.kms.keystore.html5.jaxrs;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intel.dcsg.cpg.validation.Fault;
 import com.intel.mtwilson.Folders;
 import com.intel.mtwilson.feature.FeatureDirectory;
@@ -12,6 +17,7 @@ import com.intel.mtwilson.feature.FeatureFilterCriteria;
 import com.intel.mtwilson.feature.xml.FeatureType;
 import com.intel.mtwilson.jaxrs2.Link;
 import com.intel.mtwilson.launcher.ws.ext.V2;
+import com.intel.mtwilson.util.validation.faults.Thrown;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,6 +25,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.BeanParam;
@@ -62,6 +69,12 @@ public class Directory {
     private FeatureDirectory featureDirectory = new FeatureDirectory();
 
     /**
+     * ONLY looks in the html5 directories of installed features, which means
+     * it's possible to search for public resources via this API too (by starting
+     * with the "public/" prefix) but that would be an exploitation of this
+     * implementation, not the correct way to query for that. The correct way
+     * would be to query for /html5/public/directory  which only looks in public
+     * resources.
      *
      * @param feature identifier to define the scope of the directory listing;
      * corresponds to a subdirectory of /opt/mtwilson/features
@@ -76,7 +89,100 @@ public class Directory {
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     @Path("/directory")
-    public DirectoryListing getDirectoryListing(@BeanParam DirectoryFilterCriteria filters, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+    public DirectoryListing getResourceDirectoryListing(@BeanParam DirectoryFilterCriteria filters, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+        DirectoryFinderFactory directoryFinderFactory = new DirectoryFinderFactory("html5", "/", "/", false);
+        return getDirectoryListing(directoryFinderFactory,filters, request, response);
+    }
+
+    /**
+     * ONLY looks in the html5/public directories of installed features
+     * 
+     * @param feature identifier to define the scope of the directory listing;
+     * corresponds to a subdirectory of /opt/mtwilson/features
+     * @param path of the directory to list within the html5 resources of the
+     * specified feature, relative to /opt/mtwilson/features/{feature}/html5;
+     * leading slash "/" is optional; can leave the path empty or set to "/" to
+     * get the top-level directory listing
+     * @param request
+     * @param response
+     * @return
+     */
+    @GET
+    @Produces({MediaType.APPLICATION_JSON})
+    @Path("/public/directory")
+    public DirectoryListing getPublicResourceDirectoryListing(@BeanParam DirectoryFilterCriteria filters, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+        DirectoryFinderFactory directoryFinderFactory = new DirectoryFinderFactory("html5/public", "/", "/public", true);
+//        if( filters.relativePath != null && filters.relativePath.startsWith("/public")) {
+//            filters.relativePath = filters.relativePath.substring("/public".length());
+//            log.debug("Adjusting relative path for public resource: {}", filters.relativePath);
+//        }
+        return getDirectoryListing(directoryFinderFactory,filters, request, response);
+    }
+    
+    public static class DirectoryFinderFactory {
+        private String featureRelativePath;
+        private String featureRelativePathRoot;
+        private String hrefRelativePath;
+        private boolean isPublic;
+
+        /**
+         * 
+         * @param featureRelativePath like html5  used to form all the paths under a feature directory by appending the relative path to this
+         * @param featureRelativePathRoot like / or /public to be appended to featureRelativePath and only allow files under this, note this may overlap the relative path which is why it's a separate setting
+         * @param hrefRelativePath like /html (which would translate to /v1/html5) to create urls bya ppending the relative path to this
+         */
+        public DirectoryFinderFactory(String featureRelativePath, String featureRelativePathRoot, String hrefRelativePath, boolean isPublic) {
+            this.featureRelativePath = featureRelativePath;
+            this.featureRelativePathRoot = featureRelativePathRoot;
+            this.hrefRelativePath = hrefRelativePath;
+            this.isPublic = isPublic;
+        }
+        
+        public DirectoryFinder create(String feature) {
+            String featurePath = Folders.features(feature);
+            return new DirectoryFinder(featurePath + File.separator + featureRelativePath, featureRelativePathRoot, hrefRelativePath, isPublic);
+        }
+    }
+    public static class DirectoryFinder {
+        private String absoluteBasePath;
+        private String relativeRootPath;
+        private String hrefRelativePath;
+        private boolean isPublic;
+        
+        /**
+         * 
+         * @param absoluteBasePath like /opt/mtwilson/features/featureABC/html5  used to form all the paths by appending the relative path to this
+         * @param relativeRootPath like / or /public to be appended to absoluteBasePath and only allow files under this,  note this may overlap the relative path which is why it's a separate setting
+         * @param hrefRelativePath like /html5 (which would translate to /v1/html5) to create urls by appending the relative path to this
+         */
+        public DirectoryFinder(String absoluteBasePath, String relativeRootPath, String hrefRelativePath, boolean isPublic) {
+            this.absoluteBasePath = absoluteBasePath;
+            this.relativeRootPath = relativeRootPath;
+            this.hrefRelativePath = hrefRelativePath;
+            this.isPublic = isPublic;
+        }
+        
+        public boolean isAllowed(File file) {
+            String rootPath = absoluteBasePath + File.separator + relativeRootPath;
+            rootPath = rootPath.replace(File.separator, "/").replaceAll("/+", "/");
+            String filePath = file.getAbsolutePath().replace(File.separator, "/").replaceAll("/+", "/");
+            log.debug("Root path: {}", rootPath);
+            if( filePath.startsWith(rootPath) && file.exists() && !file.isHidden() && !file.getName().startsWith(".") ) {
+                return true;
+            }
+            
+            return false;
+        }
+        
+        public boolean isPublic(File file) {
+            return isPublic;
+        }
+        
+        public String getBasePath() { return absoluteBasePath; }
+        public String getBaseHref() { return hrefRelativePath; }
+    }
+    
+    private DirectoryListing getDirectoryListing(DirectoryFinderFactory directoryFinderFactory, @BeanParam DirectoryFilterCriteria filters, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         if( filters == null ) { filters = new DirectoryFilterCriteria(); }
         // if a feature was specified, we look only there - otherwise we look in all features that extend html5
         FeatureFilterCriteria featureFilters = new FeatureFilterCriteria();
@@ -94,35 +200,27 @@ public class Directory {
 
         DirectoryListing listing = new DirectoryListing();
         for (String feature : features) {
-            String featureHtml5Path = Folders.features(feature) + File.separator + "html5";
+            DirectoryFinder finder = directoryFinderFactory.create(feature);
+            String basePath = finder.getBasePath();
+            String baseHref = finder.getBaseHref();
 
             String platformRelativePath = "";
             if (filters.relativePath != null) {
                 platformRelativePath = filters.relativePath.replace("/", File.separator);
             }
 
-            File file = new File(featureHtml5Path + File.separator + platformRelativePath);
+            File file = new File(basePath + File.separator + platformRelativePath);
             log.debug("Absolute path: {}", file.getAbsolutePath());
 
             // protect against tricks like .. to escape the html5 directory
-            if (!file.getAbsolutePath().startsWith(featureHtml5Path)) {
-                continue; //throw new WebApplicationException(Status.NOT_FOUND); // resp.setStatus(Response.Status.NOT_FOUND.getStatusCode());
+            if( !finder.isAllowed(file) ) {
+                log.warn("Skipping file because not allowed: {}", file.getAbsolutePath());
+                continue;
             }
-
-            // check if target file exists
-            if (!file.exists()) {
-                continue; //throw new WebApplicationException(Status.NOT_FOUND); // resp.setStatus(Response.Status.NOT_FOUND.getStatusCode());
-            }
-
-            // protect hidden files and dot-files by convention
-            if (file.isHidden() || file.getName().startsWith(".")) {
-                continue; //throw new WebApplicationException(Status.NOT_FOUND); // resp.setStatus(Response.Status.NOT_FOUND.getStatusCode());
-            }
-
 
             // provide a directory listing in JSON format
             if (file.isDirectory()) {
-                String directoryRelativePath = file.getAbsolutePath().replace(featureHtml5Path, "");
+                String directoryRelativePath = file.getAbsolutePath().replace(basePath, "");
                 if( directoryRelativePath.isEmpty() ) {
                     directoryRelativePath = "/";
                 }
@@ -132,16 +230,17 @@ public class Directory {
                 if( files != null ) {
                 for (File directoryFile : files) {
                     DirectoryEntry entry = new DirectoryEntry();
-                    entry.name = directoryFile.getName();
-                    String fileRelativePath = directoryFile.getAbsolutePath().replace(featureHtml5Path, "").replace(File.separator, "/");
+                    String fileRelativePath = directoryFile.getAbsolutePath().replace(basePath, "").replace(File.separator, "/");
                     String rel = directoryFile.isDirectory() ? "directory" : "file";
                     try {
                         BasicFileAttributes attributes = Files.readAttributes(directoryFile.toPath(), BasicFileAttributes.class);
                         entry.feature = feature;
                         entry.directory = directoryRelativePathUri;
                         entry.size = attributes.size();
-                        entry.links.add(Link.build().href(getDirectoryLink(feature, fileRelativePath)).rel(rel));
-                        if( directoryFile.isFile() ) { entry.links.add(Link.build().href(getContentLink(feature, fileRelativePath)).rel("download")); }
+                        entry.name = directoryFile.getName();
+                        entry.isPublic = finder.isPublic(directoryFile);
+                        entry.links.add(Link.build().href(getDirectoryLink(feature, normalize(baseHref+fileRelativePath))).rel(rel));
+                        if( directoryFile.isFile() ) { entry.links.add(Link.build().href(getContentLink(feature, normalize(baseHref+fileRelativePath))).rel("download")); }
                         listing.entries.add(entry);
                     } catch (IOException e) {
                         log.error("Cannot get file attributes: {}", file.getAbsolutePath(), e);
@@ -150,10 +249,10 @@ public class Directory {
                 }
                 }
             } else if (file.isFile()) {
-                String fileRelativePath = file.getAbsolutePath().replace(featureHtml5Path, "").replace(File.separator, "/");
+                String fileRelativePath = file.getAbsolutePath().replace(basePath, "").replace(File.separator, "/");
                 String parentRelativePath = file.getParentFile().getAbsolutePath();
-                if (parentRelativePath.startsWith(featureHtml5Path)) {
-                    parentRelativePath = parentRelativePath.replace(featureHtml5Path, "");
+                if (parentRelativePath.startsWith(basePath)) {
+                    parentRelativePath = parentRelativePath.replace(basePath, "");
                 } else {
                     // if the parent is outside the html5 directory, just reset its relative path to "/" to indicate the html5 "root" for the feature
                     parentRelativePath = "/";
@@ -168,8 +267,10 @@ public class Directory {
                     entry.feature = feature;
                     entry.directory = parentRelativePathUri;
                     entry.size = attributes.size();
-                    entry.links.add(Link.build().href(getDirectoryLink(feature, parentRelativePathUri)).rel("parent"));
-                    if( directoryFile.isFile() ) { entry.links.add(Link.build().href(getContentLink(feature, fileRelativePath)).rel("download")); }
+                    entry.name = directoryFile.getName();
+                    entry.isPublic = finder.isPublic(directoryFile);
+                    entry.links.add(Link.build().href(getDirectoryLink(feature, normalize(baseHref+parentRelativePathUri))).rel("parent"));
+                    if( directoryFile.isFile() ) { entry.links.add(Link.build().href(getContentLink(feature, normalize(baseHref+fileRelativePath))).rel("download")); }
                    listing.entries.add(entry);
                 } catch (IOException e) {
                     log.error("Cannot get file attributes: {}", file.getAbsolutePath(), e);
@@ -180,16 +281,27 @@ public class Directory {
         return listing;
     }
     
+    private String normalize(String path) {
+        String result = path.replaceAll("/+", "/");
+        if( !result.startsWith("/") ) {
+            result = "/" + result;
+        }
+        return result;
+    }
+    
     private String getDirectoryLink(String feature, String path) {
+        if( path.startsWith("/public/") ) {
+            return String.format("/html5/public/directory?feature=%s&path=%s", feature, path.substring("/public/".length()));
+        }
         return String.format("/html5/directory?feature=%s&path=%s", feature, path);
     }
     
     private String getContentLink(String feature, String path) {
         log.debug("getContentLink feature:{}, path:{}", feature, path);
-        if( path.startsWith("public") ) {
-            return String.format("/html5/public/%s/%s", feature, path.substring("public/".length()));
+        if( path.startsWith("/public/") ) {
+            return String.format("/html5/public/%s/%s", feature, path.substring("/public/".length()));
         }
-        return String.format("/html5/features/%s/%s", feature, path);
+        return String.format("/html5/resources/%s/%s", feature, path);
     }
 
     
@@ -265,7 +377,7 @@ public class Directory {
     
     
     /**
-     * @deprecated api path /features/{featureId}/{path} will be removed in a later release
+     * @deprecated api path /features/{featureId}/{path} will be removed in a later release, use /resources/{featureId}/{path} instead for protected resources or /public/{featureId}/{path} for public resources
      * @param featureId
      * @param path
      * @param request
@@ -318,6 +430,73 @@ public class Directory {
         return getBytes(featureHtml5Path, relativePath);
     }
     
+    
+    @Path("/public/merge")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public JsonNode getMergedPublicResources(@QueryParam("path") String path, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+
+        DirectoryFilterCriteria directoryFilterCriteria = new DirectoryFilterCriteria();
+        directoryFilterCriteria.relativePath = path;
+        DirectoryListing matchingJsonFiles = getPublicResourceDirectoryListing(directoryFilterCriteria, request, response);
+        ObjectNode result = new ObjectNode(JsonNodeFactory.instance);
+        if( matchingJsonFiles.faults != null && !matchingJsonFiles.faults.isEmpty() ) {
+            result.putPOJO("faults", matchingJsonFiles.faults);
+            return result;
+        }
+        
+        if( matchingJsonFiles.entries == null ) {
+            return result;
+        }
+        
+        ObjectMapper mapper = new ObjectMapper();
+        for( DirectoryEntry entry : matchingJsonFiles.entries ) {
+            String feature = entry.feature; 
+            String directory = ( entry.isPublic != null && entry.isPublic.booleanValue() ? "/public" : "" ) + entry.directory; 
+            String filename = entry.name;
+            String entryPath = Folders.features(feature) + File.separator + "html5" + directory.replace("/", File.separator) + File.separator + filename;
+            log.debug("/public/merge.json reading file: {}", entryPath);
+            try {
+                File entryFile = new File(entryPath);
+                JsonNode json = mapper.readTree(entryFile);
+                if( json != null && json.isObject() ) {
+                    mergeJsonObjects(result, (ObjectNode)json);
+                }
+            }
+            catch(IOException e) {
+                ArrayList<Fault> faults = new ArrayList<>();
+                faults.add(new Thrown(e));
+                result.putPOJO("faults", faults);
+                continue;
+            }
+        }
+        
+        return result;
+    }
+    
+    // deep merge for objects , merge for arrays, and copy (but not replace) for primitive types
+    private void mergeJsonObjects(ObjectNode to, ObjectNode from) {
+        if( to == null || from == null ) { return; }
+        Iterator<String> fieldNames = from.fieldNames();
+        while(fieldNames.hasNext()) {
+            String fieldName = fieldNames.next();
+            JsonNode source = from.get(fieldName);
+            JsonNode target = to.get(fieldName);
+            if( target == null ) {
+                to.set(fieldName, source);
+            }
+            else if( target.isObject() && source.isObject() ) {
+                mergeJsonObjects((ObjectNode)target, (ObjectNode)source);
+            }
+            else if( target.isArray() && source.isArray() ) {
+                ((ArrayNode)target).addAll((ArrayNode)source);
+            }
+            else {
+                log.error("Cannot merge data to {} from {}", to.getNodeType().name(), from.getNodeType().name());
+            }
+        }
+    }
+    
     public static class DirectoryListing {
 
         public ArrayList<DirectoryEntry> entries = new ArrayList<>();
@@ -331,6 +510,7 @@ public class Directory {
         public String name;
         public Long size;
         public ArrayList<Link> links = new ArrayList<>();
+        public Boolean isPublic;
 //        public BasicFileAttributes attributes;
     }
 

@@ -1,5 +1,5 @@
 /*
- * kms_resource_loader.js
+ * resource_loader.js
  * 
  * Loads specified JS, CSS, HTML resources and maintains cache of loaded resources
  * to prevent redundant downloads. Scripts can use the resource loader to declare

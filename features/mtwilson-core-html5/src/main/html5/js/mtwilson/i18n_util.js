@@ -19,8 +19,8 @@
 function Localizer() {
     var self = this;
     self.options = {
-        'lowerCaseLng': true, // will send "en-US" as "en-us" for __lng__ variable
-        'resGetPath': '/html5/features/kms-keys/mtwilson-core-html5/content/keys.html/locales/__ns__-__lng__.json', // resource files will be stored in locales/translation-en-US.json  for example
+        'lowerCaseLng': false, // when true, will send "en-US" as "en-us" for __lng__ variable
+        'resGetPath': '/v1/html5/public/merge?path=/mtwilson-core-html5/locales/__ns__.__lng__.json', // resource files will be stored in locales/translation.en-US.json  for example
         'detectLngQS': 'lang', // optional query string parameter to set language, for example  ?lang=en-US 
         'cookieName': 'lang', // optional cookie name to set language
         'preload': ['en-US'], // optimization, 
@@ -62,7 +62,7 @@ function Localizer() {
                     lng = self.options.fallbackLng;
                 }
             }
-            if( fromPath === null ) { fromPath = "/mtwilson-core-html5/i18n"; }
+            if( fromPath === null ) { fromPath = "/mtwilson-core-html5/locales"; }
             var filename = ns+"."+lng+".json";  // for example  main.en-US.json;  plugins can use their name like "simplename.en-US.json" or "com.example.full.name.en-US.json"
             discovery.eachJSON(fromPath+"/"+filename, function(json,context) {
                 console.log("i18n content called with json: %O", json);

@@ -100,3 +100,22 @@ ul.navbar-right {
   font-weight: normal;
   color: #ccc;
 }
+
+.panel-primary-subdued {
+  border-color: #555;
+}
+.panel-primary-subdued > .panel-heading {
+  color: #fff;
+  background-color: #555;
+  border-color: #555;
+}
+.panel-primary-subdued > .panel-heading + .panel-collapse > .panel-body {
+  border-top-color: #555;
+}
+.panel-primary-subdued > .panel-heading .badge {
+  color: #555;
+  background-color: #fff;
+}
+.panel-primary-subdued > .panel-footer + .panel-collapse > .panel-body {
+  border-bottom-color: #555;
+}
