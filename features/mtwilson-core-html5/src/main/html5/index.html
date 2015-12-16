@@ -353,7 +353,7 @@
                                             console.log("NEW ACTION");
                                             self.click(function(e) {
                                                 e.preventDefault();
-                                                $(this).tab("show");
+                                                self.tab("show");
                                                 var href = $(this).attr("href");
                                                 $(".tab-pane").removeClass("active");
                                                 $(href).addClass("active");

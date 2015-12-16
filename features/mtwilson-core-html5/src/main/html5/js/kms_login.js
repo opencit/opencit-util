@@ -23,6 +23,7 @@ function LoginViewModel() {
 
     // operations
     self.login = function(loginFormElement) {
+		document.getElementById("loginButton").disabled = true;
         console.log("Endpoint: %s", endpoint);
         //            console.log("Search keys 1: %O", ko.toJSON(searchCriteriaItem)); //   results in error: InvalidStateError: Failed to read the 'selectionDirection' property from 'HTMLInputElement': The input element's type ('hidden') does not support selection
         console.log("Login request to %s: %O", endpoint+"/login", ko.toJSON(self.loginRequest)); // attempting to serialize loginRequestItem produces errors, probably because it represents the entire form
