@@ -440,7 +440,7 @@ public abstract class PersistenceManager implements ServletContextListener {
 
         int maxActive = Integer.valueOf(jpaProperties.getProperty("dbcp.max.active", "100"));
         int maxIdle = Integer.valueOf(jpaProperties.getProperty("dbcp.max.idle", "64"));
-        int minIdle = Integer.valueOf(jpaProperties.getProperty("dbcp.min.idle", "32"));
+        int minIdle = Integer.valueOf(jpaProperties.getProperty("dbcp.min.idle", "1"));
         int numTestsPerEvictionRun = Double.valueOf(Math.ceil(minIdle * 1.0 / 2)).intValue();
         
         ds.setInitialSize(minIdle);
