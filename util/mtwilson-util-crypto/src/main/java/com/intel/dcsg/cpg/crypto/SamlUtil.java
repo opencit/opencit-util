@@ -1,4 +1,7 @@
 /*
+ * For some of the code snippets
+ * All rights reserved by Capstone Courseware, LLC. Used by permission.
+ * 
  * Copyright (C) 2011-2012 Intel Corporation
  * All rights reserved.
  */
