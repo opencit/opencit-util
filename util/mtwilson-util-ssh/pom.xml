@@ -22,21 +22,29 @@
     </build>
     <dependencies>
 
-        <!-- begin sshj for remote administration -->
         <dependency>
+            <!-- Purpose: connecting to hosts via ssh and sftp -->
+            <!-- URL: https://github.com/hierynomus/sshj -->
+            <!-- License: Apache 2.0 https://github.com/hierynomus/sshj/blob/master/LICENSE -->
             <groupId>net.schmizz</groupId>
             <artifactId>sshj</artifactId>
             <version>0.8.1</version>
         </dependency>
-        <!-- end sshj for remote administration  -->
         
-        <!--    the crypto dependency is only needed if using RemoteHostKeyDigestVerifier;  the dependent project should also depend on mtwilson-util-crypto    -->
         <dependency>
+            <!-- Required only for: RemoteHostKeyDigestVerifier -->
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-crypto</artifactId>
             <optional>true</optional>
         </dependency>
-        
+
+        <dependency>
+            <!-- Required only for: SftpTransferProgress -->
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-performance</artifactId>
+            <optional>true</optional>
+        </dependency>
+                
         <!-- logging -->
         <dependency>
             <groupId>org.slf4j</groupId>

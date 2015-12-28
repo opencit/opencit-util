@@ -67,8 +67,7 @@ public class Rpc extends Document implements Progress {
     @JacksonXmlProperty(localName="fault")        
     private Fault[] faults;
     private Status status;
-    private Long current;
-    private Long max;
+    private long current, max;
     
     public String getName() {
         return name;
@@ -99,12 +98,12 @@ public class Rpc extends Document implements Progress {
     }
     
     @Override
-    public Long getCurrent() {
+    public long getCurrent() {
         return current;
     }
 
     @Override
-    public Long getMax() {
+    public long getMax() {
         return max;
     }
 

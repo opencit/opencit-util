@@ -294,7 +294,7 @@ function FeatureDiscovery() {
         
         // adjust filter criteria for public resource requests;  shorthand is to use /public prefix in the URL and needs to be converted to public:true and no /public prefix in URL
         var isPublic = false;
-        if( typeof directoryFilterCriteria["path"] === "string" && directoryFilterCriteria["path"].startsWith("/public") ) {
+        if( typeof directoryFilterCriteria["path"] === "string" && directoryFilterCriteria["path"].indexOf("/public") === 0 ) {
             isPublic = true;
             directoryFilterCriteria["path"] = directoryFilterCriteria["path"].substr("/public".length);
             directoryFilterCriteria["public"] = true;

@@ -191,6 +191,27 @@ function ResourceLoader() {
         }
     };
     self.loadJS = function(url_array, callback, callback_args) {
+        
+        // normalize any relative URLs to be complete URLs
+        /*
+        var uriBase = new URI();
+        $.each(url_array, function(index) {
+            if( URI(url_array[index]).is("absolute") === false ) {
+                url_array[index] = uriBase.absoluteTo(url_array[index]);
+                console.log("Resource loader loadJS making relative path absoluteResource: %s", url_array[index]);
+            }
+        });
+        */
+        var uriBase = new URI();
+        for(var uidx=0; uidx<url_array.length; uidx++) {
+            console.log("Resource loader checking if URL is absolute: %s", url_array[uidx]);
+            if( URI(url_array[uidx]).is("absolute") === false ) {
+                var absolutePath = URI( url_array[uidx] ).absoluteTo(uriBase).normalize().toString();
+                url_array[uidx] = absolutePath;
+                console.log("Resource loader loadJS making relative path absoluteResource: %s", url_array[uidx]);
+            }
+        }
+       
         var request = {"urls": url_array, "callback": callback, "callback_args": callback_args, "done": false}; // done wlll be true when we invoke the callback function
         // first register each url and set a status if it's a new entry
         $.map(url_array, function(url) {
@@ -409,13 +430,17 @@ function ResourceLoader() {
         // look for all script tags that have a src attribute
         $("script[src]").each(function(index, element) {
             //console.log("Looking at script tag # %d:  %O", index, element);
-            // now if  element.src  starts with element.baseURI then remove that part so we're left with the relative path
+            // now if  element.src  starts with element.baseURI then remove that part so we're left with the relative path            
             var uri = element.src;
+            /*
             var prefix = self.findPrefix([element.src, element.baseURI]);
             if (prefix) {
                 uri = element.src.slice(prefix.length);
             }
-            //console.log("Registering script uri: %s", uri);
+            console.log("Resource loader got element.src: %s", element.src);
+            console.log("Resource loader got element.baseURI: %s", element.baseURI);
+            */
+            console.log("Resource loader registering script uri: %s", uri);
             self.js[uri] = {status: "done"};
         });
     };
@@ -425,11 +450,13 @@ function ResourceLoader() {
             //console.log("Looking at stylesheet tag # %d:  %O", index, element);
             // now if  element.src  starts with element.baseURI then remove that part so we're left with the relative path
             var uri = element.href;
+            /*
             var prefix = self.findPrefix([element.href, element.baseURI]);
             if (prefix) {
                 uri = element.href.slice(prefix.length);
             }
-            //console.log("Registering stylesheet uri: %s", uri);
+            */
+            console.log("Resource loader registering stylesheet uri: %s", uri);
             self.css[uri] = {status: "done"};
         });
     };

@@ -8,6 +8,7 @@ import com.intel.dcsg.cpg.configuration.Configuration;
 import com.intel.dcsg.cpg.console.InteractiveCommand;
 import com.intel.mtwilson.configuration.ConfigurationFactory;
 import com.intel.mtwilson.configuration.ConfigurationProvider;
+import java.io.File;
 /**
  * Display or set a specific configuration key 
  * 
@@ -34,7 +35,15 @@ public class Config extends InteractiveCommand {
             throw new IllegalArgumentException("Usage: Config <key> [--delete|newValue]");
         }            
         
-            ConfigurationProvider provider = ConfigurationFactory.getConfigurationProvider();
+        ConfigurationProvider provider;
+        String configurationFilePath = getOptions().getString("file"); // does not need to exist;  configuration will be saved there if writing a new value, and will be encrypted automatically if password is in environment
+        if( configurationFilePath == null ) {
+            provider = ConfigurationFactory.getConfigurationProvider();
+        }
+        else {
+            provider = ConfigurationFactory.createConfigurationProvider(new File(configurationFilePath));
+        }
+            
             Configuration configuration = provider.load();
 
             String existingValue = configuration.get(key);

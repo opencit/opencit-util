@@ -22,10 +22,9 @@ import org.apache.commons.io.IOUtils;
  * @author jbuhacoff
  */
 public class ConfigurationFactory {
+
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ConfigurationFactory.class);
-
     private static final String PASSWORD = "PASSWORD"; // transforms into MTWILSON_PASSWORD, KMS_PASSWORD, etc. environment variables
-
     private static ConfigurationProvider provider;
     private static Configuration configuration;
 
@@ -37,10 +36,11 @@ public class ConfigurationFactory {
     }
 
     /**
-     * Get a read-only view of the current configuration. If you need to 
-     * edit the configuration, use {@code getConfigurationProvider()} instead.
+     * Get a read-only view of the current configuration. If you need to edit
+     * the configuration, use {@code getConfigurationProvider()} instead.
+     *
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     public static Configuration getConfiguration() throws IOException {
         if (configuration == null) {
@@ -53,49 +53,67 @@ public class ConfigurationFactory {
         }
         return configuration;
     }
-    
+
     /**
-     * Get the active configuration provider, from which you can
-     * load and reload the configuration, and store any changes to the
-     * configuration.
+     * Get the active configuration provider for the default configuration file,
+     * from which you can load and reload
+     * the configuration, and store any changes to the configuration.
+     * The configuration provider instance is cached, so subsequent calls to
+     * this method will return the same instance.
+     *
+     * @return
+     * @throws IOException
+     */
+    public static ConfigurationProvider getConfigurationProvider() throws IOException {
+        if (provider == null) {
+            // locate the configuration file
+            File file = getConfigurationFile();
+            provider = createConfigurationProvider(file);
+        }
+        return provider;
+    }
+
+    /**
+     * Create a new configuration provider instance for an arbitrary configuration
+     * file location, from which you can load and store the configuration in
+     * plaintext or encrypted format (depending on presence of password in environment).
+     * Each call to this method returns a NEW instance which is not cached,
+     * even if the specified file is the default configuration file location.
+     * 
+     * @param file to existing or non-existing (but writable) file location
      * @return
      * @throws IOException 
      */
-    public static ConfigurationProvider getConfigurationProvider() throws IOException {
-        if( provider == null ) {
-            // locate the configuration file
-            File file = getConfigurationFile();
-            if( file.exists() ) {
-                // load existing configuration
-                try (FileInputStream in = new FileInputStream(file)) {
-                    String content = IOUtils.toString(in);
-                    // 2. detect if it's encrypted: it would start with something like -----BEGIN ENCRYPTED DATA----- and ends with -----END ENCRYPTED DATA-----
+    public static ConfigurationProvider createConfigurationProvider(File file) throws IOException {
+        ConfigurationProvider instance;
+        if (file.exists()) {
+            // load existing configuration
+            try (FileInputStream in = new FileInputStream(file)) {
+                String content = IOUtils.toString(in);
+                // 2. detect if it's encrypted: it would start with something like -----BEGIN ENCRYPTED DATA----- and ends with -----END ENCRYPTED DATA-----
 
-                    if (Pem.isPem(content)) {
-                        // 3. read encrypted configuration
-                // password environment variable name like MTWILSON_PASSWORD, TRUSTAGENT_PASSWORD, KMS_PASSWORD, etc.
-                        String password = Environment.get(PASSWORD);
-    //                    ByteArrayResource resource = new ByteArrayResource(content.getBytes(Charset.forName("UTF-8")));
-                        provider = new EncryptedConfigurationProvider(new FileResource(file), password);
-                    } else {
-                        // 3. read plain configuration
-    //                    ByteArrayResource resource = new ByteArrayResource(content.getBytes(Charset.forName("UTF-8")));
-                        provider = new ResourceConfigurationProvider(new FileResource(file));
-                    }
+                if (Pem.isPem(content)) {
+                    // 3. read encrypted configuration
+                    // password environment variable name like MTWILSON_PASSWORD, TRUSTAGENT_PASSWORD, KMS_PASSWORD, etc.
+                    String password = Environment.get(PASSWORD);
+                    //                    ByteArrayResource resource = new ByteArrayResource(content.getBytes(Charset.forName("UTF-8")));
+                    instance = new EncryptedConfigurationProvider(new FileResource(file), password);
+                } else {
+                    // 3. read plain configuration
+                    //                    ByteArrayResource resource = new ByteArrayResource(content.getBytes(Charset.forName("UTF-8")));
+                    instance = new ResourceConfigurationProvider(new FileResource(file));
                 }
             }
-            else {
-                // create new configuration; if a password variable is set, assume the configuration should be encrypted
-                // password environment variable name like MTWILSON_PASSWORD, TRUSTAGENT_PASSWORD, KMS_PASSWORD, etc.
-                String password = Environment.get(PASSWORD);
-                if( password == null ) {
-                    provider = new EmptyConfigurationProvider(new ResourceConfigurationProvider(new FileResource(file)));
-                }
-                else {
-                    provider = new EmptyConfigurationProvider(new EncryptedConfigurationProvider(new FileResource(file), password));
-                }
+        } else {
+            // create new configuration; if a password variable is set, assume the configuration should be encrypted
+            // password environment variable name like MTWILSON_PASSWORD, TRUSTAGENT_PASSWORD, KMS_PASSWORD, etc.
+            String password = Environment.get(PASSWORD);
+            if (password == null) {
+                instance = new EmptyConfigurationProvider(new ResourceConfigurationProvider(new FileResource(file)));
+            } else {
+                instance = new EmptyConfigurationProvider(new EncryptedConfigurationProvider(new FileResource(file), password));
             }
         }
-        return provider;
+        return instance;
     }
 }

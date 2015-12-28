@@ -7,7 +7,6 @@ package com.intel.kms.console.cmd;
 import com.intel.dcsg.cpg.console.InteractiveCommand;
 import com.intel.dcsg.cpg.crypto.RandomUtil;
 import com.intel.dcsg.cpg.io.pem.Pem;
-import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 
 /**
@@ -18,14 +17,15 @@ import java.nio.charset.Charset;
  *
  * Example output:
  * <pre>
- * CGaTpWf3YcFeEzyQfxlOAQ==
+ * CGaTpWf3YcFeEzyQfxlOAQ
  * </pre>
  *
  * Note that the length parameter specifies how much randomness should be in the
  * password (number of random bytes) not necessarily how many characters should
  * be in the output; because the output is base64-encoded password, it will
- * always be longer than the actual password but this extra length does not
- * provide security because it is only encoding.
+ * always be longer than the actual random bytes but this extra length does not
+ * provide security because it is only encoding. Also, any padding characters
+ * at the end of the base64 output are removed. 
  *
  * This command does not require reading or writing to any configuration or
  * file. The user must copy and paste the generated password and provide it in
@@ -49,7 +49,7 @@ public class GeneratePassword extends InteractiveCommand {
     public void execute(String[] args) throws Exception {
         int lengthBytes = options.getInt("length", 16);
 
-        char[] password = RandomUtil.randomBase64String(lengthBytes).toCharArray();
+        char[] password = RandomUtil.randomBase64String(lengthBytes).replace("=", "").toCharArray();
 
         if (this.options != null && options.getBoolean("pem", false)) {
             // print base64-encoded key in PEM-style format

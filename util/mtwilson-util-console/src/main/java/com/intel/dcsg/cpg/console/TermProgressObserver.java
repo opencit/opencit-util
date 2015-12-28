@@ -27,12 +27,12 @@ public class TermProgressObserver implements Observer<Progress> {
     
     @Override
     public void observe(Progress progress) {
-        Long current = progress.getCurrent();
-        Long max = progress.getMax();
-        String currentText = current == null ? "unknown" : current.toString();
-        String maxText = current == null ? "unknown" : max.toString();
-        String count = current == null && max == null ? "unknown" : String.format("%s/%s", currentText, maxText);
-        String percent = current == null || max == null || max == 0 ? "" : String.format("%.0f%%", current*100.0/max);
+        long current = progress.getCurrent();
+        long max = progress.getMax();
+        String currentText = String.valueOf(current); //current == null ? "unknown" : current.toString();
+        String maxText = String.valueOf(max);  //current == null ? "unknown" : max.toString();
+        String count = String.format("%s/%s", currentText, maxText); //current == null && max == null ? "unknown" : String.format("%s/%s", currentText, maxText);
+        String percent = max == 0 ? "" : String.format("%.0f%%", current*100.0/max); // current == null || max == null || max == 0 ? "" : String.format("%.0f%%", current*100.0/max);
         String labelText = task == null ? progress.getClass().getSimpleName() : task.getId();
         String shortLabelText = labelText.length() > 20 ? labelText.substring(0, 17) + "..." : labelText;
         String label = String.format("%-20s", shortLabelText);
@@ -44,9 +44,9 @@ public class TermProgressObserver implements Observer<Progress> {
     }
     
     private String generateBar(Progress progress) {
-        Long current = progress.getCurrent();
-        Long max = progress.getMax();
-        if( current == null || max == null || max == 0 ) {
+        long current = progress.getCurrent();
+        long max = progress.getMax();
+        if( /* current == null || max == null || */ max == 0 ) {
             return "";
         }
         StringBuilder str = new StringBuilder();

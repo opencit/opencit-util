@@ -213,7 +213,11 @@ public class Directory {
             log.debug("Absolute path: {}", file.getAbsolutePath());
 
             // protect against tricks like .. to escape the html5 directory
-            if( !finder.isAllowed(file) ) {
+            if( !file.exists() ) {
+                log.warn("Skipping file because does not exist: {}", file.getAbsolutePath());
+                continue;
+            }
+            else if( !finder.isAllowed(file) ) {
                 log.warn("Skipping file because not allowed: {}", file.getAbsolutePath());
                 continue;
             }
