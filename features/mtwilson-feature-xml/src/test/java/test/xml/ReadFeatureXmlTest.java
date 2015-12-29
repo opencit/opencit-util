@@ -119,7 +119,7 @@ public class ReadFeatureXmlTest {
     @Test
     public void testReadFeatureType() throws Exception {
         InputStream in = getClass().getResourceAsStream("/feature-xml-examples/feature1.xml");
-        FeatureType feature = fromXML(in, FeatureType.class);
+        Feature feature = fromXML(in, Feature.class);
         in.close();
         ObjectMapper mapper = new ObjectMapper();
         mapper.setPropertyNamingStrategy(new PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy());

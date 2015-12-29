@@ -14,7 +14,8 @@ import com.intel.mtwilson.Folders;
 import com.intel.mtwilson.feature.FeatureDirectory;
 import com.intel.mtwilson.feature.FeatureDirectory.FeatureListing;
 import com.intel.mtwilson.feature.FeatureFilterCriteria;
-import com.intel.mtwilson.feature.xml.FeatureType;
+import com.intel.mtwilson.feature.xml.Feature;
+//import com.intel.mtwilson.feature.xml.FeatureType;
 import com.intel.mtwilson.jaxrs2.Link;
 import com.intel.mtwilson.launcher.ws.ext.V2;
 import com.intel.mtwilson.util.validation.faults.Thrown;
@@ -194,7 +195,7 @@ public class Directory {
         ArrayList<String> features = new ArrayList<>();
         // list all features that match the criteria (must extend html5, optional specific feature id)
         FeatureListing featureListing = featureDirectory.getFeatureListing(featureFilters, request, response);
-        for (FeatureType featureType : featureListing.features) {
+        for (Feature featureType : featureListing.features) {
             features.add(featureType.getId());
         }
 

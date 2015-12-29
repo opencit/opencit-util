@@ -10,7 +10,7 @@ import com.intel.dcsg.cpg.io.file.DirectoryFilter;
 import com.intel.dcsg.cpg.xml.JAXB;
 import com.intel.mtwilson.Folders;
 import com.intel.mtwilson.feature.fault.BadFeatureDescriptor;
-import com.intel.mtwilson.feature.xml.FeatureType;
+//import com.intel.mtwilson.feature.xml.FeatureType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -79,7 +79,7 @@ public class Feature extends AbstractCommand implements Command {
         }
     }
 
-    private FeatureType readFeatureXmlFromZip(File zip) throws IOException, JAXBException, XMLStreamException {
+    private com.intel.mtwilson.feature.xml.Feature readFeatureXmlFromZip(File zip) throws IOException, JAXBException, XMLStreamException {
         try (ZipFile zipfile = new ZipFile(zip)) {
             ZipEntry featureXmlEntry = zipfile.getEntry("feature.xml");
             if (featureXmlEntry == null) {
@@ -92,7 +92,7 @@ public class Feature extends AbstractCommand implements Command {
             try {
                 String featureXml = IOUtils.toString(in, Charset.forName("UTF-8"));
                 JAXB jaxb = new JAXB();
-                FeatureType feature = jaxb.read(featureXml, FeatureType.class);
+                com.intel.mtwilson.feature.xml.Feature feature = jaxb.read(featureXml, com.intel.mtwilson.feature.xml.Feature.class);
                 return feature;
             } catch (IOException | JAXBException | XMLStreamException e) {
                 in.close();
@@ -106,7 +106,7 @@ public class Feature extends AbstractCommand implements Command {
         File zip = new File(pathToFeatureZip);
         if (zip.exists() && zip.isFile()) {
             // first extract the feature id from the zip file
-            FeatureType feature = readFeatureXmlFromZip(zip);
+            com.intel.mtwilson.feature.xml.Feature feature = readFeatureXmlFromZip(zip);
             unzip(zip, new File(Folders.features(feature.getId())));
         }
     }
@@ -127,7 +127,7 @@ public class Feature extends AbstractCommand implements Command {
 
     private void list() {
         log.debug("Feature list");
-        ArrayList<FeatureType> features = new ArrayList<>();
+        ArrayList<com.intel.mtwilson.feature.xml.Feature> features = new ArrayList<>();
         File featureDirectory = new File(Folders.features());
         File[] featureSubdirectories = featureDirectory.listFiles(new DirectoryFilter());
         if (featureSubdirectories != null) {
@@ -139,7 +139,7 @@ public class Feature extends AbstractCommand implements Command {
                     try (FileInputStream in = new FileInputStream(featureXmlFile)) {
                         String featureXml = IOUtils.toString(in, Charset.forName("UTF-8"));
                         JAXB jaxb = new JAXB();
-                        FeatureType feature = jaxb.read(featureXml, FeatureType.class);
+                        com.intel.mtwilson.feature.xml.Feature feature = jaxb.read(featureXml, com.intel.mtwilson.feature.xml.Feature.class);
                         features.add(feature);
                     } catch (IOException | JAXBException | XMLStreamException e) {
                         log.error("Cannot open feature.xml in {}", featureSubdirectory.getAbsolutePath(), e);
@@ -149,7 +149,7 @@ public class Feature extends AbstractCommand implements Command {
             }
         }
         // display list
-        for (FeatureType feature : features) {
+        for (com.intel.mtwilson.feature.xml.Feature feature : features) {
             System.out.println(feature.getId());
         }
     }

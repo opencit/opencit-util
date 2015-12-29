@@ -28,24 +28,22 @@
             <id>feature4</id>
         </feature-ref>
     </conflicts>
-    <includes>
-        <components>
-            <component>
-                <id>componentA</id>
-                <version>0.76</version>
-                <name>Component A</name>
-                <description>An important sub-component</description>
-                <provider>
-                    <name>Intel</name>
-                    <url>http://www.intel.com</url>
-                </provider>
-                <license>
-                    <copyright>2014 Intel Corporation. All rights reserved.</copyright>
-                    <url>file:///LICENSE.TXT</url>
-                </license>
-            </component>
-        </components>
-    </includes>
+    <components>
+        <component>
+            <id>componentA</id>
+            <version>0.76</version>
+            <name>Component A</name>
+            <description>An important sub-component</description>
+            <provider>
+                <name>Intel</name>
+                <url>http://www.intel.com</url>
+            </provider>
+            <license>
+                <copyright>2014 Intel Corporation. All rights reserved.</copyright>
+                <url>file:///LICENSE.TXT</url>
+            </license>
+        </component>
+    </components>
     <!--
     <links>
         <link rel="issues">http://www.provider.com/support</link>
