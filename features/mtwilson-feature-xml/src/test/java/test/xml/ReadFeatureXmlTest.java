@@ -60,7 +60,7 @@ public class ReadFeatureXmlTest {
     /**
      * Sample output for feature 1:
      * 
-{"id":"feature1","version":"0.1","name":"Feature #1","provider":{"name":"Intel","url":"http://www.intel.com"},"description":"An example feature","license":{"copyright":"2014 Intel Corporation. All rights reserved.","url":"file:///LICENSE.TXT"},"includes":null,"requires":null,"conflicts":null,"links":null}
+{"id":"feature1","version":"0.1","name":"Feature #1","provider":{"name":"Intel","url":"http://www.intel.com"},"description":"An example feature","license":{"copyright":"2014 Intel Corporation. All rights reserved.","url":"file:///LICENSE.TXT"},"includes":[],"requires":[],"conflicts":[],"links":[],"settings":[],"extends":[]}
      * 
      * Sample output for feature 2:
      * 
@@ -75,16 +75,55 @@ public class ReadFeatureXmlTest {
 {"id":"feature4","version":"0.1","name":"Feature #4","provider":{"name":"Intel","url":"http://www.intel.com"},"description":"An example feature","license":{"copyright":"2014 Intel Corporation. All rights reserved.","url":"file:///LICENSE.TXT"},"includes":{"components":{"component":{"id":"componentA","version":"0.76","name":"Component A","provider":{"name":"Intel","url":"http://www.intel.com"},"description":"An important sub-component","license":{"copyright":"2014 Intel Corporation. All rights reserved.","url":"file:///LICENSE.TXT"},"includes":null,"requires":null,"conflicts":null,"links":null}}},"requires":null,"conflicts":null,"links":{"link":{"value":"mailto:feature4-users@provider.com","rel":"mailing list","type":null}}}
 {"id":"feature4","version":"0.1","name":"Feature #4","provider":{"name":"Intel","url":"http://www.intel.com"},"description":"An example feature","license":{"copyright":"2014 Intel Corporation. All rights reserved.","url":"file:///LICENSE.TXT"},"includes":{"components":{"component":{"id":"componentA","version":"0.76","name":"Component A","provider":{"name":"Intel","url":"http://www.intel.com"},"description":"An important sub-component","license":{"copyright":"2014 Intel Corporation. All rights reserved.","url":"file:///LICENSE.TXT"},"includes":null,"requires":null,"conflicts":null,"links":null}}},"requires":null,"conflicts":null,"links":{"link":{"href":"mailto:feature4-users@provider.com","rel":"mailing list","type":null}}}
      * 
+     * Sample output for feature 5:
+     * 
+ {"id":"feature4","version":"0.1","name":"Feature #4","provider":{"name":"Intel","url":"http://www.intel.com"},
+ * "description":"An example feature",
+ * "license":{"copyright":"2014 Intel Corporation. All rights reserved.",
+ * "url":"file:///LICENSE.TXT"},
+ * "includes":{"components":{"component":{"id":"componentA","version":"0.76","name":"Component A","provider":{"name":"Intel","url":"http://www.intel.com"},"description":"An important sub-component","license":{"copyright":"2014 Intel Corporation. All rights reserved.","url":"file:///LICENSE.TXT"},"includes":null,"requires":null,"conflicts":null,"links":null,"settings":null,"extends":null}}},
+ * "requires":{"feature_ref":{"id":"feature2","version":null}},
+ * "conflicts":{"feature_ref":{"id":"feature4","version":null}},"links":{"link":{"href":"mailto:feature4-users@provider.com","rel":"mailing list","type":null}},
+ * "settings":{"setting":{"name":"com.example.setting3","required":null,"type":"integer"}},"extends":null}     * 
+     * 
+     * Sample output for feature 6 without jaxb-xew-plugin:
+     * 
+{"id":"feature4","version":"0.1","name":"Feature #4","provider":{"name":"Intel","url":"http://www.intel.com"}
+* ,"description":"An example feature","license":{"copyright":"2014 Intel Corporation. All rights reserved.",
+* "url":"file:///LICENSE.TXT"},"includes":null,"requires":{"feature_ref":[{"id":"feature1","version":null},
+* {"id":"feature2","version":null}]},"conflicts":{"feature_ref":[{"id":"feature3","version":null},
+* {"id":"feature4","version":null}]},"links":{"link":[{"href":"http://www.provider.com/support","rel":"issues","type":null},
+* {"href":"mailto:feature4-users@provider.com","rel":"mailing list","type":null}]},
+* "settings":{"setting":[{"name":"com.example.setting1","required":null,"type":null},
+* {"name":"com.example.setting2","required":true,"type":null},
+* {"name":"com.example.setting3","required":null,"type":"integer"}]},"extends":null}     * 
+     * 
+     * Sample output for feature 6 WITH jaxb-xew-plugin:
+     * 
+{"id":"feature4","version":"0.1","name":"Feature #4","provider":{"name":"Intel","url":"http://www.intel.com"},
+* "description":"An example feature","license":{"copyright":"2014 Intel Corporation. All rights reserved.",
+* "url":"file:///LICENSE.TXT"},"includes":[],
+* "requires":[{"id":"feature1","version":null},
+* {"id":"feature2","version":null}],
+* "conflicts":[{"id":"feature3","version":null},{"id":"feature4","version":null}],
+* "links":[{"href":"http://www.provider.com/support","rel":"issues","type":null},
+* {"href":"mailto:feature4-users@provider.com","rel":"mailing list","type":null}],
+* "settings":[{"name":"com.example.setting1","required":null,"type":null},
+* {"name":"com.example.setting2","required":true,"type":null},
+* {"name":"com.example.setting3","required":null,"type":"integer"}],"extends":[]}
+* 
+     * 
+     * 
      * @throws Exception
      */    
     @Test
     public void testReadFeatureType() throws Exception {
-        InputStream in = getClass().getResourceAsStream("/feature-xml-examples/feature4.xml");
+        InputStream in = getClass().getResourceAsStream("/feature-xml-examples/feature1.xml");
         FeatureType feature = fromXML(in, FeatureType.class);
         in.close();
         ObjectMapper mapper = new ObjectMapper();
         mapper.setPropertyNamingStrategy(new PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy());
-        log.debug("feature1: {}", mapper.writeValueAsString(feature));
+        log.debug("feature: {}", mapper.writeValueAsString(feature));
     }
     /*
     public class TagSelection {

@@ -39,6 +39,23 @@
                             </schemaIncludes>
                             <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/mtwilson-feature.episode</episodeFile>
                             <generatePackage>com.intel.mtwilson.feature.xml</generatePackage>
+                            <extension>true</extension>
+                            <args>
+                                <arg>-Xxew</arg>
+                                <arg>-Xxew:plural</arg>
+                                <arg>-Xxew:instantiate lazy</arg>
+                            </args>
+                            <plugins>
+                                <plugin>
+                                    <!-- Purpose: automatically add @XmlElementWrapper annotations to generated classes -->
+                                    <!-- License: LGPL 3.0 http://www.gnu.org/licenses/lgpl-3.0.html -->
+                                    <!-- Site: https://github.com/dmak/jaxb-xew-plugin/blob/master/README.md -->
+                                    <!-- NOTE:  THIS PLUGIN IS BUILD-TIME ONLY, IT IS NOT DISTRIBUTED WITH OUR APPLICATION -->
+                                    <groupId>com.github.jaxb-xew-plugin</groupId>
+                                    <artifactId>jaxb-xew-plugin</artifactId>
+                                    <version>1.6</version>
+                                </plugin>
+                            </plugins>
                         </configuration>
                         <id>mtwilson-feature</id>
                     </execution>
