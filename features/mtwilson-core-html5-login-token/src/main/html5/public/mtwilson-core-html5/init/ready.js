@@ -8,5 +8,5 @@
  * This script assumes that jQuery ($) has already been loaded.
  */
 
-console.log("mtwilson-core-html5-login-anon:  ready.js loaded");
+console.log("mtwilson-core-html5-login-token:  ready.js loaded");
 

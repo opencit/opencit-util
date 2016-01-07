@@ -12,7 +12,7 @@
 console.log("mtwilson-core-html5-login-token:  start.js loaded");
 
 setTimeout(function() {
-	resourceLoader.loadHTML("/html5/public/mtwilson-core-html5-login-token/login.html", {
+	resourceLoader.loadHTML("/v1/html5/public/com.intel.mtwilson.core.login.token/login.html", {
 		into: "#main",
 		tab: "login",
 		activate: true // means switch to this tab as soon as its loaded; same as providing callback: function() { mainViewModel.tab("#login", "#main"); }

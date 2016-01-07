@@ -52,9 +52,9 @@ public class JettyTlsKeystore extends AbstractSetupTask {
     private static final String TLS_ALIAS = "jetty";
     
     // configuration keys
-    private static final String KMS_TLS_CERT_DN = "jetty.tls.cert.dn";
-    private static final String KMS_TLS_CERT_IP = "jetty.tls.cert.ip";
-    private static final String KMS_TLS_CERT_DNS = "jetty.tls.cert.dns";
+    private static final String JETTY_TLS_CERT_DN = "jetty.tls.cert.dn";
+    private static final String JETTY_TLS_CERT_IP = "jetty.tls.cert.ip";
+    private static final String JETTY_TLS_CERT_DNS = "jetty.tls.cert.dns";
     public static final String JAVAX_NET_SSL_KEYSTORE = "javax.net.ssl.keyStore";
     public static final String JAVAX_NET_SSL_KEYSTOREPASSWORD = "javax.net.ssl.keyStorePassword";
     public static final String ENDPOINT_URL = "endpoint.url";
@@ -98,7 +98,8 @@ public class JettyTlsKeystore extends AbstractSetupTask {
             if( keystorePassword == null || keystorePassword.toCharArray().length == 0 ) { configuration("Keystore password has not been generated"); }
         }
         
-        dn = getConfiguration().get(KMS_TLS_CERT_DN, "CN=kms"); //trustagentConfiguration.getTrustagentTlsCertDn();
+        // mtwilson-core-launcher sets these system properties: mtwilson.application.id (mtwilson) and mtwilson.application.name (Mt Wilson)
+        dn = getConfiguration().get(JETTY_TLS_CERT_DN, "CN="+System.getProperty("mtwilson.application.name", "Cloud Integrity Technology")); // was:  CN=kms
         // we need to know our own local ip addresses/hostname in order to add them to the ssl cert
         ip = getTrustagentTlsCertIpArray();
         dns = getTrustagentTlsCertDnsArray();
@@ -184,9 +185,9 @@ public class JettyTlsKeystore extends AbstractSetupTask {
         if( propertiesFile.exists() ) {
             properties.load(new StringReader(FileUtils.readFileToString(propertiesFile, Charset.forName("UTF-8"))));
         }
-        properties.setProperty("kms.tls.cert.md5", Md5Digest.digestOf(tlscert.getEncoded()).toString());
-        properties.setProperty("kms.tls.cert.sha1", Sha1Digest.digestOf(tlscert.getEncoded()).toString());
-        properties.setProperty("kms.tls.cert.sha256", Sha256Digest.digestOf(tlscert.getEncoded()).toString());
+        properties.setProperty("tls.cert.md5", Md5Digest.digestOf(tlscert.getEncoded()).toString());
+        properties.setProperty("tls.cert.sha1", Sha1Digest.digestOf(tlscert.getEncoded()).toString());
+        properties.setProperty("tls.cert.sha256", Sha256Digest.digestOf(tlscert.getEncoded()).toString());
         StringWriter writer = new StringWriter();
         properties.store(writer, String.format("updated on %s", Iso8601Date.format(new Date())));
         FileUtils.write(propertiesFile, writer.toString(), Charset.forName("UTF-8"));
@@ -217,12 +218,12 @@ public class JettyTlsKeystore extends AbstractSetupTask {
         
         // save the settings in configuration
         getConfiguration().set(JAVAX_NET_SSL_KEYSTORE, keystoreFile.getAbsolutePath());
-        getConfiguration().set(KMS_TLS_CERT_DN, dn);
+        getConfiguration().set(JETTY_TLS_CERT_DN, dn);
         if( ip != null ) {
-            getConfiguration().set(KMS_TLS_CERT_IP, StringUtils.join(ip, ","));
+            getConfiguration().set(JETTY_TLS_CERT_IP, StringUtils.join(ip, ","));
         }
         if( dns != null ) {
-            getConfiguration().set(KMS_TLS_CERT_DNS, StringUtils.join(dns, ","));
+            getConfiguration().set(JETTY_TLS_CERT_DNS, StringUtils.join(dns, ","));
         }
         
         // save the password to the password vault
@@ -269,12 +270,12 @@ public class JettyTlsKeystore extends AbstractSetupTask {
     
     // note: duplicated from TrustagentConfiguration
     public String getTrustagentTlsCertIp() {
-        return getConfiguration().get(KMS_TLS_CERT_IP, "");
+        return getConfiguration().get(JETTY_TLS_CERT_IP, "");
     }
     // note: duplicated from TrustagentConfiguration
     public String[] getTrustagentTlsCertIpArray() throws SocketException {
 //        return getConfiguration().getString(KMS_TLS_CERT_IP, "127.0.0.1").split(",");
-        String[] TlsCertIPs = getConfiguration().get(KMS_TLS_CERT_IP, "").split(",");
+        String[] TlsCertIPs = getConfiguration().get(JETTY_TLS_CERT_IP, "").split(",");
         if (TlsCertIPs != null && !TlsCertIPs[0].isEmpty()) {
             log.debug("Retrieved IPs from configuration: {}", (Object[])TlsCertIPs);
             return TlsCertIPs;
@@ -290,12 +291,12 @@ public class JettyTlsKeystore extends AbstractSetupTask {
     }
     // note: duplicated from TrustagentConfiguration
     public String getTrustagentTlsCertDns() {
-        return getConfiguration().get(KMS_TLS_CERT_DNS, "");
+        return getConfiguration().get(JETTY_TLS_CERT_DNS, "");
     }
     // note: duplicated from TrustagentConfiguration
     public String[] getTrustagentTlsCertDnsArray() throws SocketException {
 //        return getConfiguration().getString(KMS_TLS_CERT_DNS, "localhost").split(",");
-        String[] TlsCertDNs = getConfiguration().get(KMS_TLS_CERT_DNS, "").split(",");
+        String[] TlsCertDNs = getConfiguration().get(JETTY_TLS_CERT_DNS, "").split(",");
         if (TlsCertDNs != null && !TlsCertDNs[0].isEmpty()) {
             log.debug("Retrieved Domain Names from configuration: {}", (Object[])TlsCertDNs);
             return TlsCertDNs;

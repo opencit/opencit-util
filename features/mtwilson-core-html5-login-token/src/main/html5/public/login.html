@@ -43,7 +43,7 @@
             // script requires:  kms_login.js  for loginViewModel
             // style requires: bootstrap, dashboard, intel
             console.log("login.html script");
-            resourceLoader.loadJS(['js/knockout.js' /*, 'js/jquery.js'*/, '/html5/public/mtwilson-core-html5-login-token/js/login.js'], function() { 
+            resourceLoader.loadJS(['js/knockout.js' /*, 'js/jquery.js'*/, '/v1/html5/public/com.intel.mtwilson.core.login.token/js/login.js'], function() { 
                 console.log("login.html: loaded scripts");
                 mainViewModel.loginViewModel = new LoginViewModel();
                 ko.applyBindings(mainViewModel, document.getElementById("login"));

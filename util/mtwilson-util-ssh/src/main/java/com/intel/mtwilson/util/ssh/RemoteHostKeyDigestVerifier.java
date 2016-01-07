@@ -25,16 +25,40 @@ import net.schmizz.sshj.transport.verification.HostKeyVerifier;
 public class RemoteHostKeyDigestVerifier implements HostKeyVerifier {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RemoteHostKeyDigestVerifier.class);
 
+    private String host;
+    private Integer port;
     private String algorithm;
     private String hexDigest;
 
+    /**
+     * Using this constructor only for isolated situations like junit tests, 
+     * because if used in production it would attempt to match ANY host against
+     * the given public key and that would only work for one host and reject
+     * connections to all others, even if another host key verifier is added
+     * that would have approved them... because it just depends on the order
+     * they are checked.
+     * @param algorithm
+     * @param hexDigest 
+     */
     public RemoteHostKeyDigestVerifier(String algorithm, String hexDigest) {
+        this.host = null;
+        this.port = null;
         this.algorithm = algorithm;
         this.hexDigest = hexDigest;
     }
 
+    public RemoteHostKeyDigestVerifier(String host, Integer port, String algorithm, String hexDigest) {
+        this.host = host;
+        this.port = port;
+        this.algorithm = algorithm;
+        this.hexDigest = hexDigest;
+    }
+    
+
     @Override
     public boolean verify(String host, int port, PublicKey publicKey) {
+        if( this.host != null && !this.host.equals(host)) { return false; }
+        if( this.port != null && !this.port.equals(port)) { return false; }
         if( publicKey instanceof RSAPublicKey ) {
             RSAPublicKey rsaPublicKey = (RSAPublicKey)publicKey;
             byte[] sshEncodedPublicKey = SshUtils.encodeSshRsaPublicKey(rsaPublicKey);
