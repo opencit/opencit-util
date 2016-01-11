@@ -696,6 +696,10 @@ public class MyConfiguration {
     public String getSamlKeyAlias() {
         return conf.getString("saml.key.alias"); 
     }
+    
+    public Integer getSamlValidityTimeInSeconds() {
+        return conf.getInteger("saml.validity.seconds", 3600);
+    }
 
     ///////////////////////// tls policy  //////////////////////////////////
     public String getGlobalTlsPolicyId() {
@@ -913,5 +917,16 @@ public class MyConfiguration {
     ///////////////////////// anti-replay protection //////////////////////////////////
     public int getAntiReplayProtectionWindowMilliseconds() {
         return conf.getInt("mtwilson.security.x509.request.expires", 60 * 60 * 1000); // default 1 hour
+    }
+    
+    // localization
+    // guarantees to return at least one element
+    public String[] getAvailableLocales() {
+        Locale[] locales = Locale.getAvailableLocales();
+        String[] localeNames = new String[locales.length];
+        for(int i=0; i<locales.length; i++) {
+            localeNames[i] = LocaleUtil.toLanguageTag(locales[i]);
+        }
+        return localeNames;
     }
 }
