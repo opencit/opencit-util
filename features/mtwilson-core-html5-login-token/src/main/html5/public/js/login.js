@@ -10,6 +10,7 @@
 function UserProfile(data) {
     this.username = ko.observable(data.username);
     this.authorizationToken = ko.observable(data.authorizationToken);
+    this.authorizationTokenExpires = ko.observable();
     this.authenticated = ko.observable(false);
     this.error = ko.observable(data.error);
 }
@@ -67,6 +68,7 @@ function LoginViewModel() {
                 
                 self.userProfile.username(self.loginRequest.username);
                 self.userProfile.authorizationToken(authorizationToken);
+                self.userProfile.authorizationTokenExpires(data.not_after);
                 self.userProfile.authenticated(true);
                 
                 // send the authorization token automatically with every ajax request
@@ -74,6 +76,7 @@ function LoginViewModel() {
                     console.log("ajaxSend: url: %s", settings.url);
                     // check if url starts with /v1  (for example /v1/users)
                     //if( settings.url.lastIndexOf('/v1',0) === 0 ) {
+                        var authorizationToken = self.userProfile.authorizationToken();
                         console.log("ajaxSend: accept header: %O", settings.accept);
                         console.log("ajaxSend: headers object: %O", settings.headers);
                         console.log("ajaxSend: AJAX request to /v1, setting authorization token: "+authorizationToken);
