@@ -526,6 +526,22 @@ public class MyConfiguration {
         }
         return locales;
     }
+    
+    /*
+    // localization
+    // guarantees to return at least one element
+    public String[] getAvailableLocales() {
+        Locale[] locales = Locale.getAvailableLocales();
+        if (locales == null || locales.length == 0) {
+            return new String[]{"en-US"};
+        }
+        String[] localeNames = new String[locales.length];
+        for (int i = 0; i < locales.length; i++) {
+            localeNames[i] = LocaleUtil.toLanguageTag(locales[i]);
+        }
+        return localeNames;
+    }
+    * */
 
     ///////////////////////// database //////////////////////////////////
     public String getDatabaseProtocol() {
@@ -736,11 +752,6 @@ public class MyConfiguration {
     public File getTlsCertificateFile() {
         return findConfigurationFile(conf.getString("mtwilson.tls.certificate.file", "ssl.crt.pem"));
     }
-
-    public File getTlsCertificateFile() {
-        return findConfigurationFile(conf.getString("mtwilson.tls.certificate.file", "ssl.crt.pem"));
-        //return new File(conf.getString("mtwilson.tls.certificate.file", getMtWilsonConf() + File.separator + "ssl.crt.pem"));
-    }
     
     public File getTlsKeystoreFile() {
         return new File(conf.getString("mtwilson.tls.keystore.file", getMtWilsonConf() + File.separator + "mtwilson-tls.jks"));
@@ -941,17 +952,4 @@ public class MyConfiguration {
         return conf.getInt("mtwilson.security.x509.request.expires", 60 * 60 * 1000); // default 1 hour
     }
 
-    // localization
-    // guarantees to return at least one element
-    public String[] getAvailableLocales() {
-        Locale[] locales = Locale.getAvailableLocales();
-        if (locales == null || locales.length == 0) {
-            return new String[]{"en-US"};
-        }
-        String[] localeNames = new String[locales.length];
-        for (int i = 0; i < locales.length; i++) {
-            localeNames[i] = LocaleUtil.toLanguageTag(locales[i]);
-        }
-        return localeNames;
-    }
 }
