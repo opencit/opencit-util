@@ -31,6 +31,7 @@ function LoginViewModel() {
 
     // operations
     self.login = function(loginFormElement) {
+		document.getElementById("loginButton").disabled = true;
         console.log("Endpoint: %s", endpoint);
         //            console.log("Search keys 1: %O", ko.toJSON(searchCriteriaItem)); //   results in error: InvalidStateError: Failed to read the 'selectionDirection' property from 'HTMLInputElement': The input element's type ('hidden') does not support selection
         console.log("Login request to %s: %O", endpoint+"/login", ko.toJSON(self.loginRequest)); // attempting to serialize loginRequestItem produces errors, probably because it represents the entire form
@@ -56,6 +57,7 @@ function LoginViewModel() {
             data: ko.toJSON(self.loginRequest), //$("#loginForm").serialize(), 
             success: function(data, status, xhr) {
                 console.log("Login results: %O", data);
+                document.getElementById("loginButton").disabled = true;
                 /*
                  * Example:
                  * {"authorization_token":"G4zpaAK426bZNqMTGGGbWVMiYJnd04Iy5DK75J1iVb4="}
@@ -104,6 +106,7 @@ function LoginViewModel() {
                         
             },
             error: function(xhr, status, errorMessage) {
+                document.getElementById("loginButton").disabled = false; 
                 console.log("Login failed with status: %s", status); // "error"
                 console.log("Login failed with message: %s", errorMessage); // "Unauthorized" which is same as xhr.statusText (the http status message)
                 console.log("Login failed: %O", xhr);

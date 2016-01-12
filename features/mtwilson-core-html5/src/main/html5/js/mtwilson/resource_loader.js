@@ -449,12 +449,13 @@ function ResourceLoader() {
         $('link[rel="stylesheet"][type="text/css"][href]').each(function(index, element) {
             //console.log("Looking at stylesheet tag # %d:  %O", index, element);
             // now if  element.src  starts with element.baseURI then remove that part so we're left with the relative path
-            var uri = element.href;
+            var uri = element.href
+			/*
             /*
             var prefix = self.findPrefix([element.href, element.baseURI]);
             if (prefix) {
                 uri = element.href.slice(prefix.length);
-            }
+            }*/
             */
             console.log("Resource loader registering stylesheet uri: %s", uri);
             self.css[uri] = {status: "done"};

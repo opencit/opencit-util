@@ -31,8 +31,10 @@ public class ConnectionPool extends AbstractObjectPool<Connection> {
     protected Connection createObject() {
         try {
             created++;
-            log.debug("creating new object for pool, now created {} trashed {} total {}", created, trashed, (created-trashed));
-            return new PooledConnection(ds.getConnection(), this);
+            log.debug("pool {} creating new object for pool, now created {} trashed {} total {}", toString(), created, trashed, (created-trashed));
+            Connection c = ds.getConnection();
+            log.debug("created connection from data source");
+            return new PooledConnection(c, this);
         } catch (SQLException e) {
             throw new IllegalStateException("Cannot create connection", e);
         }

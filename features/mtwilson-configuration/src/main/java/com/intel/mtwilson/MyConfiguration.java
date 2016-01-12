@@ -510,6 +510,23 @@ public class MyConfiguration {
         return properties;
     }
 
+    /**
+     * Returns the list of locales configured in "mtwilson.locales" , or
+     * the platform default locale if there is nothing configured.
+     * 
+     * @return an array with at least one locale
+     */
+    public String[] getAvailableLocales() {
+        // example property in file:  mtwilson.locales=en,en-US,es,es-MX
+        // the getString(key) function will return the text only up to the first comma, e.g. "en"
+        // the getStringArray(key) function never returns null,  if the key is missing or null it returns empty array, and if the value is empty string it returns an array with one element whose value is empty string
+        String[] locales = conf.getStringArray("mtwilson.locales");
+        if (locales == null || locales.length == 0 || locales[0] == null || locales[0].isEmpty()) {
+            return new String[]{LocaleUtil.toLanguageTag(Locale.getDefault())};
+        }
+        return locales;
+    }
+
     ///////////////////////// database //////////////////////////////////
     public String getDatabaseProtocol() {
         if (conf.containsKey("mtwilson.db.protocol")) {
@@ -699,7 +716,6 @@ public class MyConfiguration {
     public Integer getSamlValidityTimeInSeconds() {
         return conf.getInteger("saml.validity.seconds", 3600);
     }
-
     ///////////////////////// tls policy  //////////////////////////////////
     public String getGlobalTlsPolicyId() {
         return conf.getString("mtwilson.global.tls.policy.id"); // no default - when a value is present it means all per-host and default tls policy settings will be ignored
@@ -721,6 +737,11 @@ public class MyConfiguration {
         return findConfigurationFile(conf.getString("mtwilson.tls.certificate.file", "ssl.crt.pem"));
     }
 
+    public File getTlsCertificateFile() {
+        return findConfigurationFile(conf.getString("mtwilson.tls.certificate.file", "ssl.crt.pem"));
+        //return new File(conf.getString("mtwilson.tls.certificate.file", getMtWilsonConf() + File.separator + "ssl.crt.pem"));
+    }
+    
     public File getTlsKeystoreFile() {
         return new File(conf.getString("mtwilson.tls.keystore.file", getMtWilsonConf() + File.separator + "mtwilson-tls.jks"));
     }

@@ -438,22 +438,23 @@ public abstract class PersistenceManager implements ServletContextListener {
         ds.setDriverClassLoader(ClassLoader.getSystemClassLoader());
         ds.setDriverClassName(jpaProperties.getProperty("javax.persistence.jdbc.driver"));
 
-        int maxActive = Integer.valueOf(jpaProperties.getProperty("dbcp.max.active", "30"));
-        int maxIdle = Integer.valueOf(jpaProperties.getProperty("dbcp.max.idle", "5"));
+        int maxActive = Integer.valueOf(jpaProperties.getProperty("dbcp.max.active", "100"));
+        int maxIdle = Integer.valueOf(jpaProperties.getProperty("dbcp.max.idle", "64"));
         int minIdle = Integer.valueOf(jpaProperties.getProperty("dbcp.min.idle", "1"));
-
+        int numTestsPerEvictionRun = Double.valueOf(Math.ceil(minIdle * 1.0 / 2)).intValue();
+        
         ds.setInitialSize(minIdle);
         ds.setMaxActive(maxActive); //for example  max 250 active connections to database
         ds.setMaxIdle(maxIdle); // for example max 10 idle connections in the pool
         ds.setMinIdle(minIdle); // for example min 5 idle connections in the pool
         ds.setMaxWait(-1); // wait indefinitely for a new connection from the pool;  this is the default
-
+        
         ds.setLogAbandoned(true);
 //        ds.setLogWriter(null); // null disables logging; TODO: see if we can get a PrintWriter from slf4j... and for some reason calls createDataSource() whic hdoesn't make sense
 //        ds.setLoginTimeout(30); // in seconds ;   not supported by basicdatasource... and for some reason calls createDataSource() whic hdoesn't make sense
         ds.setMaxOpenPreparedStatements(50); // no limit
         ds.setMinEvictableIdleTimeMillis(1000 * 60 * 1); // (milliseconds) connection may be idle up to 1 minutes before being evicted
-        ds.setNumTestsPerEvictionRun(10); // how many connections to test each time
+        ds.setNumTestsPerEvictionRun(numTestsPerEvictionRun); // how many connections to test each time
         ds.setPassword(jpaProperties.getProperty("javax.persistence.jdbc.password"));
         ds.setPoolPreparedStatements(true);
         ds.setRemoveAbandoned(true);
