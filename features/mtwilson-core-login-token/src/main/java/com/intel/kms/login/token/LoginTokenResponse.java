@@ -16,6 +16,7 @@ import java.util.Collection;
  */
 public class LoginTokenResponse implements Faults {
     private String authorizationToken;
+    private Iso8601Date authorizationDate;
     private Iso8601Date notAfter;
     private ArrayList<Fault> faults = new ArrayList<>();
 
@@ -25,6 +26,14 @@ public class LoginTokenResponse implements Faults {
 
     public void setAuthorizationToken(String authorizationToken) {
         this.authorizationToken = authorizationToken;
+    }
+
+    public Iso8601Date getAuthorizationDate() {
+        return authorizationDate;
+    }
+
+    public void setAuthorizationDate(Iso8601Date authorizationDate) {
+        this.authorizationDate = authorizationDate;
     }
 
     public Iso8601Date getNotAfter() {

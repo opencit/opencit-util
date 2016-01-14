@@ -29,7 +29,14 @@ function LoginViewModel() {
     self.options = {
         "postLogoutRedirect": "index.html" //  where to send user after logout is done
     };
-
+    self.timediff = 0; // milliseconds;   client time - server time
+    self.convertServerTimestampToClientTimestamp = function(serverTime) { return serverTime + self.timediff; };
+    self.convertServerDateToClientDate = function(serverDateIso8601) { 
+        var date = new Date(serverDateIso8601);
+        date.addMilliseconds(self.timediff);
+        return date;
+    };
+    
     // operations
     self.login = function(loginFormElement) {
 		document.getElementById("loginButton").disabled = true;
@@ -61,15 +68,25 @@ function LoginViewModel() {
                 document.getElementById("loginButton").disabled = true;
                 /*
                  * Example:
-                 * {"authorization_token":"G4zpaAK426bZNqMTGGGbWVMiYJnd04Iy5DK75J1iVb4="}
+                 * {
+                 *   "authorization_token":"G4zpaAK426bZNqMTGGGbWVMiYJnd04Iy5DK75J1iVb4=",
+                 *   "not_after":"2016-01-12T08:07:05-0800"
+                 * }
                  */
                 
                 var authorizationToken = data.authorization_token;
                 
                 self.userProfile.username(self.loginRequest.username);
-                self.userProfile.authorizationToken(authorizationToken);
-                self.userProfile.authorizationTokenExpires(data.not_after);
                 self.userProfile.authenticated(true);
+                self.userProfile.authorizationToken(authorizationToken);
+                
+                var serverNow = new Date(data.authorization_date);
+                var clientNow = new Date();
+                self.timediff = clientNow.getTime() - serverNow.getTime();
+                var tokenExpiresDate = self.convertServerDateToClientDate(data.not_after); // input: ISO8601 date string,  output: Date object
+                self.userProfile.authorizationTokenExpires(tokenExpiresDate.getTime()); // now it's in client time, useful for scheduling timers, because it's adjusted for any time difference between client and server
+                
+                
                 
                 // send the authorization token automatically with every ajax request
                 $(document).ajaxSend(function(event,jqxhr,settings){

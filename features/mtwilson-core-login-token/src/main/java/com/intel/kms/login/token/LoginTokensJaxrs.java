@@ -205,9 +205,11 @@ public class LoginTokensJaxrs {
         log.info("Expiry date extended to :  " + updatedToken.getNotAfter());
 
         // include token in response headers      
+        Iso8601Date authorizationDate = new Iso8601Date(new Date());
         response.addHeader("Authorization-Token", tokenCredential.getValue());
-        response.addHeader("Date", Iso8601Date.format(new Date()));
+        response.addHeader("Authorization-Date", authorizationDate.toString());
         extendTokenResponse.setAuthorizationToken(tokenCredential.getValue());
+        extendTokenResponse.setAuthorizationDate(authorizationDate);
         extendTokenResponse.setNotAfter(new Iso8601Date(tokenCredential.getNotAfter()));
         return extendTokenResponse;
     }
