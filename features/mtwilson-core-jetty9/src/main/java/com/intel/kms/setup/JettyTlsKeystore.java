@@ -231,7 +231,7 @@ public class JettyTlsKeystore extends AbstractSetupTask {
             passwordVault.set(JAVAX_NET_SSL_KEYSTOREPASSWORD, keystorePassword);
         }
         
-        // save a special endpoint url parameter used to generate the transfer key links
+        // save a special endpoint url parameter where clients can access the web server
         getConfiguration().set(ENDPOINT_URL, getEndpoint());
     }
     
@@ -241,7 +241,8 @@ public class JettyTlsKeystore extends AbstractSetupTask {
         String endpointHost = null;
         if( dns != null ) {
             for(String hostname : dns) {
-                if( !hostname.equals("localhost") ) {
+                // using "contains" because it can be "localhost" or "ip6-localhost" on some systems
+                if( !hostname.contains("localhost") ) {
                     endpointHost = hostname;
                 }
             }
@@ -249,7 +250,8 @@ public class JettyTlsKeystore extends AbstractSetupTask {
         // if no DNS name, do we have an external IP address configured?
         if( endpointHost == null && ip != null ) {
             for(String hostname : ip) {
-                if( !hostname.equals("127.0.0.1")) {
+                // IPv4 127.0.0.1 and IPv6 0:0:0:0:0:0:0:1 and ::1 
+                if( !hostname.equals("127.0.0.1") && !hostname.equals("0:0:0:0:0:0:0:1") && !hostname.equals("::1") ) {
                     endpointHost = hostname;
                 }
             }
@@ -262,6 +264,9 @@ public class JettyTlsKeystore extends AbstractSetupTask {
         String port = getConfiguration().get("jetty.port", "80");
         if( port.equals("80") ) {
             return String.format("http://%s", endpointHost); //  http://localhost
+        }
+        else if( port.equals("443") ) {
+            return String.format("https://%s", endpointHost);
         }
         else {
             return String.format("http://%s:%s", endpointHost, port);  //  http://localhost:80
