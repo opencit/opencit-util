@@ -11,16 +11,8 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
  * @author jbuhacoff
  */
 @JacksonXmlRootElement(localName="password_login_response")
-public class PasswordLoginResponse {
-    private String authorizationToken;
-
-    public String getAuthorizationToken() {
-        return authorizationToken;
+public class PasswordLoginResponse extends LoginTokenResponse {
+    public PasswordLoginResponse() {
+        super();
     }
-
-    public void setAuthorizationToken(String authorizationToken) {
-        this.authorizationToken = authorizationToken;
-    }
-    
-    
 }

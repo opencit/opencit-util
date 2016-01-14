@@ -3,6 +3,7 @@
 
 <groupId>com.intel.mtwilson.linux</groupId>
 <artifactId>mtwilson-linux-util</artifactId>
+<name>mtwilson-core-linux-functions</name>
 	<!--
 RENAME TO:
 <groupId>com.intel.mtwilson.core</groupId>

@@ -9,11 +9,10 @@ import com.intel.dcsg.cpg.validation.Fault;
 import com.intel.dcsg.cpg.xml.JAXB;
 import com.intel.mtwilson.Folders;
 import com.intel.mtwilson.feature.fault.BadFeatureDescriptor;
-import com.intel.mtwilson.feature.xml.FeatureType;
+import com.intel.mtwilson.feature.xml.Feature;
 import com.intel.mtwilson.jaxrs2.Link;
 import com.intel.mtwilson.launcher.ws.ext.V2;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -24,7 +23,6 @@ import javax.ws.rs.BeanParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBException;
@@ -68,7 +66,7 @@ public class FeatureDirectory {
                     try (FileInputStream in = new FileInputStream(featureXmlFile)) {
                         String featureXml = IOUtils.toString(in, Charset.forName("UTF-8"));
                         JAXB jaxb = new JAXB();
-                        FeatureType feature = jaxb.read(featureXml, FeatureType.class);
+                        Feature feature = jaxb.read(featureXml, Feature.class);
                         results.features.add(feature);
                     } catch (IOException | JAXBException | XMLStreamException e) {
                         log.error("Cannot open feature.xml in {}", featureSubdirectory.getAbsolutePath(), e);
@@ -88,7 +86,7 @@ public class FeatureDirectory {
 
     public static class FeatureListing {
 
-        public ArrayList<FeatureType> features = new ArrayList<>();
+        public ArrayList<Feature> features = new ArrayList<>();
         public ArrayList<Fault> faults = new ArrayList<>();
         public ArrayList<Link> links = new ArrayList<>();
     }

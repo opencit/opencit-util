@@ -34,6 +34,12 @@ public class Password {
         }
     }
     
+    public Password(String password) {
+        if( password == null ) { this.password = new char[0]; }
+        else {
+            this.password = password.toCharArray();
+        }
+    }
     /**
      * The byte array should be cleared if not needed after creating the Password object
      * @param bytes representing the password in UTF-8 encoding

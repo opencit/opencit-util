@@ -5,7 +5,6 @@
 package com.intel.mtwilson.shiro.authc.token;
 
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * Represents the registered token value with expiration date and usage
@@ -26,6 +25,10 @@ import java.util.Objects;
  * validated a token in a request against this credential; the lookup service
  * should return a subclass that may implement a callback to increment the
  * used count in the database.
+ * 
+ * The TokenCredential is intentionally read-only. Applications can request
+ * the framework to extend/renew or replace a token (and receive a new instance)
+ * but not to attempt to modify an existing token outside the framework.
  * 
  * @author jbuhacoff
  */

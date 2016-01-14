@@ -7,7 +7,7 @@ package com.intel.mtwilson.shiro.file;
 import com.intel.mtwilson.Folders;
 import com.intel.mtwilson.shiro.Username;
 import com.intel.mtwilson.shiro.UsernameWithPermissions;
-import com.intel.mtwilson.shiro.authc.password.HashedPassword;
+import com.intel.mtwilson.crypto.password.HashedPassword;
 import com.intel.mtwilson.shiro.authc.password.PasswordAuthenticationInfo;
 import com.intel.mtwilson.shiro.file.model.UserPassword;
 import com.intel.mtwilson.shiro.file.model.UserPermission;

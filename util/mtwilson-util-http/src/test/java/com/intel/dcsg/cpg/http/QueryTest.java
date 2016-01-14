@@ -16,6 +16,8 @@ import static org.junit.Assert.*;
  * @author jbuhacoff
  */
 public class QueryTest {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(QueryTest.class);
+    
     @Test
     public void testQueryString() {
         MutableQuery query = new MutableQuery();
@@ -52,4 +54,46 @@ public class QueryTest {
         assertEquals("value2a", parameters.get("key2").get(0));
         assertEquals("value2b", parameters.get("key2").get(1));
     }
+    
+    private void logParameters(Map<String,List<String>> parameters) {
+        for( String key : parameters.keySet() ) {
+            log.debug("key: {}", key);
+            List<String> values = parameters.get(key);
+            if( values == null ) { log.debug("values null"); }
+            else {
+                for( String value : values ) {
+                    log.debug("value: {}", value);
+                }
+            }
+        }
+    }
+    
+    @Test
+    public void testParseEmptyQuery() throws UnsupportedEncodingException, MalformedURLException {
+        Map<String,List<String>> parameters = Query.parse("");
+        assertNotNull(parameters);
+        logParameters(parameters);
+    }
+    
+    @Test
+    public void testParseEmptyQueryWithAmp() throws UnsupportedEncodingException, MalformedURLException {
+        Map<String,List<String>> parameters = Query.parse("&");
+        assertNotNull(parameters);
+        logParameters(parameters);
+    }
+
+    @Test
+    public void testParseEmptyQueryWithSemicolon() throws UnsupportedEncodingException, MalformedURLException {
+        Map<String,List<String>> parameters = Query.parse(";");
+        assertNotNull(parameters);
+        logParameters(parameters);
+    }
+
+    @Test
+    public void testParseEmptyQueryWithQuestion() throws UnsupportedEncodingException, MalformedURLException {
+        Map<String,List<String>> parameters = Query.parse("?");
+        assertNotNull(parameters);
+        logParameters(parameters);
+    }
+
 }

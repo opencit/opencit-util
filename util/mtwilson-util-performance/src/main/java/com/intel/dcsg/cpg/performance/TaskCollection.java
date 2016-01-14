@@ -70,12 +70,12 @@ public class TaskCollection extends Task implements Progress {
     public Collection<Task> getCollection() { return tasks; }
 
     @Override
-    public Long getCurrent() {
+    public long getCurrent() {
         return completed + current(currentTask);
     }
 
     @Override
-    public Long getMax() {
+    public long getMax() {
         return max;
     }
     

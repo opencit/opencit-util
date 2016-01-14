@@ -64,6 +64,7 @@ public class JacksonObjectMapperProvider implements ContextResolver<ObjectMapper
         mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
         List<Module> jacksonModules = Extensions.findAll(Module.class);
         for(Module module : jacksonModules) {
+            log.debug("JacksonObjectMapperProvider registering module: {} class: {}", module.getModuleName(), module.getClass().getName());
             mapper.registerModule(module); // for example com.intel.mtwilson.jackson.bouncycastle.BouncyCastleModule, com.intel.mtwilson.jackson.validation.ValidationModule, com.intel.mtwilson.jackson.v2api.V2Module
         }
 //        mapper.registerModule(new BouncyCastleModule());  // this is a good spot for an extension point

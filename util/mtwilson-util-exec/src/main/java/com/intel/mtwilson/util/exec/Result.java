@@ -4,8 +4,6 @@
  */
 package com.intel.mtwilson.util.exec;
 
-import org.apache.commons.exec.ExecuteException;
-
 /**
  *
  * @author jbuhacoff

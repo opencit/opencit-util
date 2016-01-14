@@ -57,7 +57,11 @@ public class PasswordKeyStoreTest {
         }
     }    
     
-    @Test
+    /**
+     * This test is for occasional interactive use; not needed for routine builds.
+     * @throws Exception 
+     */
+//    @Test
     public void testMaxSizePasswordKeyStore() throws Exception {
         ByteArrayResource resource = new ByteArrayResource();
         String keystorePassword = RandomUtil.randomBase64String(16);

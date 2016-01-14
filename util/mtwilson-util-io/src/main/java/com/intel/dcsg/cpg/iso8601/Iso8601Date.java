@@ -107,6 +107,10 @@ public class Iso8601Date extends Date {
         super(milliseconds);
     }
     
+    /**
+     * Converts the date object to a string of the form yyyy-MM-dd'T'HH:mm:ssZ
+     * @return 
+     */
     @org.codehaus.jackson.annotate.JsonValue
     @com.fasterxml.jackson.annotation.JsonValue
     @Override

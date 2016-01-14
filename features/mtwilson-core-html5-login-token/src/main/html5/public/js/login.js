@@ -1,6 +1,16 @@
+/*
+ * login.js - supporting javascript for login with username and password to obtain
+ *            an authorization token and send it automatically with subsequent
+ *            AJAX requests
+ *
+ * Dependencies:
+ * jQuery, knockout
+ */
+
 function UserProfile(data) {
     this.username = ko.observable(data.username);
     this.authorizationToken = ko.observable(data.authorizationToken);
+    this.authorizationTokenExpires = ko.observable();
     this.authenticated = ko.observable(false);
     this.error = ko.observable(data.error);
 }
@@ -17,10 +27,16 @@ function LoginViewModel() {
     self.loginRequest = new LoginRequest({});
     self.userProfile = new UserProfile({});
     self.options = {
-        "postLoginActivatePage": "dashboard.html",  // dashboard should be the first view we show after login; dashboard can then load the "run once" or "are there notifications" code.
         "postLogoutRedirect": "index.html" //  where to send user after logout is done
     };
-
+    self.timediff = 0; // milliseconds;   client time - server time
+    self.convertServerTimestampToClientTimestamp = function(serverTime) { return serverTime + self.timediff; };
+    self.convertServerDateToClientDate = function(serverDateIso8601) { 
+        var date = new Date(serverDateIso8601);
+        date.addMilliseconds(self.timediff);
+        return date;
+    };
+    
     // operations
     self.login = function(loginFormElement) {
 		document.getElementById("loginButton").disabled = true;
@@ -52,20 +68,32 @@ function LoginViewModel() {
                 document.getElementById("loginButton").disabled = true;
                 /*
                  * Example:
-                 * {"authorization_token":"G4zpaAK426bZNqMTGGGbWVMiYJnd04Iy5DK75J1iVb4="}
+                 * {
+                 *   "authorization_token":"G4zpaAK426bZNqMTGGGbWVMiYJnd04Iy5DK75J1iVb4=",
+                 *   "not_after":"2016-01-12T08:07:05-0800"
+                 * }
                  */
                 
                 var authorizationToken = data.authorization_token;
                 
                 self.userProfile.username(self.loginRequest.username);
-                self.userProfile.authorizationToken(authorizationToken);
                 self.userProfile.authenticated(true);
+                self.userProfile.authorizationToken(authorizationToken);
+                
+                var serverNow = new Date(data.authorization_date);
+                var clientNow = new Date();
+                self.timediff = clientNow.getTime() - serverNow.getTime();
+                var tokenExpiresDate = self.convertServerDateToClientDate(data.not_after); // input: ISO8601 date string,  output: Date object
+                self.userProfile.authorizationTokenExpires(tokenExpiresDate.getTime()); // now it's in client time, useful for scheduling timers, because it's adjusted for any time difference between client and server
+                
+                
                 
                 // send the authorization token automatically with every ajax request
                 $(document).ajaxSend(function(event,jqxhr,settings){
                     console.log("ajaxSend: url: %s", settings.url);
                     // check if url starts with /v1  (for example /v1/users)
                     //if( settings.url.lastIndexOf('/v1',0) === 0 ) {
+                        var authorizationToken = self.userProfile.authorizationToken();
                         console.log("ajaxSend: accept header: %O", settings.accept);
                         console.log("ajaxSend: headers object: %O", settings.headers);
                         console.log("ajaxSend: AJAX request to /v1, setting authorization token: "+authorizationToken);
@@ -88,12 +116,10 @@ function LoginViewModel() {
                 });
                 
                 
-                // load the navbar and the dashboard, and activate the post-login primary view
-                
-//                var nextView = self.options.postLoginActivatePage; // "dashboard.html";
-                
+                // inform the application that we just logged on successfully,
+                // application will switch to next screen
                 $(document).trigger({
-                    type: "mtwilson-core-html5:login:success",
+                    type: "mtwilson-core-html5:init:ready", // was:  mtwilson-core-html5:login:success
                     message: {"username": self.userProfile.username() },
                     time: new Date()
                 });

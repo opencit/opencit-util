@@ -34,12 +34,12 @@ public class TermProgressObserverTest {
         }
 
         @Override
-        public Long getCurrent() {
+        public long getCurrent() {
             return Long.valueOf(i);
         }
 
         @Override
-        public Long getMax() {
+        public long getMax() {
             return Long.valueOf(max);
         }
     }
@@ -56,12 +56,12 @@ public class TermProgressObserverTest {
         }
 
         @Override
-        public Long getCurrent() {
+        public long getCurrent() {
             return Long.valueOf(i);
         }
 
         @Override
-        public Long getMax() {
+        public long getMax() {
             return Long.valueOf(max);
         }
     }    
@@ -82,12 +82,12 @@ public class TermProgressObserverTest {
             }
         }
         @Override
-        public Long getCurrent() {
+        public long getCurrent() {
             return Long.valueOf(i);
         }
 
         @Override
-        public Long getMax() {
+        public long getMax() {
             return Long.valueOf(max);
         }
         

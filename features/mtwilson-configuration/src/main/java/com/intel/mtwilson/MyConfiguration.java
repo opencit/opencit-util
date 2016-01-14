@@ -186,8 +186,7 @@ public class MyConfiguration {
                             encryptedFile.saveString(writer.toString());
                             break;
                         }
-                    }
-                    else {
+                    } else {
                         log.debug("Writing plaintext properties to {}", file.getAbsolutePath());
                         Properties p = new Properties();
                         p.load(new StringReader(content));
@@ -401,16 +400,16 @@ public class MyConfiguration {
         }
         return files;
     }
-    
+
     /**
-     * 
-     * @return File representing the configuration file mtwilson.properties in the folder returned by @{code getConfiguration()}
+     *
+     * @return File representing the configuration file mtwilson.properties in
+     * the folder returned by
+     * @{code getConfiguration()}
      */
     public File getConfigurationFile() {
         return ConfigurationFactory.getConfigurationFile();
     }
-    
-    
 
     public Configuration getConfiguration() {
         return conf;
@@ -502,7 +501,7 @@ public class MyConfiguration {
             properties.setProperty("mtwilson.api.password", conf.getString("mtwilson.api.password"));
 
         }
-        
+
         if (conf.containsKey("mtwilson.api.tls.policy.certificate.sha1")) {
             properties.setProperty("mtwilson.api.tls.policy.certificate.sha1", conf.getString("mtwilson.api.tls.policy.certificate.sha1"));
         } else if (conf.containsKey("mtwilson.api.tls.policy.insecure")) {
@@ -527,6 +526,22 @@ public class MyConfiguration {
         }
         return locales;
     }
+    
+    /*
+    // localization
+    // guarantees to return at least one element
+    public String[] getAvailableLocales() {
+        Locale[] locales = Locale.getAvailableLocales();
+        if (locales == null || locales.length == 0) {
+            return new String[]{"en-US"};
+        }
+        String[] localeNames = new String[locales.length];
+        for (int i = 0; i < locales.length; i++) {
+            localeNames[i] = LocaleUtil.toLanguageTag(locales[i]);
+        }
+        return localeNames;
+    }
+    * */
 
     ///////////////////////// database //////////////////////////////////
     public String getDatabaseProtocol() {
@@ -535,10 +550,10 @@ public class MyConfiguration {
         }
         if (conf.containsKey("mountwilson.as.db.protocol")) {
             conf.getString("mountwilson.as.db.protocol", "postgresql");
-        } 
+        }
         if (conf.containsKey("mountwilson.ms.db.protocol")) {
             conf.getString("mountwilson.ms.db.protocol", "postgresql");
-        } 
+        }
         if (conf.containsKey("mtwilson.db.driver")) {
             String driver = conf.getString("mtwilson.db.driver", "");
             if (driver.equals("org.postgresql.Driver")) {
@@ -566,10 +581,10 @@ public class MyConfiguration {
         }
         if (conf.containsKey("mountwilson.as.db.driver")) {
             conf.getString("mountwilson.as.db.driver", "org.postgresql.Driver");
-        } 
+        }
         if (conf.containsKey("mountwilson.ms.db.driver")) {
             conf.getString("mountwilson.ms.db.driver", "org.postgresql.Driver");
-        } 
+        }
         if (conf.containsKey("mtwilson.db.protocol")) {
             String protocol = conf.getString("mtwilson.db.protocol", "");
             if (protocol.equals("postgresql")) {
@@ -597,10 +612,10 @@ public class MyConfiguration {
         }
         if (conf.containsKey("mountwilson.as.db.port")) {
             conf.getString("mountwilson.as.db.port", "5432");
-        } 
+        }
         if (conf.containsKey("mountwilson.ms.db.port")) {
             conf.getString("mountwilson.ms.db.port", "5432");
-        } 
+        }
         if (conf.containsKey("mtwilson.db.protocol")) {
             String protocol = conf.getString("mtwilson.db.protocol", "");
             if (protocol.equals("postgresql")) {
@@ -709,9 +724,9 @@ public class MyConfiguration {
     public String getSamlKeystorePassword() {
         return conf.getString("saml.key.password"); // bug #733 
     }
-    
+
     public String getSamlKeyAlias() {
-        return conf.getString("saml.key.alias"); 
+        return conf.getString("saml.key.alias");
     }
 
     public Integer getSamlValidityTimeInSeconds() {
@@ -721,20 +736,21 @@ public class MyConfiguration {
     public String getGlobalTlsPolicyId() {
         return conf.getString("mtwilson.global.tls.policy.id"); // no default - when a value is present it means all per-host and default tls policy settings will be ignored
     }
+
     public String getDefaultTlsPolicyId() {
         return conf.getString("mtwilson.default.tls.policy.id"); // no default - when a value is present it is used whenever a tls connection needs to be made but no per-request or per-host tls policy was specified
     }
+
     public Set<String> getTlsPolicyAllow() {
         String[] allowed = conf.getStringArray("mtwilson.tls.policy.allow");
-        if( allowed.length == 0 ) {
-            allowed = new String[] { "certificate", "certificate-digest" }; // the other possible values which are intentionally not included in the default list are public-key, public-key-digest, INSECURE and TRUST_FIRST_CERTIFICATE
+        if (allowed.length == 0) {
+            allowed = new String[]{"certificate", "certificate-digest"}; // the other possible values which are intentionally not included in the default list are public-key, public-key-digest, INSECURE and TRUST_FIRST_CERTIFICATE
         }
         return Collections.unmodifiableSet(new HashSet<>(Arrays.asList(allowed)));
     }
-    
+
     public File getTlsCertificateFile() {
         return findConfigurationFile(conf.getString("mtwilson.tls.certificate.file", "ssl.crt.pem"));
-        //return new File(conf.getString("mtwilson.tls.certificate.file", getMtWilsonConf() + File.separator + "ssl.crt.pem"));
     }
     
     public File getTlsKeystoreFile() {
@@ -816,23 +832,23 @@ public class MyConfiguration {
      */
     public String getMtWilsonHome() {
         /*
-        String mtwilsonHome = System.getenv("MTWILSON_HOME");
-        log.debug("MTWILSON_HOME={}", mtwilsonHome);
-        if (mtwilsonHome == null) {
-            if (Platform.isUnix()) {
-                mtwilsonHome = "/opt/mtwilson";
-                log.debug("MTWILSON_HOME={} (Linux default)", mtwilsonHome);
-            }
-            if (Platform.isWindows()) {
-                mtwilsonHome = "C:" + File.separator + "mtwilson"; // applications in Program Files need administrator permission to write to their folders 
-                log.debug("MTWILSON_HOME={} (Windows default)", mtwilsonHome);
-            }
-        }
-        if (mtwilsonHome == null) {
-            throw new IllegalStateException("MTWILSON_HOME environment variable must be defined");
-        }
-        return mtwilsonHome;
-        */
+         String mtwilsonHome = System.getenv("MTWILSON_HOME");
+         log.debug("MTWILSON_HOME={}", mtwilsonHome);
+         if (mtwilsonHome == null) {
+         if (Platform.isUnix()) {
+         mtwilsonHome = "/opt/mtwilson";
+         log.debug("MTWILSON_HOME={} (Linux default)", mtwilsonHome);
+         }
+         if (Platform.isWindows()) {
+         mtwilsonHome = "C:" + File.separator + "mtwilson"; // applications in Program Files need administrator permission to write to their folders 
+         log.debug("MTWILSON_HOME={} (Windows default)", mtwilsonHome);
+         }
+         }
+         if (mtwilsonHome == null) {
+         throw new IllegalStateException("MTWILSON_HOME environment variable must be defined");
+         }
+         return mtwilsonHome;
+         */
         return Folders.application();
     }
 
@@ -842,24 +858,24 @@ public class MyConfiguration {
      */
     public String getMtWilsonConf() {
         /*
-        String mtwilsonConf = System.getenv("MTWILSON_CONF");
-        log.debug("MTWILSON_CONF={}", mtwilsonConf);
-        if (mtwilsonConf == null) {
-            if (Platform.isUnix()) {
-                //mtwilsonConf = "/etc/mtwilson";
-                mtwilsonConf = "/etc/intel/cloudsecurity";
-                log.debug("MTWILSON_CONF={} (Linux default)", mtwilsonConf);
-            }
-            if (Platform.isWindows()) {
-                mtwilsonConf = getMtWilsonHome() + File.separator + "configuration";
-                log.debug("MTWILSON_CONF={} (Windows default)", mtwilsonConf);
-            }
-        }
-        if (mtwilsonConf == null) {
-            throw new IllegalStateException("MTWILSON_CONF environment variable must be defined");
-        }
-        return mtwilsonConf;
-        */
+         String mtwilsonConf = System.getenv("MTWILSON_CONF");
+         log.debug("MTWILSON_CONF={}", mtwilsonConf);
+         if (mtwilsonConf == null) {
+         if (Platform.isUnix()) {
+         //mtwilsonConf = "/etc/mtwilson";
+         mtwilsonConf = "/etc/intel/cloudsecurity";
+         log.debug("MTWILSON_CONF={} (Linux default)", mtwilsonConf);
+         }
+         if (Platform.isWindows()) {
+         mtwilsonConf = getMtWilsonHome() + File.separator + "configuration";
+         log.debug("MTWILSON_CONF={} (Windows default)", mtwilsonConf);
+         }
+         }
+         if (mtwilsonConf == null) {
+         throw new IllegalStateException("MTWILSON_CONF environment variable must be defined");
+         }
+         return mtwilsonConf;
+         */
         return Folders.configuration();
     }
 
@@ -888,10 +904,10 @@ public class MyConfiguration {
         String mtwilsonJava = System.getenv("MTWILSON_JAVA");
         log.debug("MTWILSON_JAVA={}", mtwilsonJava);
         /*
-        if (mtwilsonJava == null) {
-            mtwilsonJava = conf.getString("mtwilson.fs.java");
-        }
-        */
+         if (mtwilsonJava == null) {
+         mtwilsonJava = conf.getString("mtwilson.fs.java");
+         }
+         */
         if (mtwilsonJava == null) {
             mtwilsonJava = getMtWilsonHome() + File.separator + "java";
         }
@@ -926,7 +942,7 @@ public class MyConfiguration {
     public File getCaKeystoreFile() {
         return new File(getMtWilsonConf() + File.separator + "cakey.pem");
     }
-    
+
     public File getCaCertsFile() {
         return new File(getMtWilsonConf() + File.separator + "cacerts.pem");
     }
@@ -935,4 +951,5 @@ public class MyConfiguration {
     public int getAntiReplayProtectionWindowMilliseconds() {
         return conf.getInt("mtwilson.security.x509.request.expires", 60 * 60 * 1000); // default 1 hour
     }
+
 }

@@ -11,6 +11,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
+ * This is a decorator for Connection that overrides close() to return the
+ * connection to the pool instead of actually closing it. 
+ * 
  * The only important methods are the constructor and close. 
  * All other methods are overridden for logging purposes only.
  * 

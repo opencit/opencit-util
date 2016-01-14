@@ -55,6 +55,7 @@
         <module>mtwilson-util-pipe</module>
         <module>mtwilson-util-rfc822</module>
         <module>mtwilson-util-shiro</module>
+        <module>mtwilson-util-ssh</module>
         <module>mtwilson-util-text-transform</module>
         <module>mtwilson-util-tls-policy</module>
         <module>mtwilson-util-tpm12</module>

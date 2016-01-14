@@ -2,9 +2,7 @@
  * Copyright (C) 2014 Intel Corporation
  * All rights reserved.
  */
-package com.intel.mtwilson.shiro.authc.password;
-
-import com.intel.mtwilson.crypto.password.HashProtection;
+package com.intel.mtwilson.crypto.password;
 
 /**
  * 
