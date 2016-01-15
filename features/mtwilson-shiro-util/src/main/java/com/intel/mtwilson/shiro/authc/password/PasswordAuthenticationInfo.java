@@ -7,6 +7,7 @@ package com.intel.mtwilson.shiro.authc.password;
 import java.util.Objects;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.subject.PrincipalCollection;
+import com.intel.mtwilson.crypto.password.HashedPassword;
 
 /**
  * The SaltedAuthenticationInfo is not implemented because it isn't

@@ -9,6 +9,7 @@ import com.intel.dcsg.cpg.authz.token.TokenFactory;
 import com.intel.dcsg.cpg.configuration.Configuration;
 import com.intel.dcsg.cpg.configuration.PropertiesConfiguration;
 import com.intel.dcsg.cpg.crypto.RandomUtil;
+import com.intel.dcsg.cpg.iso8601.Iso8601Date;
 import com.intel.mtwilson.configuration.ConfigurationFactory;
 import com.intel.mtwilson.jaxrs2.mediatype.DataMediaType;
 import com.intel.mtwilson.launcher.ws.ext.V2;
@@ -145,14 +146,16 @@ public class PasswordLogin {
         database.add(tokenCredential, usernameWithPermissions);
 
         // include token in response headers
+        Iso8601Date authorizationDate = new Iso8601Date(new Date());
         response.addHeader("Authorization-Token", tokenCredential.getValue());
+        response.addHeader("Authorization-Date", authorizationDate.toString());
 
-
+        // and in response body
         PasswordLoginResponse passwordLoginResponse = new PasswordLoginResponse();
         passwordLoginResponse.setAuthorizationToken(tokenCredential.getValue());
-
+        passwordLoginResponse.setAuthorizationDate(authorizationDate);
+        passwordLoginResponse.setNotAfter(new Iso8601Date(tokenCredential.getNotAfter()));
         return passwordLoginResponse;
     }
-    
     
 }

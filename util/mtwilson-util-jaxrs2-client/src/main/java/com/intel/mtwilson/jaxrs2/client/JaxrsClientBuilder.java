@@ -38,6 +38,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateEncodingException;
+import java.util.HashSet;
 //import org.glassfish.jersey.client.HttpUrlConnectorProvider; // jersey 2.10.1
 import org.glassfish.jersey.client.HttpUrlConnector; // jersey 2.4.1
 
@@ -66,6 +67,7 @@ public class JaxrsClientBuilder {
     private TlsPolicy tlsPolicy;
     private URL url;
     private TlsConnection tlsConnection;
+    private HashSet<Class> classRegistrations;
 
     public JaxrsClientBuilder() {
         clientConfig = new ClientConfig();
@@ -212,6 +214,14 @@ public class JaxrsClientBuilder {
         this.tlsPolicy = tlsPolicy;
         return this;
     }
+    
+    public JaxrsClientBuilder register(Class clazz) {
+        if( classRegistrations == null ) {
+            classRegistrations = new HashSet<>();
+        }
+        classRegistrations.add(clazz);
+        return this;
+    }
 
     public JaxrsClient build() {
         try {
@@ -220,12 +230,17 @@ public class JaxrsClientBuilder {
             authentication(); // adds to clientConfig
 //        client = ClientBuilder.newClient(clientConfig);
 //            Client client = ClientBuilder.newBuilder().sslContext(tlsConnection.getSSLContext()).hostnameVerifier(tlsConnection.getTlsPolicy().getHostnameVerifier()).withConfig(clientConfig).build();
-            Client client = ClientBuilder.newBuilder()
+            ClientBuilder builder = ClientBuilder.newBuilder()
                     .withConfig(clientConfig)
                     .sslContext(tlsConnection.getSSLContext()) // when commented out,  get pkix path building failure from java's built-in ssl context... when enabled, our custom ssl context doesn't get called at all.
 //                    .hostnameVerifier(TlsPolicyManager.getInstance().getHostnameVerifier())
-                    .hostnameVerifier(tlsConnection.getTlsPolicy().getHostnameVerifier())
-                    .build();
+                    .hostnameVerifier(tlsConnection.getTlsPolicy().getHostnameVerifier());
+            if( classRegistrations != null ) {
+                for(Class clazz : classRegistrations) {
+                    builder.register(clazz);
+                }
+            }
+            Client client = builder.build();
             if (configuration != null && Boolean.valueOf(configuration.get("org.glassfish.jersey.filter.LoggingFilter.printEntity", "true"))) {
                 client.register(new LoggingFilter(Logger.getLogger("org.glassfish.jersey.filter.LoggingFilter"), true));
             } else {

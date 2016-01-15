@@ -37,8 +37,14 @@
             <artifactId>mtwilson-shiro-util</artifactId>
 			<version>${mtwilson.version}</version>
         </dependency>
-      
-            
+
+        <dependency>
+        <groupId>com.intel.mtwilson.util</groupId>
+    <artifactId>mtwilson-util-shiro</artifactId>
+    <scope>test</scope>
+        </dependency>
+
+                        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

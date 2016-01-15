@@ -68,8 +68,12 @@ public class QueryStringTokenAuthenticationFilter extends HttpQueryAuthenticatio
      * @return
      */
     private Map<String, List<String>> parseQueryParameters(HttpServletRequest httpRequest) {
+        String queryString = httpRequest.getQueryString();
+        if (queryString == null) {
+            return null;
+        }
         try {
-            Map<String, List<String>> queryParameters = Query.parse(httpRequest.getQueryString());
+            Map<String, List<String>> queryParameters = Query.parse(queryString);
             return queryParameters;
         } catch (UnsupportedEncodingException e) {
             log.error("Cannot parse query string", e);
@@ -127,12 +131,14 @@ public class QueryStringTokenAuthenticationFilter extends HttpQueryAuthenticatio
                 if (queryParameters == null) {
                     queryParameters = parseQueryParameters(httpRequest);
                 }
-                List<String> authorizationTokens = queryParameters.get(authorizationQueryParameterName);
-                if (authorizationTokens != null && !authorizationTokens.isEmpty()) {
-                    // we use only the first token provided
-                    String tokenFromQuery = authorizationTokens.get(0);
-                    log.debug("Got token from query: {}", tokenFromQuery);
-                    return new Token(tokenFromQuery);
+                if (queryParameters != null) {
+                    List<String> authorizationTokens = queryParameters.get(authorizationQueryParameterName);
+                    if (authorizationTokens != null && !authorizationTokens.isEmpty()) {
+                        // we use only the first token provided
+                        String tokenFromQuery = authorizationTokens.get(0);
+                        log.debug("Got token from query: {}", tokenFromQuery);
+                        return new Token(tokenFromQuery);
+                    }
                 }
             } catch (Exception e) {
                 log.error("Cannot parse query string", e);

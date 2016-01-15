@@ -4,6 +4,7 @@
  */
 package com.intel.mtwilson.util.validation.faults;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.intel.dcsg.cpg.validation.Fault;
 
 /**
@@ -34,6 +35,7 @@ public class Thrown extends Fault {
         }
     }
 
+    @JsonIgnore
     public Throwable getCause() {
         return cause;
     }

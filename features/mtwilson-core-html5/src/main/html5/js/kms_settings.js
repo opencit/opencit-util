@@ -1,29 +1,3 @@
-/**
- * 
- * @param propertyName default sort order is ascending but you can pass "+propertyName" for explicitly ascending or "-propertyName" for descending
- * @return {function} a comparison function that operates on the named property in its two arguments
- */
-function sortBy(propertyName) {
-    var sortOrder = 1; // default ascending
-    if( propertyName[0] === "+" ) {
-        sortOrder = 1; // explicitly ascending
-        propertyName = propertyName.substr(1);
-    }
-    if( propertyName[0] === "-" ) {
-        sortOrder = -1; // descending
-        propertyName = propertyName.substr(1);
-    }
-    return function(a,b) {
-        var result = 0;
-        var propA = a[propertyName];
-        var propB = b[propertyName];
-        var valueA = (typeof(propA) === "function" ? propA() : propA);
-        var valueB = (typeof(propB) === "function" ? propB() : propB);
-        if( valueA < valueB) { result = -1; }
-        if( valueA > valueB) { result = 1; }
-        return result * sortOrder;
-    };
-}
 
             function Setting(data) {
                 this.name = ko.observable(data.name);

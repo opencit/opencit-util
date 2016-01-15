@@ -6,6 +6,7 @@ package com.intel.dcsg.cpg.validation;
 
 import java.math.BigDecimal;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -71,6 +72,22 @@ public class ValidationUtilTest {
         pojo.data = new byte[] { 0, 1, 2, 3, 4 };
         log.debug("tostring = {}", new Pojo().toString());
         ValidationUtil.validate(pojo);
+    }
+
+    @Test
+    public void testHexWithSeparatorValidation() {
+        log.debug("c7:da:72:9e:a6:3e:aa:68:4f valid? {}", ValidationUtil.isValidWithRegex("c7:da:72:9e:a6:3e:aa:68:4f", RegexPatterns.HEX_WITH_SEPARATOR));
+        assertTrue(ValidationUtil.isValidWithRegex("c7:da:72:9e:a6:3e:aa:68:4f", RegexPatterns.HEX_WITH_SEPARATOR));
+        log.debug("c7da:72:9e:a6:3e:aa:68:4f valid? {}", ValidationUtil.isValidWithRegex("c7da:72:9e:a6:3e:aa:68:4f", RegexPatterns.HEX_WITH_SEPARATOR));
+        assertFalse(ValidationUtil.isValidWithRegex("c7da:72:9e:a6:3e:aa:68:4f", RegexPatterns.HEX_WITH_SEPARATOR));
+    }
+
+    @Test
+    public void testHexWithOptionalSeparatorValidation() {
+        log.debug("c7:da:72:9e:a6:3e:aa:68:4f valid? {}", ValidationUtil.isValidWithRegex("c7:da:72:9e:a6:3e:aa:68:4f", RegexPatterns.HEX_WITH_OPTIONAL_SEPARATOR));
+        assertTrue(ValidationUtil.isValidWithRegex("c7:da:72:9e:a6:3e:aa:68:4f", RegexPatterns.HEX_WITH_OPTIONAL_SEPARATOR));
+        log.debug("c7da:72:9e:a6:3e:aa:68:4f valid? {}", ValidationUtil.isValidWithRegex("c7da:72:9e:a6:3e:aa:68:4f", RegexPatterns.HEX_WITH_OPTIONAL_SEPARATOR));
+        assertTrue(ValidationUtil.isValidWithRegex("c7da:72:9e:a6:3e:aa:68:4f", RegexPatterns.HEX_WITH_OPTIONAL_SEPARATOR));
     }
 
 }

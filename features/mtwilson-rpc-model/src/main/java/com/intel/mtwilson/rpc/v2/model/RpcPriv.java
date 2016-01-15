@@ -4,14 +4,7 @@
  */
 package com.intel.mtwilson.rpc.v2.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-import com.intel.dcsg.cpg.validation.Fault;
-import com.intel.mtwilson.jaxrs2.Document;
-import com.intel.dcsg.cpg.performance.Progress;
 
 /**
  * A remote procedure call has an id, href, name of the procedure, input, 

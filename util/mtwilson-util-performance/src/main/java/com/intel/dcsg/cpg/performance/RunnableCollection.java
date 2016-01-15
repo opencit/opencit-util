@@ -44,12 +44,12 @@ public class RunnableCollection implements Runnable, Progress {
     }
 
     @Override
-    public Long getCurrent() {
+    public long getCurrent() {
         return completed;
     }
 
     @Override
-    public Long getMax() {
+    public long getMax() {
         return max;
     }
     

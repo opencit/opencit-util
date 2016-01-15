@@ -4,16 +4,13 @@
  */
 package com.intel.mtwilson.shiro.authc.password;
 
-import com.intel.dcsg.cpg.crypto.Sha256Digest;
-import com.intel.dcsg.cpg.io.ByteArray;
 import com.intel.mtwilson.crypto.password.PasswordUtil;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
+import com.intel.mtwilson.crypto.password.HashedPassword;
 
 /**
  * This class is similar to HashedCredentialsMatcher that comes wtih 

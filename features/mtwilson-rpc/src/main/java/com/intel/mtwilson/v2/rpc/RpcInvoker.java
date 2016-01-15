@@ -144,7 +144,7 @@ public class RpcInvoker implements Runnable {
 
         // Task is done.  Now we check the progres -- if the task itself didn't report progress the current/max will be 0/0  , so we change it to 1/1  
         // but if the task did report progress, then it's max will be non-zero ,  and in that case we leave it alone.
-        if( rpc.getMax() == null || rpc.getMax().longValue() == 0L ) {
+        if( rpc.getMax() == 0 ) {
             rpc.setMax(1L);
             rpc.setCurrent(1L);
         }

@@ -18,6 +18,8 @@
 	<module>mtwilson-core-data-bundle</module>
 	<module>mtwilson-core-feature-inventory</module>
 	<module>mtwilson-core-html5</module>
+	<module>mtwilson-core-html5-login-anon</module>
+	<module>mtwilson-core-html5-login-token</module>
 	<module>mtwilson-core-help</module>
 	<module>mtwilson-core-jetty9</module>
 	<module>mtwilson-core-login-token</module>

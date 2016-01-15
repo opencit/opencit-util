@@ -129,6 +129,19 @@ public class MemoryTokenRealm extends AuthorizingRealm {
             map.put(credential.getValue(), new TokenRecord(credential, usernameWithPermissions));
         }
         
+        public void update(String value, TokenCredential update) {
+            TokenRecord record = map.get(value);
+            if( record == null ) {
+                throw new IllegalArgumentException("Token not found");
+            }
+            TokenCredential existing = record.getCredential();
+            // enforce rules... we don't allow lowering the uses but we do allow changing the max, and we allow changing the notAfter date
+            if( existing.getUsed() != null && (update.getUsed() == null || update.getUsed() < existing.getUsed()) ) {
+                throw new IllegalArgumentException("Invalid 'used' count");
+            }
+            record.credential = update;
+        }
+        
         public TokenRecord getByTokenValue(String value) {
             TokenRecord existing = findByTokenValue(value);
             if( existing == null ) {

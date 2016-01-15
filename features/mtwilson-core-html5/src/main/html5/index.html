@@ -70,8 +70,11 @@
         <script src="js/array_filter.js"></script>        
         <!-- Placed at the end of the document so the pages load faster -->
         <!-- infrastructure -->
-        <script src="js/kms_resource_loader.js"></script>
-        <script src="js/kms_discovery.js"></script>
+        <script src="js/mtwilson/namespace.js"></script>
+        <script src="js/mtwilson/sort.js"></script>
+        <script src="js/mtwilson/resource_loader.js"></script>
+        <script src="js/mtwilson/discovery.js"></script>
+        <script src="js/mtwilson/navbar.js"></script>
         <!-- <script src="js/require.js"></script>  -->
         <!-- independent -->
         <script src="js/uuid.js"></script>
@@ -79,6 +82,7 @@
         <script src="js/URI.js"></script>
         <script src="js/date.js"></script>
         <script src="js/knockout.js"></script>
+        <script src="js/knockout.mapping.js"></script>
         <script src="js/handlebars.js"></script>
         <!-- jquery -->
         <script src="js/jquery.js"></script>
@@ -87,8 +91,13 @@
         <!-- bootstrap -->
         <script src="js/bootstrap.min.js"></script>
         <!-- i18next -->
+        <!--
         <script src="js/i18next-1.10.1.min.js"></script>
-        <script src="js/i18n_util.js"></script>
+        -->
+        <script src="js/i18next-2.0.9.min.js"></script>
+        <script src="js/i18nextXHRBackend.min.js"></script>
+        <script src="js/i18next-jquery.min.js"></script>
+        <script src="js/mtwilson/i18n_util.js"></script>
         <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
         <script src="js/ie10-viewport-bug-workaround.js"></script>
 
@@ -143,6 +152,7 @@
                 self.data = [];  // original array of  [ { name: x, value: y }, ... ] pairs we get from server
                 self.map = {}; // data converted to a map of { name: value, ... }
                 self.init = function(settings) {
+                    if( typeof settings === "undefined" ) { settings = []; }
                     self.data = settings;
                     // convert the array of name,value objects to a map of name:value pairs
                     for(var i=0; i<settings.length; i++) {
@@ -172,23 +182,21 @@
                 }
         
         
-                //$("#login_content").hide();
-                //$("#dashboard_content").load("dashboard.html");
-                //resourceLoader.loadHTML("dashboard.html", "#dashboard_content");
-                //$("#dashboard_content").show();
-                setTimeout(function() {
-                    resourceLoader.loadHTML("login.html",
-                            {into: "#main",
-                                tab: "login",
-                                activate: true // means switch to this tab as soon as its loaded; same as providing callback: function() { mainViewModel.tab("#login", "#main"); }
-                            });
-                }, 1000); // delay this call by 1 second for quick display of the logo splash screen while the discovery call below loads the rest of the UI
-                
-                
                 // register scripts and stylesheets already loaded as part of the page markup
                 resourceLoader.registerLoadedJS();
                 resourceLoader.registerLoadedCSS();
 
+                // discover the login feature; if the application does not need
+                // a login then it should include mtwilson-core-html5-login-anon
+                // which will automatically "log in" as anonymous user.
+                // CONTRACT: there should be only ONE plugin that takes control
+                // of the login process, and it should trigger the event
+                // "mtwilson-core-html5:init:ready"  when it's ready to display
+                // the application.
+                discovery.eachJS("/public/mtwilson-core-html5/init/start.js", function(callback_args,context) {
+                    console.log("on start called after extension: %O with context: %O", callback_args, context );
+                });
+                
 
                 //resourceLoader.loadJS(['js/URI.js' /*, 'js/jquery.js' */], function() {
                     //ko.applyBindings(mainViewModel, document.getElementById("navbar"));
@@ -199,7 +207,8 @@
                 
 
                 // after successful login we can load the settings
-                $(document).on("mtwilson-core-html5:login:success.mtwilson-configuration-settings-ws-v2", function(e) {
+                // CHANGED FROM mtwilson-core-html5:login:success TO mtwilson-core-html5:init:ready
+                $(document).on("mtwilson-core-html5:init:ready.mtwilson-configuration-settings-ws-v2", function(e) {
                     console.log("settings intercepted login success event: %O", e);
 
                     // assume settings API is present - this will need to be edited later to use discovery , and use the settings javascript API provided by settings feature, which should include caching so it doesn'ta ctually make multiple queries to server
@@ -379,22 +388,24 @@
                 // define the successful login handlers, which load the html pages and navbar buttons
                 $(document).on("mtwilson-configuration-settings-ws-v2:settings:data.mtwilson-core-html5:navbar", function(e) {
                     console.log("navbar intercepted settings data event: %O", e);
-
+                            var navbar = namespace("com.intel.mtwilson.core.html5.navbar"); // from mtwilson/navbar.js
+                            
                             var buttonOrder = configuration.get("mtwilson.navbar.buttons");
                             var hometab = configuration.get("mtwilson.navbar.hometab");  
                             if( buttonOrder ) {
                                 // sort the buttons with 
-                                insertButtonsIntoNavbar( buttonOrder, hometab  );
+                                navbar.insertButtonsIntoNavbar( buttonOrder, hometab  );
                             }
                             else {
                             // no setting, so insert buttons without specified order
-                                insertButtonsIntoNavbar();
+                                navbar.insertButtonsIntoNavbar();
                             }
                 });
                 $(document).on("mtwilson-configuration-settings-ws-v2:settings:error.mtwilson-core-html5:navbar", function(e) {
                     console.log("navbar intercepted settings error event: %O", e);
                             // cannot load setting, so insert buttons without specified order
-                                insertButtonsIntoNavbar();
+                            var navbar = namespace("com.intel.mtwilson.core.html5.navbar"); // from mtwilson/navbar.js
+                                navbar.insertButtonsIntoNavbar();
                 });
 
 
@@ -402,8 +413,7 @@
                 $(document).on("mtwilson-configuration-settings-ws-v2:settings:data.mtwilson-core-html5:content", function(e) {
                     console.log("content intercepted settings data event: %O", e);
 
-                    // discover main tabs;   
-                    // for now, default tab is hardcoded to "dashbaord"
+                    // discover administrator-configured main tabs (which can be a subset of the available installed tabs)
                     var hometab = configuration.get("mtwilson.navbar.hometab");  
 //                    var defaultMainTab = selectHomeTab();
                     console.log("defaultMainTab = %s", hometab);
@@ -442,14 +452,15 @@
                 });                
                 */
 
-                $(document).on("mtwilson-core-html5:login:success.mtwilson-core-html5:init", function(e) {
+                // CHANGED FROM mtwilson-core-html5:login:success TO mtwilson-core-html5:init:ready
+                $(document).on("mtwilson-core-html5:init:ready.mtwilson-core-html5:init", function(e) {
                     console.log("content intercepted login success event: %O", e);
                     // discover features that implement "run on load" and invoke them
                     // this is an "open interface", with no expectation on what the
                     // features might do, in order to enable new integrations. 
                     // also a good place for features to declare their event handlers.
                     // this activity is restricted to AFTER successful login.
-                    discovery.eachJS("/mtwilson-core-html5/init/ready.js", function(callback_args,context) {
+                    discovery.eachJS("/public/mtwilson-core-html5/init/ready.js", function(callback_args,context) {
                         console.log("onready called after extension: %O with context: %O", callback_args, context );
                     });
                 });
