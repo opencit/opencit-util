@@ -4,6 +4,8 @@
  */
 package com.intel.dcsg.cpg.configuration;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -19,6 +21,7 @@ public class HashMapConfigurationTest {
     private MapConfiguration createConfiguration() {
         MapConfiguration c = new MapConfiguration();
         c.set("foo", "bar");
+        c.set("baz", null);
         return c;
     }
     /**
@@ -32,4 +35,14 @@ public class HashMapConfigurationTest {
         assertEquals("bar", c.get("foo"));
     }
     
+    @Test
+    public void testCreateHashMapFromConfiguration() {
+        MapConfiguration c = createConfiguration();
+        HashMap<String,String> map = MapConfiguration.toHashMap(c);
+        for(Map.Entry<String,String> entry : map.entrySet()) {
+            log.debug("key: {}  value: {}", entry.getKey(), entry.getValue());
+        }
+        assertEquals("bar", map.get("foo"));
+        assertNull(map.get("baz"));
+    }
 }
