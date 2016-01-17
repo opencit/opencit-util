@@ -22,6 +22,7 @@
 	<module>mtwilson-core-html5-login-token</module>
 	<module>mtwilson-core-help</module>
 	<module>mtwilson-core-jetty9</module>
+	<module>mtwilson-core-junit</module>
 	<module>mtwilson-core-login-token</module>
 	<module>mtwilson-core-version</module>
     <module>mtwilson-extensions-cache</module>
