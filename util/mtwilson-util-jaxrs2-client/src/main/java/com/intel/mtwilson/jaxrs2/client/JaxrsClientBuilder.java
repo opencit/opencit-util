@@ -17,6 +17,7 @@ import com.intel.dcsg.cpg.io.FileResource;
 import java.io.File;
 import java.util.Properties;
 import com.intel.dcsg.cpg.configuration.Configuration;
+import com.intel.dcsg.cpg.configuration.PrefixConfiguration;
 import com.intel.dcsg.cpg.configuration.PropertiesConfiguration;
 import com.intel.dcsg.cpg.crypto.CryptographyException;
 import com.intel.dcsg.cpg.tls.policy.TlsPolicy;
@@ -68,6 +69,8 @@ public class JaxrsClientBuilder {
     private URL url;
     private TlsConnection tlsConnection;
     private HashSet<Class> classRegistrations;
+    private String proxyHost;
+    private Integer proxyPort;
 
     public JaxrsClientBuilder() {
         clientConfig = new ClientConfig();
@@ -180,10 +183,14 @@ public class JaxrsClientBuilder {
                 log.debug("creating TlsConnection from URL and TlsPolicy");
                 tlsConnection = new TlsConnection(url, tlsPolicy);
             } else if (configuration != null) {
-                tlsPolicy = PropertiesTlsPolicyFactory.createTlsPolicy(configuration);
-                log.debug("TlsPolicy is {}", this.tlsPolicy.getClass().getName());
-                tlsConnection = new TlsConnection(url, tlsPolicy);
-                log.debug("set TlsConnection from configuration");
+                PrefixConfiguration tls = new PrefixConfiguration(configuration, "tls."); 
+                PrefixConfiguration tls2 = new PrefixConfiguration(configuration, "mtwilson.api.tls.");
+                if( !tls.keys().isEmpty() || !tls2.keys().isEmpty() ) {
+                    tlsPolicy = PropertiesTlsPolicyFactory.createTlsPolicy(configuration);
+                    log.debug("TlsPolicy is {}", this.tlsPolicy.getClass().getName());
+                    tlsConnection = new TlsConnection(url, tlsPolicy);
+                    log.debug("set TlsConnection from configuration");
+                }
             }
         }
         if (tlsConnection != null) {
@@ -193,6 +200,17 @@ public class JaxrsClientBuilder {
 //            log.debug("setting HttpsURLConnection defaults");
 //            TlsUtil.setHttpsURLConnectionDefaults(tlsConnection);
         }
+    }
+    
+    private void proxy() {
+        if( proxyHost == null && configuration != null ) {
+            proxyHost = configuration.get("proxy.host");
+            proxyPort = Integer.valueOf(configuration.get("proxy.port","8080"));
+        }
+       if( proxyHost != null ) {
+            clientConfig.connector(new HttpUrlConnector(clientConfig, new ProxyConnectionFactory(proxyHost, proxyPort)));
+        }
+        
     }
 
     // you can set this instead of url and tlsPolicy
@@ -222,24 +240,34 @@ public class JaxrsClientBuilder {
         classRegistrations.add(clazz);
         return this;
     }
+    
+    public JaxrsClientBuilder proxy(String proxyHost, int proxyPort) {
+        this.proxyHost = proxyHost;
+        this.proxyPort = proxyPort;
+        return this;
+    }
 
     public JaxrsClient build() {
         try {
             url();
             tls(); // sets tls connection
+            proxy(); // optional http proxy -- may override tls settings
             authentication(); // adds to clientConfig
 //        client = ClientBuilder.newClient(clientConfig);
 //            Client client = ClientBuilder.newBuilder().sslContext(tlsConnection.getSSLContext()).hostnameVerifier(tlsConnection.getTlsPolicy().getHostnameVerifier()).withConfig(clientConfig).build();
-            ClientBuilder builder = ClientBuilder.newBuilder()
-                    .withConfig(clientConfig)
-                    .sslContext(tlsConnection.getSSLContext()) // when commented out,  get pkix path building failure from java's built-in ssl context... when enabled, our custom ssl context doesn't get called at all.
+            ClientBuilder builder = ClientBuilder.newBuilder().withConfig(clientConfig);
+            
+            if( tlsConnection != null ) {
+                    builder.sslContext(tlsConnection.getSSLContext()); // when commented out,  get pkix path building failure from java's built-in ssl context... when enabled, our custom ssl context doesn't get called at all.
 //                    .hostnameVerifier(TlsPolicyManager.getInstance().getHostnameVerifier())
-                    .hostnameVerifier(tlsConnection.getTlsPolicy().getHostnameVerifier());
+                    builder.hostnameVerifier(tlsConnection.getTlsPolicy().getHostnameVerifier());
+            }
             if( classRegistrations != null ) {
                 for(Class clazz : classRegistrations) {
                     builder.register(clazz);
                 }
             }
+//            builder.
             Client client = builder.build();
             if (configuration != null && Boolean.valueOf(configuration.get("org.glassfish.jersey.filter.LoggingFilter.printEntity", "true"))) {
                 client.register(new LoggingFilter(Logger.getLogger("org.glassfish.jersey.filter.LoggingFilter"), true));
