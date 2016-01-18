@@ -1,8 +1,10 @@
 /*
- * Anonymous login
+ * Password login with tokens
  * 
  * This plugin lets the splash screen display for about a second before
- * announcing that the app is ready to start. There is no login request.
+ * showing a login screen. Submitting the login form with username and
+ * password will authenticate with server to receive a login token that
+ * is also used for CSRF protection.
  *
  * Dependencies:
  * This script assumes that jQuery ($) has already been loaded.

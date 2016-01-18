@@ -56,5 +56,18 @@ public class PropertiesConfiguration extends AbstractConfiguration {
         return true;
     }
 
-    
+    /**
+     * Creates a new Properties instance from any Configuration instance
+     * and copies all the settings to it
+     * 
+     * @param configuration
+     * @return 
+     */
+    public static Properties toProperties(Configuration configuration) {
+        Properties properties = new Properties();
+        for(String key : configuration.keys()) {
+            properties.setProperty(key, configuration.get(key));
+        }
+        return properties;
+    }
 }

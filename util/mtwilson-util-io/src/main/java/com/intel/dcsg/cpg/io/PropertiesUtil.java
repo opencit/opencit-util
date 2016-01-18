@@ -7,8 +7,8 @@ package com.intel.dcsg.cpg.io;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Properties;
 
 /**
@@ -46,5 +46,29 @@ public class PropertiesUtil {
             return properties;
         }
     }
+    
+    public static Properties replacePrefix(Properties properties, String prefix, String replace) {
+        Properties copy = new Properties();
+        Enumeration names = properties.propertyNames();
+        while(names.hasMoreElements()) {
+            String key = (String)names.nextElement();
+            copy.setProperty(key.replace(prefix, replace), properties.getProperty(key));
+        }
+        return copy;
+    }
+
+    public static Properties removePrefix(Properties properties, String prefix) {
+        return replacePrefix(properties, prefix, "");
+    }
+
+    public static Properties addPrefix(Properties properties, String prefix) {
+        Properties copy = new Properties();
+        Enumeration names = properties.propertyNames();
+        while(names.hasMoreElements()) {
+            String key = (String)names.nextElement();
+            copy.setProperty(prefix+key, properties.getProperty(key));
+        }
+        return copy;
+    }    
     
 }
