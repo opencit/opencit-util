@@ -15,6 +15,8 @@ import org.skife.jdbi.v2.tweak.ConnectionFactory;
  * @author jbuhacoff
  */
 public class ExistingConnectionFactory implements ConnectionFactory {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExistingConnectionFactory.class);
+
     private Connection connection;
     public ExistingConnectionFactory(Connection connection) {
         this.connection = connection;
@@ -23,6 +25,7 @@ public class ExistingConnectionFactory implements ConnectionFactory {
     
     @Override
     public Connection openConnection() throws SQLException {
+        log.debug("openConnection returning connection: {}", connection);
         return connection;
         /*
         try {

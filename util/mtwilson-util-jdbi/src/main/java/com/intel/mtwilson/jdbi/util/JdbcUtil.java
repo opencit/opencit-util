@@ -4,17 +4,12 @@
  */
 package com.intel.mtwilson.jdbi.util;
 
-import com.intel.dcsg.cpg.configuration.Configuration;
-//import com.intel.mtwilson.My;
-import com.intel.mtwilson.configuration.ConfigurationFactory;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Set;
 import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.commons.dbcp.BasicDataSource;
 
 /**
  *
