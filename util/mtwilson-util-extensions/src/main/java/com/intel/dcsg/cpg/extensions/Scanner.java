@@ -22,7 +22,9 @@ public class Scanner {
     private boolean throwErrors = false; // by default we'll skip any NoClassDefFoundError and continue scanning for what is available
     private List<String> includePackages = null; // when null, will accept implementations in any package; when set, will only accept implementations in specified packages
     private List<String> excludePackages = null; // when null, will accept implementations in any package; when set, will exclude implementations in specified packages (overrides includePackages so can be used to exclude specific portion of included package)
-
+    private List<String> includePackagePrefixes = null;
+    private List<String> excludePackagePrefixes = null;
+    
     public Scanner() {
     }
 
@@ -32,34 +34,46 @@ public class Scanner {
 
     public void setIncludePackages(List<String> includePackages) {
         this.includePackages = includePackages;
+        if( includePackages != null ) {
+            this.includePackagePrefixes = toPackagePrefixes(includePackages);
+        }
     }
 
     public void setExcludePackages(List<String> excludePackages) {
         this.excludePackages = excludePackages;
+        if( excludePackages != null ) {
+            this.excludePackagePrefixes = toPackagePrefixes(excludePackages);
+        }
     }
 
     private void process(Class<?> clazz) {
+        String className = clazz.getName();
+        log.debug("Scanning {}", className);
         // ignore interfaces and abstract classes because they cannot be instantiated and therefore cannot be extensions themselves
         if (clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) {
+            log.debug("Rejecting interface or abstract class: {}", className);
             return;
         }
-        if (includePackages == null || startsWithAny(clazz.getName(), toPackagePrefixes(includePackages))) {
-            if (excludePackages == null || !startsWithAny(clazz.getName(), toPackagePrefixes(excludePackages))) {
+        if( includePackages == null ) { log.debug("Not configured included packages"); };
+        if( excludePackages == null ) { log.debug("Not configured included packages"); };
+        
+        if (includePackagePrefixes == null || startsWithAny(className, includePackagePrefixes)) {
+            if (excludePackagePrefixes == null || !startsWithAny(className, excludePackagePrefixes)) {
 
                 for (int i = 0; i < registrars.length; i++) {
                     Registrar registrar = registrars[i];
-                    log.debug("Processing {} with registrar {}", clazz.getName(), registrar.getClass().getName());
+                    log.debug("Processing {} with registrar {}", className, registrar.getClass().getName());
                     try {
                         if (registrar.accept(clazz)) {
-                            log.debug("Auto-registered {} with {}", clazz.getName(), registrar.getClass().getName());
+                            log.debug("Auto-registered {} with {}", className, registrar.getClass().getName());
                         }
                     } catch (RuntimeException e) { // could be ClassNotFoundException or NoClassDefFoundError
-                        log.debug("Cannot evaluate class {}: {}", clazz.getName(), e.getClass().getName());
+                        log.debug("Cannot evaluate class {}: {}", className, e.getClass().getName());
                         if (throwExceptions) {
                             throw e;
                         }
                     } catch (Error e) {
-                        log.debug("Cannot evaluate class {}: {}", clazz.getName(), e.getClass().getName());
+                        log.debug("Cannot evaluate class {}: {}", className, e.getClass().getName());
                         if (throwErrors) {
                             throw e;
                         }
@@ -115,6 +129,7 @@ public class Scanner {
     private boolean startsWithAny(String test, List<String> prefixes) {
         for (String prefix : prefixes) {
             if (test.startsWith(prefix)) {
+                log.debug("Class {} starts with {}", test, prefix);
                 return true;
             }
         }

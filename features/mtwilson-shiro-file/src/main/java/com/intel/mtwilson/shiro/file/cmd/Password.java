@@ -33,9 +33,7 @@ public class Password implements Command {
     private LoginDAO dao;
     
     public Password() {
-        if (this.options == null) {
-            this.options = new MapConfiguration(new Properties());
-        }
+        this.options = new MapConfiguration(new Properties());
     }
     
     @Override

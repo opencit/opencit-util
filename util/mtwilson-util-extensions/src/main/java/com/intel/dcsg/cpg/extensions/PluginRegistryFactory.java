@@ -31,6 +31,7 @@ public class PluginRegistryFactory {
      */
     private static <T> Map<String,String> createRegistryMap(Class<T> extension, Transformer<String> keyTransformer) {
         HashMap<String,String> map = new HashMap<>();
+        log.debug("Creating registry map for {}", extension.getName());
         List<T> commands = Extensions.findAll(extension);
         for( T command : commands ) {
             String fqcn = command.getClass().getName();
