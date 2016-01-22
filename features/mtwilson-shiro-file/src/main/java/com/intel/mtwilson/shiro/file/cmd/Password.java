@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Properties;
+import org.apache.commons.configuration.MapConfiguration;
 /**
  * NOTE: this task is deprecated by mtwilson-shiro-file including a similar
  * task but without trustagent specific permissions.
@@ -29,6 +31,10 @@ public class Password implements Command {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Password.class);
     private Configuration options;
     private LoginDAO dao;
+    
+    public Password() {
+        this.options = new MapConfiguration(new Properties());
+    }
     
     @Override
     public void setOptions(Configuration options) {
