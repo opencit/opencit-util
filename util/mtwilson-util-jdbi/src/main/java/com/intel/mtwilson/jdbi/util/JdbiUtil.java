@@ -14,15 +14,22 @@ import java.sql.Connection;
 public class JdbiUtil {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JdbiUtil.class);
 
-    private static DBI dbi = null;
+        // issue #4978: removing static instance
+//    private static DBI dbi = null;
     
     public static DBI getDBI(Connection connection) {
         log.debug("JdbiUtil (mtwilson-util-jdbi) using connection: {}", connection);
 //        if (dbi == null) {
 //            dbi = new DBI(new ExistingConnectionFactory(connection));
 //        }
+        /*
         dbi = new DBI(new ExistingConnectionFactory(connection));   //previously created DBI object was causing issues in cit-3.0-beta2-sprint2; therefore forced creation of new object
         log.debug("JdbiUtil (mtwilson-util-jdbi) created new DBI instance: {}", dbi);
         return dbi;
+        */
+      // issue #4978: creating new DBI instance for each request
+     log.debug("JdbiUtil (mtwilson-util-jdbi) created new DBI instance");
+     return new DBI(new ExistingConnectionFactory(connection));
+        
     }
 }
