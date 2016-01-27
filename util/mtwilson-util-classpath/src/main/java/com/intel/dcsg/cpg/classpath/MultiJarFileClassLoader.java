@@ -27,7 +27,7 @@ public class MultiJarFileClassLoader extends LimitedClassLoader implements Close
 //    private final JarFile[] jarFiles;
 //    private final ConcurrentHashMap<File,JarFile> files = new ConcurrentHashMap<File,JarFile>();
 //    private final List<ClasspathEntry> classpath = Collections.synchronizedList(new ArrayList<ClasspathEntry>());
-    private final ArrayList<ClasspathEntry> classpath = new ArrayList<ClasspathEntry>();
+    private final ArrayList<ClasspathEntry> classpath = new ArrayList<>();
 
     /**
      * Create a MultiJarFileClassLoader with an empty classpath; you need to call add(File[] classpath) in order to have
@@ -97,6 +97,7 @@ public class MultiJarFileClassLoader extends LimitedClassLoader implements Close
 
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
+        log.debug("findClass {}", name);
         try {
 //            synchronized (classpath) {
                 for (ClasspathEntry entry : classpath) { //for(Entry<File,JarFile> entry : files.entrySet()) { //for(int i=0; i<classpath.length; i++) {

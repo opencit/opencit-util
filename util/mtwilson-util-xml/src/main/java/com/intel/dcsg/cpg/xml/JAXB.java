@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -37,10 +38,11 @@ import org.w3c.dom.Node;
  */
 public class JAXB {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JAXB.class);
-
+    private static final HashMap<Class,JAXBContext> contexts = new HashMap<>();
+    
     private ClassLoader jaxbClassLoader = null;
     private Charset charset = Charset.forName("UTF-8");
-
+    
     public ClassLoader getJaxbClassLoader() {
         return jaxbClassLoader;
     }
@@ -69,12 +71,16 @@ public class JAXB {
     
 
     protected JAXBContext getContextForType(Class valueType) throws JAXBException {
-        log.debug("getContextForType: {}", valueType.getPackage().getName());
-        JAXBContext jc;
+        JAXBContext jc = contexts.get(valueType);
+        if( jc == null ) {
         if (jaxbClassLoader != null) {
+            log.debug("getContextForType: {} with specified classloader: {}", valueType.getPackage().getName(), jaxbClassLoader);
             jc = JAXBContext.newInstance(valueType.getPackage().getName(), jaxbClassLoader);
         } else {
-            jc = JAXBContext.newInstance(valueType.getPackage().getName());
+            log.debug("getContextForType: {} with default classloader: {}", valueType.getPackage().getName(), Thread.currentThread().getContextClassLoader());
+            jc = JAXBContext.newInstance(valueType.getPackage().getName()); // uses Thread.currentThread().getContextClassLoader()
+        }
+        contexts.put(valueType, jc);
         }
         return jc;
     }
