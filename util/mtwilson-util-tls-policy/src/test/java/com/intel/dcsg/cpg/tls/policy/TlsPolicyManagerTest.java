@@ -4,6 +4,7 @@
  */
 package com.intel.dcsg.cpg.tls.policy;
 
+import com.intel.dcsg.cpg.io.PropertiesUtil;
 import com.intel.dcsg.cpg.tls.policy.impl.CertificateTlsPolicy;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.net.MalformedURLException;
 import com.intel.dcsg.cpg.tls.policy.impl.InsecureTlsPolicy;
 //import com.intel.dcsg.cpg.tls.policy.impl.TrustKnownCertificateTlsPolicy;
 import com.intel.dcsg.cpg.x509.repository.ArrayCertificateRepository;
+import com.intel.mtwilson.core.junit.Env;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -20,6 +22,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -42,19 +45,23 @@ public class TlsPolicyManagerTest {
     private static Logger log = LoggerFactory.getLogger(TlsPolicyManagerTest.class);
     private static boolean useTlsPolicyManager = false;
     
-    private ArrayList<String> getTargets() {
-        // vmware: 10.1.71.175, 10.1.71.173, 10.1.71.176, 10.1.71.174
-        // citrix: 10.1.71.201, 10.1.71.126
-        // intel:  10.1.71.167, 10.1.71.170
+    private ArrayList<String> getTargets() throws IOException {
+        Properties intelProperties = PropertiesUtil.removePrefix(Env.getProperties("cit3-trustagent"), "cit3.trustagent.");
+        Properties vmwareProperties = PropertiesUtil.removePrefix(Env.getProperties("vmware"), "vmware.");
+        Properties citrixProperties = PropertiesUtil.removePrefix(Env.getProperties("citrix"), "citrix.");
+
+        String[] vmwareTargets = vmwareProperties.getProperty("hosts").split(", ");
+        String[] citrixTargets = citrixProperties.getProperty("hosts").split(", ");
+        
         ArrayList<String> targets = new ArrayList<String>();
         for(int i=0; i<5; i++) {
-        targets.add("https://10.1.71.162/sdk"); //;Administrator;intel123!");
-        targets.add("https://10.1.71.163/sdk"); //;Administrator;intel123!");
-        targets.add("https://10.1.71.201/"); // root;P@ssw0rd
+            for(String host : vmwareTargets) {
+                targets.add(String.format("https://%s/sdk", host));
+            }
+            for(String host : citrixTargets) {
+                targets.add(String.format("https://%s", host));
+            }
         }
-//        targets.add("https://10.1.71.126/;Administrator;intel123!");
-//        targets.add("https://10.1.71.167:9999");
-//        targets.add("https://10.1.71.170:9999");
         return targets;
     }
     

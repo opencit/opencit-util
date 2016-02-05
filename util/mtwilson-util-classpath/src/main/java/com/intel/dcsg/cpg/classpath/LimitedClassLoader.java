@@ -72,6 +72,7 @@ public class LimitedClassLoader extends ClassLoader {
      */
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+        log.debug("loadClass {}", name);
         if (name.startsWith("java.")) {
             return super.loadClass(name, resolve);
         }

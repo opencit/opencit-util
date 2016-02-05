@@ -41,14 +41,17 @@ public class StringWildcardFilter implements Filter<String> {
     public StringWildcardFilter(Collection<String> matchPatterns) {
         addAll(matchPatterns);
     }
+    public StringWildcardFilter(String... matchPatterns) {
+        addAll(matchPatterns);
+    }
     
     public final void add(String pattern) {
         if (pattern.startsWith("*") && pattern.endsWith("*")) {
             contains.add(pattern.substring(1, pattern.length() - 1)); // strip off the wildcards
         } else if (pattern.startsWith("*")) {
-            startsWith.add(pattern.substring(1));
+            endsWith.add(pattern.substring(1));
         } else if (pattern.endsWith("*")) {
-            endsWith.add(pattern.substring(0, pattern.length() - 1));
+            startsWith.add(pattern.substring(0, pattern.length() - 1));
         } else {
             equalTo.add(pattern);
         }        
@@ -60,25 +63,31 @@ public class StringWildcardFilter implements Filter<String> {
         }        
     }
 
+    public final void addAll(String... patterns) {
+        for (String pattern : patterns) {
+            add(pattern);
+        }        
+    }
+    
     @Override
     public boolean accept(String item) {
         for (String pattern : equalTo) {
-            if (pattern.equals(item)) {
+            if (item.equals(pattern)) {
                 return true;
             }
         }
         for (String pattern : startsWith) {
-            if (pattern.startsWith(item)) {
+            if (item.startsWith(pattern)) {
                 return true;
             }
         }
         for (String pattern : endsWith) {
-            if (pattern.endsWith(item)) {
+            if (item.endsWith(pattern)) {
                 return true;
             }
         }
         for (String pattern : contains) {
-            if (pattern.contains(item)) {
+            if (item.contains(pattern)) {
                 return true;
             }
         }
