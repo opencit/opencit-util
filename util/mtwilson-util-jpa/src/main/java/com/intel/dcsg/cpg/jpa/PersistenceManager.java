@@ -71,7 +71,7 @@ public abstract class PersistenceManager implements ServletContextListener {
      * This map contains one static EntityManagerFactory for each Persistence
      * Unit used in the application
      */
-    private static final ConcurrentHashMap<String, EntityManagerFactory> factories = new ConcurrentHashMap<String, EntityManagerFactory>();
+    private static final ConcurrentHashMap<String, EntityManagerFactory> factories = new ConcurrentHashMap<>();
 
     public EntityManagerFactory getEntityManagerFactory(String persistenceUnitName) {
         log.info("PersistenceManager is configured with {} factories in getEntityManagerFactory", factories.keySet().size());
@@ -457,7 +457,7 @@ public abstract class PersistenceManager implements ServletContextListener {
         ds.setNumTestsPerEvictionRun(numTestsPerEvictionRun); // how many connections to test each time
         ds.setPassword(jpaProperties.getProperty("javax.persistence.jdbc.password"));
         ds.setPoolPreparedStatements(true);
-        ds.setRemoveAbandoned(true);
+        ds.setRemoveAbandoned(true); 
         ds.setRemoveAbandonedTimeout(60 * 1); // (seconds) connection may be abandoned for up to 1 minutes before being removed
         String validationQuery = jpaProperties.getProperty("dbcp.validation.query"); // dbcp.validation.query default null
         boolean validateOnBorrow = Boolean.valueOf(jpaProperties.getProperty("dbcp.validation.on.borrow", "true")); // dbcp.validation.on.borrow default true

@@ -180,7 +180,7 @@ public class UpdateExtensionsCacheFile extends LocalSetupTask {
         setIncludePackages(Arrays.asList(includeStartsWithKeywords));
         
         // default is to exclude java and javax packages; applications can override with a configuration setting
-        String excludePackagesStartsWith = getConfiguration().get("mtwilson.extensions.packageExcludeFilter.startsWith", "java, javax");
+        String excludePackagesStartsWith = getConfiguration().get("mtwilson.extensions.packageExcludeFilter.startsWith", "java,javax");
         String[] excludeStartsWithKeywords = StringUtils.split(excludePackagesStartsWith, ", ");
         getConfiguration().set("mtwilson.extensions.packageExcludeFilter.startsWith", excludePackagesStartsWith);
         setExcludePackages(Arrays.asList(excludeStartsWithKeywords));
@@ -248,6 +248,7 @@ public class UpdateExtensionsCacheFile extends LocalSetupTask {
     
     
     private void scanExtensions() {
+        log.debug("Scanning for available extensions");
         // scan each jar in the classpath
         Scanner scanner = new Scanner(new Registrar[] { new ImplementationRegistrar(), new AnnotationRegistrar(V2.class), new AnnotationRegistrar(V1.class), new AnnotationRegistrar(RPC.class), new AnnotationRegistrar(Background.class), new AnnotationRegistrar(Provider.class) });
         scanner.setIncludePackages(getIncludePackages());
