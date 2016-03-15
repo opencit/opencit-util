@@ -1,23 +1,24 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-
-    <artifactId>mtwilson-maven-package-makeself</artifactId>
+    
     <groupId>com.intel.mtwilson.maven</groupId>
+    <artifactId>mtwilson-maven-package-makeself</artifactId>
+    <version>3.0-SNAPSHOT</version>
+    
     <packaging>pom</packaging>
     <description>Describes how to create an application self-extracting file</description>
-
-<parent>
-  <groupId>com.intel.mtwilson</groupId>
-  <artifactId>mtwilson-maven-build-coreutil-maven</artifactId>
-  <version>3.0-SNAPSHOT</version>
-</parent>	
-
+    
+    <parent>
+        <groupId>com.intel.mtwilson</groupId>
+        <artifactId>mtwilson-maven-build-coreutil-maven</artifactId>
+        <version>3.0-SNAPSHOT</version>
+    </parent>
+    
     <properties>
         <!-- package poms that inherit can override this; it's the folder name to unextract (when using keep option) and .bin will be appended for the installer filename -->
         <makeself.name>${project.artifactId}-${project.version}</makeself.name>
     </properties>
-
+    
     <profiles>
         <profile>
             <activation>

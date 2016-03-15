@@ -1,23 +1,26 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    
     <groupId>com.intel.mtwilson.maven</groupId>
     <artifactId>mtwilson-maven-java</artifactId>
+    <version>3.0-SNAPSHOT</version>
+    
     <packaging>pom</packaging>
+    
     <parent>
         <groupId>com.intel.mtwilson</groupId>
         <artifactId>mtwilson-maven-build-coreutil-maven</artifactId>
         <version>3.0-SNAPSHOT</version>
     </parent>
-
+    
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <mtwilson.version>3.0-SNAPSHOT</mtwilson.version> <!-- mtwilson.version is the internal version number for software components, for convenience in keeping everything in sync when we build -->
-        <mtwilson.release>1.0.0-SNAPSHOT</mtwilson.release> <!-- mtwilson.release is the official release number that should be reported by the applications and shown on the installer filename -->
+        <mtwilson.version>${project.version}</mtwilson.version> <!-- mtwilson.version is the internal version number for software components, for convenience in keeping everything in sync when we build -->
+        <mtwilson.release>${project.version}</mtwilson.release> <!-- mtwilson.release is the official release number that should be reported by the applications and shown on the installer filename -->
         <jersey-version>1.9-ea04</jersey-version>
         <maven.build.timestamp.format>yyyyMMdd.HHmm</maven.build.timestamp.format>
     </properties>
-
+    
     <!--
     <reporting>    
       <plugins>  
