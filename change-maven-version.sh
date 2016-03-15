@@ -27,12 +27,17 @@ fi
 
 changeVersionCommand="mvn versions:set -DnewVersion=${version}"
 changeParentVersionCommand="mvn versions:update-parent -DnewVersion=${version}"
+mvnInstallCommand="mvn clean install"
 
 if [ $? -ne 0 ]; then echo "Failed to change maven version at top level" >&2; exit 3; fi
 (cd maven/mtwilson-maven-bom-coreutil && $changeVersionCommand)
 if [ $? -ne 0 ]; then echo "Failed to change maven version on \"maven/mtwilson-maven-bom-coreutil\" folder" >&2; exit 3; fi
+(cd maven/mtwilson-maven-bom-coreutil && $mvnInstallCommand)
+if [ $? -ne 0 ]; then echo "Failed to maven install \"maven/mtwilson-maven-bom-coreutil\"" >&2; exit 3; fi
 (cd maven/mtwilson-maven-bom-external && $changeVersionCommand)
 if [ $? -ne 0 ]; then echo "Failed to change maven version on \"maven/mtwilson-maven-bom-external\" folder" >&2; exit 3; fi
+(cd maven/mtwilson-maven-bom-external && $mvnInstallCommand)
+if [ $? -ne 0 ]; then echo "Failed to maven install \"maven/mtwilson-maven-bom-external\"" >&2; exit 3; fi
 (cd maven/mtwilson-core-application-zip && $changeVersionCommand)
 if [ $? -ne 0 ]; then echo "Failed to change maven version on \"maven/mtwilson-core-application-zip\" folder" >&2; exit 3; fi
 (cd maven/mtwilson-core-feature-zip && $changeVersionCommand)
