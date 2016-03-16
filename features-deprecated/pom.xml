@@ -1,45 +1,45 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    
     <groupId>com.intel.mtwilson.common</groupId>
     <artifactId>mtwilson-common</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <version>3.1-SNAPSHOT</version>
+    
     <packaging>pom</packaging>
-	<name>mtwilson-maven-build-coreutil-features-deprecated</name>
-
+    <name>mtwilson-maven-build-coreutil-features-deprecated</name>
     <description>Mt Wilson Common Projects are being migrated to Mt Wilson Utility Projects</description>
-
-<parent>
-  <groupId>com.intel.mtwilson</groupId>
-  <artifactId>mtwilson-maven-build-coreutil-root</artifactId>
-  <version>3.0-SNAPSHOT</version>
-</parent>	
-  
+    
+    <parent>
+        <groupId>com.intel.mtwilson</groupId>
+        <artifactId>mtwilson-maven-build-coreutil-root</artifactId>
+        <version>3.0-SNAPSHOT</version>
+    </parent>
+    
     <modules>
         <module>crypto</module>
     </modules>
-
-	<dependencyManagement>
+    
+    <dependencyManagement>
         <dependencies>
 
-        <dependency>
-    <groupId>com.intel.mtwilson.maven</groupId>
-    <artifactId>mtwilson-maven-bom-coreutil</artifactId>
-  <version>3.0-SNAPSHOT</version>
-  <type>pom</type>
-	<scope>import</scope>
-        </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.maven</groupId>
+                <artifactId>mtwilson-maven-bom-coreutil</artifactId>
+                <version>3.1-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
-        <dependency>
-    <groupId>com.intel.mtwilson.maven</groupId>
-    <artifactId>mtwilson-maven-bom-external</artifactId>
-  <version>3.0-SNAPSHOT</version>
-  <type>pom</type>
-	<scope>import</scope>
-        </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.maven</groupId>
+                <artifactId>mtwilson-maven-bom-external</artifactId>
+                <version>3.1-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
 
-		</dependencyManagement>
+    </dependencyManagement>
 	
 
 </project>

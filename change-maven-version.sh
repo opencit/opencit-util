@@ -44,3 +44,5 @@ if [ $? -ne 0 ]; then echo "Failed to change maven version on \"maven/mtwilson-c
 if [ $? -ne 0 ]; then echo "Failed to change maven version on \"maven/mtwilson-core-feature-zip\" folder" >&2; exit 3; fi
 (cd maven/mtwilson-maven-java && $changeVersionCommand)
 if [ $? -ne 0 ]; then echo "Failed to change maven version on \"maven/mtwilson-maven-java\" folder" >&2; exit 3; fi
+(cd features-deprecated  && $changeVersionCommand)
+if [ $? -ne 0 ]; then echo "Failed to change maven version on \"features-deprecated\" folder" >&2; exit 3; fi
