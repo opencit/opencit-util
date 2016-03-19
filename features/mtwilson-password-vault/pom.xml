@@ -1,18 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-
+    
     <groupId>com.intel.mtwilson.integration</groupId>
     <artifactId>mtwilson-password-vault</artifactId>
+    
     <packaging>jar</packaging>
-	<name>mtwilson-core-password-vault</name>
+    <name>mtwilson-core-password-vault</name>
     <description>Password vault management and password generation command</description>
+    
     <parent>
-		<groupId>com.intel.mtwilson</groupId>
-		<artifactId>mtwilson-maven-build-coreutil-features</artifactId>
-		<version>3.0-SNAPSHOT</version>
+        <groupId>com.intel.mtwilson</groupId>
+        <artifactId>mtwilson-maven-build-coreutil-features</artifactId>
+        <version>3.0-SNAPSHOT</version>
     </parent>
-
+    
     <build>
         <plugins>
             <plugin>
@@ -20,41 +21,35 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <inherited>true</inherited>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <inherited>true</inherited>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <inherited>true</inherited>
             </plugin>
-
         </plugins>        
     </build>
-
+    
     <dependencies>
-
-	<!--
+        <!--
         <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>
             <artifactId>mtwilson-launcher-api</artifactId>
         </dependency>
-		-->
+        -->
         <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>
             <artifactId>mtwilson-configuration</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.intel.mtwilson.services</groupId>
             <artifactId>mtwilson-setup-ext</artifactId>
-            <version>${project.version}</version>
         </dependency>
-		<!--
+        <!--
         <dependency>
             <groupId>com.intel.mtwilson.kms</groupId>
             <artifactId>kms-keystore-api</artifactId>
@@ -64,7 +59,7 @@
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-extensions</artifactId>
         </dependency>
-		-->
+        -->
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-io</artifactId>
@@ -89,7 +84,7 @@
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-pem</artifactId>
         </dependency>
-		<!--
+        <!--
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-tls-policy</artifactId>
@@ -98,7 +93,7 @@
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-performance</artifactId>
         </dependency>
-		-->
+        -->
         <!-- mtwilson integration -->
         <!--
         <dependency>
@@ -107,13 +102,13 @@
             <version>1.2-SNAPSHOT</version>
         </dependency>
         -->
-		<!--
+        <!--
         <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>
             <artifactId>mtwilson-client-java6</artifactId>
             <version>${mtwilson.version}</version>
         </dependency>
-		-->
+        -->
         <!-- end mtwilson integration -->
       
             
@@ -143,7 +138,7 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
-    <!--
+        <!--
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
@@ -152,11 +147,10 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
-
-                <dependency>
-                    <groupId>javax.ws.rs</groupId>
-                    <artifactId>javax.ws.rs-api</artifactId>
-                </dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+        </dependency>
         -->
     </dependencies>  
 </project>

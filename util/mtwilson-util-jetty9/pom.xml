@@ -1,9 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    
+    <groupId>com.intel.mtwilson.util</groupId>
     <artifactId>mtwilson-util-jetty9</artifactId>
+    
     <packaging>jar</packaging>
     <name>mtwilson-util-jetty9</name>
-
+    
     <parent>
         <groupId>com.intel.mtwilson.util</groupId>
         <artifactId>mtwilson-util</artifactId>
@@ -11,20 +14,17 @@
     </parent>
     
     <properties />
-
+    
     <build>
-	
         <plugins>
-		    
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
-
         </plugins>
     </build>
+    
     <dependencies>
-
         <!-- jetty ,  see complete list of available modules at http://mvnrepository.com/artifact/org.eclipse.jetty -->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
@@ -84,34 +84,29 @@
             <artifactId>jetty-xml</artifactId>
             <version>9.1.0.RC2</version>
         </dependency>
-                                                            
         <!-- end jetty -->
-	
+        
         <!--
         <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>
             <artifactId>mtwilson-my</artifactId>
-            <version>${project.version}</version>
         </dependency>
         -->
-
+        
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-        
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
         </dependency>
-                
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
-
         <!--
         <dependency>
             <groupId>org.glassfish</groupId>
@@ -146,9 +141,7 @@
             <artifactId>xml-apis</artifactId>
             <version>1.4.01</version>
         </dependency>
-        -->
-		
-		
+        -->	
     </dependencies>
     
 </project>

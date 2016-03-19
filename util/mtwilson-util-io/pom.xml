@@ -1,31 +1,32 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-
-  <artifactId>mtwilson-util-io</artifactId>
-  <version>0.3-SNAPSHOT</version>
-  <packaging>jar</packaging>
-  <name>mtwilson-util-io</name>
-  <description>File and network related objects</description>
+    <modelVersion>4.0.0</modelVersion>
+    
+    <groupId>com.intel.mtwilson.util</groupId>
+    <artifactId>mtwilson-util-io</artifactId>
+    <!--<version>0.3-SNAPSHOT</version>-->
+    
+    <packaging>jar</packaging>
+    <name>mtwilson-util-io</name>
+    <description>File and network related objects</description>
+    
     <parent>
         <groupId>com.intel.mtwilson.util</groupId>
         <artifactId>mtwilson-util</artifactId>
         <version>3.0-SNAPSHOT</version>
     </parent>
-
-		<build>
-	<plugins>
-		<!-- git commit info -->
-		<plugin>
-		<groupId>org.codehaus.groovy.maven</groupId>
-		<artifactId>gmaven-plugin</artifactId>
-        <version>1.0</version>
-		</plugin>
-		
-	</plugins>
-	</build>
-
-  <dependencies>
-      
+    
+    <build>
+        <plugins>
+            <!-- git commit info -->
+            <plugin>
+                <groupId>org.codehaus.groovy.maven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
+                <version>1.0</version>
+            </plugin>
+        </plugins>
+    </build>
+    
+    <dependencies>
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-text-transform</artifactId>
@@ -35,44 +36,38 @@
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-pipe</artifactId>
         </dependency>
-        
-        
-    <dependency>
-	  <groupId>com.intel.mtwilson.util</groupId>
-	  <artifactId>mtwilson-util-validation</artifactId>
-    </dependency>
-
-
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-validation</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-codec</artifactId>
         </dependency>
-
-<!-- for iso8601 date parsing -->
+        
+        <!-- for iso8601 date parsing -->
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
         </dependency>
-
-    <!-- to support rfc822 message handling -->
-    <!--
-    <dependency>
-        <groupId>javax.mail</groupId>
-        <artifactId>mailapi</artifactId>
-        <version>1.4.3</version>
-    </dependency>
-    -->
-    
-    <dependency>
-		<groupId>junit</groupId>
-		<artifactId>junit</artifactId>
-		<scope>test</scope>
-      <type>jar</type>
-    </dependency>
-    <dependency>
-		<groupId>org.slf4j</groupId>
-		<artifactId>slf4j-api</artifactId>
-    </dependency>
+        <!-- to support rfc822 message handling -->
+        <!--
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mailapi</artifactId>
+            <version>1.4.3</version>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
         <!--
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -86,11 +81,11 @@
             <artifactId>logback-classic</artifactId>
             <scope>test</scope>
         </dependency>        
-    <dependency>
-		<groupId>commons-beanutils</groupId>
-		<artifactId>commons-beanutils</artifactId>
-		<scope>compile</scope>
-    </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
@@ -99,44 +94,42 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
-    <dependency>
-		<groupId>org.apache.commons</groupId>
-		<artifactId>commons-lang3</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-configuration</groupId>
-      <artifactId>commons-configuration</artifactId>
-    </dependency>
-    
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+        </dependency>
         <!-- for com.intel.mtwilson.as.helper.JacksonMappingProvider to allow OpenStack JSON output where single-element array is serialized as a string value instead of a single-element array -->
-    <dependency>
-    	<groupId>org.codehaus.jackson</groupId>
-    	<artifactId>jackson-jaxrs</artifactId>
-    	<version>1.9.11</version>
-        <optional>true</optional>
-    </dependency>
-    <!-- see also: jackson 2.0 explanation http://www.cowtowncoder.com/blog/archives/2012/03/entry_466.html -->
-    <dependency>
-    	<groupId>com.fasterxml.jackson.core</groupId>
-    	<artifactId>jackson-annotations</artifactId>
-        <optional>true</optional>
-    </dependency>
-    <dependency>
-    	<groupId>com.fasterxml.jackson.core</groupId>
-    	<artifactId>jackson-core</artifactId>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-    	<groupId>com.fasterxml.jackson.core</groupId>
-    	<artifactId>jackson-databind</artifactId>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-    	<groupId>com.fasterxml.jackson.dataformat</groupId>
-    	<artifactId>jackson-dataformat-xml</artifactId>
-        <scope>test</scope>
-    </dependency>
-
-
-  </dependencies>  
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-jaxrs</artifactId>
+            <version>1.9.11</version>
+            <optional>true</optional>
+        </dependency>
+        <!-- see also: jackson 2.0 explanation http://www.cowtowncoder.com/blog/archives/2012/03/entry_466.html -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    
 </project>

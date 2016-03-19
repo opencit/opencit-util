@@ -1,52 +1,47 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    
     <groupId>com.intel.mtwilson.integration</groupId>
     <artifactId>mtwilson-launcher</artifactId>
+    
     <packaging>jar</packaging>
     <name>mtwilson-core-launcher</name>
     <description>Launches Mt Wilson services</description>
+    
     <parent>
-		<groupId>com.intel.mtwilson</groupId>
-		<artifactId>mtwilson-maven-build-coreutil-features</artifactId>
-		<version>3.0-SNAPSHOT</version>
+        <groupId>com.intel.mtwilson</groupId>
+        <artifactId>mtwilson-maven-build-coreutil-features</artifactId>
+        <version>3.0-SNAPSHOT</version>
     </parent>
-
-
+    
     <dependencies>
-
         <dependency>
-		<groupId>com.intel.mtwilson.integration</groupId>
-		<artifactId>mtwilson-launcher-api</artifactId>
-		<version>${project.version}</version>            
-        </dependency>
-
-        <dependency>
-		<groupId>com.intel.mtwilson.integration</groupId>
-		<artifactId>mtwilson-configuration</artifactId>
-		<version>${project.version}</version>            
-        </dependency>
-
-        <dependency>
-		<groupId>com.intel.mtwilson.util</groupId>
-		<artifactId>mtwilson-util-classpath</artifactId>
+            <groupId>com.intel.mtwilson.integration</groupId>
+            <artifactId>mtwilson-launcher-api</artifactId>
         </dependency>
         <dependency>
-		<groupId>com.intel.mtwilson.util</groupId>
-		<artifactId>mtwilson-util-configuration</artifactId>
+            <groupId>com.intel.mtwilson.integration</groupId>
+            <artifactId>mtwilson-configuration</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-classpath</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-configuration</artifactId>
         </dependency>
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-console</artifactId>
         </dependency>
         <dependency>
-		<groupId>com.intel.mtwilson.util</groupId>
-		<artifactId>mtwilson-util-extensions</artifactId>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-extensions</artifactId>
         </dependency>
         <dependency>
-		<groupId>com.intel.mtwilson.services</groupId>
-		<artifactId>mtwilson-extensions-cache</artifactId>
-        <version>3.0-SNAPSHOT</version>
+            <groupId>com.intel.mtwilson.services</groupId>
+            <artifactId>mtwilson-extensions-cache</artifactId>
         </dependency>
         
         <!-- for Filter -->
@@ -66,28 +61,25 @@
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-shiro</artifactId>
         </dependency>
-
-                
+        
         <!-- for ModuleDirectoryLauncher , MavenDirectoryLauncher, and MavenLauncher -->
         <dependency>
-		<groupId>com.intel.mtwilson.util</groupId>
-		<artifactId>mtwilson-util-module</artifactId>
-		<version>0.2-SNAPSHOT</version>
-        <optional>true</optional>  
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-module</artifactId>
+            <optional>true</optional>
         </dependency>
-
-
+        
         <!-- TODO the launcher shouldn't need this, remove in favor of new Filesystem class -->
         <!--
         <dependency>
-		<groupId>com.intel.mtwilson.integration</groupId>
-		<artifactId>mtwilson-my</artifactId>
-		<version>${project.version}</version>            
-        <optional>true</optional>  
+            <groupId>com.intel.mtwilson.integration</groupId>
+            <artifactId>mtwilson-my</artifactId>
+            <version>${project.version}</version>            
+            <optional>true</optional>  
         </dependency>
         -->
-            
-            <!-- for use of AlarmClock for eventloop and for progress monitor -->
+        
+        <!-- for use of AlarmClock for eventloop and for progress monitor -->
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-performance</artifactId>
@@ -97,32 +89,29 @@
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-io</artifactId>
         </dependency>
-
-<!--
+        
+        <!--
         <dependency>
-f            <groupId>com.intel.mtwilson.util</groupId>
+            <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-crypto</artifactId>
             <version>0.1.4-SNAPSHOT</version>
         </dependency>
-            
         -->
-            
-            <!--
-<dependency>
-         <groupId>org.reflections</groupId>
-         <artifactId>reflections</artifactId>
-         <version>0.9.9-RC1</version>
-     </dependency>
+        
+        <!--
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.9.9-RC1</version>
+        </dependency>
         -->
-                             
+        
         <!-- testing -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-        
-
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -132,9 +121,8 @@ f            <groupId>com.intel.mtwilson.util</groupId>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <scope>test</scope>
-        </dependency>        
-
-
+        </dependency>
+        
         <!-- the following modules are only included for testing the launch from maven -->
         <!--
         <dependency>
@@ -156,8 +144,6 @@ f            <groupId>com.intel.mtwilson.util</groupId>
             <scope>test</scope>
         </dependency>
         -->
-
-    </dependencies>  
-    
+    </dependencies>
     
 </project>

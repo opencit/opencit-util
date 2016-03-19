@@ -1,20 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    
     <groupId>com.intel.mtwilson.services</groupId>
     <artifactId>mtwilson-shiro-util</artifactId>
+    
     <packaging>jar</packaging>
     <name>mtwilson-core-shiro-util</name>
-
+    
     <parent>
-  <groupId>com.intel.mtwilson</groupId>
-		<artifactId>mtwilson-maven-build-coreutil-features</artifactId>
+        <groupId>com.intel.mtwilson</groupId>
+        <artifactId>mtwilson-maven-build-coreutil-features</artifactId>
         <version>3.0-SNAPSHOT</version>
     </parent>
     
-    
     <build>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -22,8 +21,8 @@
             </plugin>
         </plugins>
     </build>
+    
     <dependencies>
-
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-core</artifactId>
@@ -38,8 +37,7 @@
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-aspectj</artifactId>
             <version>1.2.2</version>
-        </dependency>		
-        
+        </dependency>
         
         <!-- for @V2 annotation on AuthorizationExceptionMapper -->
         <!--
@@ -55,13 +53,10 @@
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-shiro</artifactId>
             <scope>test</scope>
-        </dependency>		
-
-
+        </dependency>
         <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>
             <artifactId>mtwilson-configuration</artifactId>
-            <version>${mtwilson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
@@ -74,13 +69,11 @@
         <dependency>
             <groupId>com.intel.mtwilson.services</groupId>
             <artifactId>mtwilson-webservice-util</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.intel.mtwilson.services</groupId>
             <artifactId>mtwilson-http-security</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- servlet and jaxrs apis for the exception mapper -->	

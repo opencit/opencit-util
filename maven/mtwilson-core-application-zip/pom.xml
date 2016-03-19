@@ -21,7 +21,6 @@
     
     <dependencyManagement>
         <dependencies>
-
             <dependency>
                 <groupId>com.intel.mtwilson.maven</groupId>
                 <artifactId>mtwilson-maven-bom-coreutil</artifactId>
@@ -29,7 +28,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-
             <dependency>
                 <groupId>com.intel.mtwilson.maven</groupId>
                 <artifactId>mtwilson-maven-bom-external</artifactId>
@@ -38,12 +36,10 @@
                 <scope>import</scope>
             </dependency>
         </dependencies>
-
     </dependencyManagement>
-  
+    
     <build>
         <plugins>
-                    
             <!-- copy all java dependencies (transitive) to the java folder for later packaging -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -75,9 +71,7 @@
                     </execution>
                 </executions>
             </plugin>
-
-
-                                        
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>

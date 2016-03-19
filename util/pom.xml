@@ -1,20 +1,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-	<!--
-  <groupId>com.intel.mtwilson</groupId>
-  <artifactId>mtwilson-maven-build-coreutil-util</artifactId>
-  -->
-        <groupId>com.intel.mtwilson.util</groupId>
-        <artifactId>mtwilson-util</artifactId>
+    
+    <groupId>com.intel.mtwilson.util</groupId>
+    <artifactId>mtwilson-util</artifactId>
+    <version>3.0-SNAPSHOT</version>
+    
+    <!--
+    <groupId>com.intel.mtwilson</groupId>
+    <artifactId>mtwilson-maven-build-coreutil-util</artifactId>
+    -->
     <packaging>pom</packaging>
-
-<parent>
-  <groupId>com.intel.mtwilson</groupId>
-  <artifactId>mtwilson-maven-build-coreutil-root</artifactId>
-  <version>3.0-SNAPSHOT</version>
-</parent>	
-	
+    
+    <parent>
+        <groupId>com.intel.mtwilson</groupId>
+        <artifactId>mtwilson-maven-build-coreutil-root</artifactId>
+        <version>3.0-SNAPSHOT</version>
+    </parent>
+    
     <modules>
         <module>mtwilson-util-archive</module>
         <module>mtwilson-util-authz-token</module>
@@ -37,9 +39,9 @@
         <module>mtwilson-util-jaxrs2-client</module>
         <module>mtwilson-util-jaxrs2-client-jersey2.0</module>
         <module>mtwilson-util-jaxrs2-server</module>
-        <module>mtwilson-util-jersey2</module>
         <module>mtwilson-util-jdbc</module>
         <module>mtwilson-util-jdbi</module>
+        <module>mtwilson-util-jersey2</module>
         <module>mtwilson-util-jetty9</module>
         <module>mtwilson-util-jooq</module>
         <module>mtwilson-util-jpa</module>
@@ -63,40 +65,35 @@
         <module>mtwilson-util-validation</module>
         <module>mtwilson-util-xml</module>
     </modules>
-
-	<!--
-	<build>
+    
+    <!--
+    <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
         </plugins>
-	
-	</build>
-	-->
-	
-	<dependencyManagement>
+    </build>
+    -->
+    
+    <dependencyManagement>
         <dependencies>
-
-        <dependency>
-    <groupId>com.intel.mtwilson.maven</groupId>
-    <artifactId>mtwilson-maven-bom-coreutil</artifactId>
-  <version>3.0-SNAPSHOT</version>
-  <type>pom</type>
-	<scope>import</scope>
-        </dependency>
-
-        <dependency>
-    <groupId>com.intel.mtwilson.maven</groupId>
-    <artifactId>mtwilson-maven-bom-external</artifactId>
-  <version>3.0-SNAPSHOT</version>
-  <type>pom</type>
-	<scope>import</scope>
-        </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.maven</groupId>
+                <artifactId>mtwilson-maven-bom-coreutil</artifactId>
+                <version>3.0-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.maven</groupId>
+                <artifactId>mtwilson-maven-bom-external</artifactId>
+                <version>3.0-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
-
-		</dependencyManagement>
-	
-	
-	</project>
+    </dependencyManagement>
+    
+</project>

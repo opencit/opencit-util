@@ -1,18 +1,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    
+    <groupId>com.intel.mtwilson.util</groupId>
     <artifactId>mtwilson-util-tpm12</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <!--<version>0.1-SNAPSHOT</version>-->
+    
     <packaging>jar</packaging>
     <description>Utilities for working with TPM 1.2 data structures and functions</description>
+    
     <parent>
         <groupId>com.intel.mtwilson.util</groupId>
         <artifactId>mtwilson-util</artifactId>
         <version>3.0-SNAPSHOT</version>
     </parent>
-
+    
     <dependencies>
-      
         <!-- required for sha digest -->
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
@@ -22,22 +24,21 @@
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-io</artifactId>
         </dependency>
-
+        
         <!-- hex encoding -->
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
         </dependency>
         
-
         <!-- required for RSA/ECB/OAEP, and also by TpmUtils for makeCert and makeEkCert subject alternative name extensions -->
-                <dependency>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcprov-jdk16</artifactId> <!-- was  bcprov-jdk15 in HisPrivacyCAWebServices2 -->
-                    <version>1.46</version>                     <!-- was 1.41 -->
-                  <!--  <scope>provided</scope>--> <!-- need to include it for the -setup.jar  -->
-                </dependency>
-    	
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk16</artifactId> <!-- was  bcprov-jdk15 in HisPrivacyCAWebServices2 -->
+            <version>1.46</version>               <!-- was 1.41 -->
+            <!--  <scope>provided</scope>--> <!-- need to include it for the -setup.jar  -->
+        </dependency>
+        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -51,7 +52,7 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <scope>test</scope>
-        </dependency>        
-
-    </dependencies>  
+        </dependency>
+    </dependencies>
+    
 </project>

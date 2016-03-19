@@ -1,17 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    
     <groupId>com.intel.mtwilson.core</groupId>
     <artifactId>mtwilson-core-jetty9</artifactId>
-	<version>0.1-SNAPSHOT</version>
+    <!--<version>0.1-SNAPSHOT</version>-->
+    
     <packaging>jar</packaging>
     <description>HTTP service using Jetty 9 which provides trust-based key retrieval and related APIs</description>
+    
     <parent>
-		<groupId>com.intel.mtwilson</groupId>
-		<artifactId>mtwilson-maven-build-coreutil-features</artifactId>
+        <groupId>com.intel.mtwilson</groupId>
+        <artifactId>mtwilson-maven-build-coreutil-features</artifactId>
         <version>3.0-SNAPSHOT</version>
     </parent>
-
+    
     <build>
         <plugins>
             <plugin>
@@ -19,47 +21,39 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <inherited>true</inherited>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <inherited>true</inherited>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <inherited>true</inherited>
             </plugin>
-
-        </plugins>        
+        </plugins>
     </build>
-
+    
     <dependencies>
-
-<!--
+        <!--
         <dependency>
             <groupId>com.intel.mtwilson.kms</groupId>
             <artifactId>kms-keystore-api</artifactId>
-            <version>${project.version}</version>
         </dependency>
--->
+        -->
         <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>
             <artifactId>mtwilson-configuration</artifactId>
-            <version>3.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>
             <artifactId>mtwilson-password-vault</artifactId>
-            <version>3.0-SNAPSHOT</version>
         </dependency>
 
         <!-- for SetupTask and AbstractSetupTask -->
         <dependency>
             <groupId>com.intel.mtwilson.services</groupId>
             <artifactId>mtwilson-setup-ext</artifactId>
-            <version>3.0-SNAPSHOT</version>
         </dependency>
             
         <dependency>
@@ -86,9 +80,7 @@
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-performance</artifactId>
         </dependency>
-
-      
-            
+        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -115,14 +107,14 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
-            <version>4.2</version>
+            <!--<version>4.2</version>-->
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.2</version>
+            <!--<version>4.2</version>-->
         </dependency>
-<!--
+        <!--
         <dependency>
             <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-core</artifactId>
@@ -142,28 +134,31 @@
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-grizzly</artifactId>
             <version>1.17.1</version>
-        </dependency> --> <!--
+        </dependency>
+        -->
+        <!--
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-grizzly2-servlet</artifactId>
             <version>1.17.1</version>
         </dependency>
         <dependency>
-                <groupId>javax.ws.rs</groupId>
-                <artifactId>jsr311-api</artifactId>
-                <version>1.1</version>
-        </dependency>-->
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>jsr311-api</artifactId>
+            <version>1.1</version>
+        </dependency>
+        -->
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <!-- if your container implements Servlet API older than 3.0, use "jersey-container-servlet-core"  -->
             <artifactId>jersey-container-servlet</artifactId>
-            <version>2.12</version>
+            <!--<version>2.12</version>-->
         </dependency>
         <!-- Required only when you are using JAX-RS Client -->
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-client</artifactId>
-            <version>2.12</version>
+            <!--<version>2.12</version>-->
         </dependency>
         <!--
         <dependency>
@@ -177,30 +172,26 @@
             <artifactId>jersey-jetty-connector</artifactId>
             <version>2.12</version>
         </dependency>
-
-
-    <dependency>
-        <groupId>org.glassfish.jersey.containers</groupId>
-        <artifactId>jersey-container-jetty-http</artifactId>
-        <version>2.12</version>
-    </dependency>
-
-    <dependency>
-        <groupId>org.glassfish.jersey.containers</groupId>
-        <artifactId>jersey-container-jetty-servlet</artifactId>
-        <version>2.12</version>
-    </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-jetty-http</artifactId>
+            <version>2.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-jetty-servlet</artifactId>
+            <version>2.12</version>
+        </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.0.1</version>
+            <!--<version>2.0.1</version>-->
         </dependency>
         <dependency>
-                    <artifactId>jaxb-impl</artifactId>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <version>2.2.7-b63</version>
+            <artifactId>jaxb-impl</artifactId>
+            <groupId>com.sun.xml.bind</groupId>
+            <version>2.2.7-b63</version>
         </dependency>
-        
-
-    </dependencies>  
+    </dependencies>
+    
 </project>

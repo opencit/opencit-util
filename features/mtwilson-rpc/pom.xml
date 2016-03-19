@@ -1,50 +1,45 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    
     <groupId>com.intel.mtwilson.services</groupId>
     <artifactId>mtwilson-rpc</artifactId>
+    
     <packaging>jar</packaging>
     <name>mtwilson-core-rpc</name>
-
+    
     <parent>
-  <groupId>com.intel.mtwilson</groupId>
-		<artifactId>mtwilson-maven-build-coreutil-features</artifactId>
+        <groupId>com.intel.mtwilson</groupId>
+        <artifactId>mtwilson-maven-build-coreutil-features</artifactId>
         <version>3.0-SNAPSHOT</version>
     </parent>
     
     <properties />
-
+    
     <build>
-	
         <plugins>
-		    
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
-
         </plugins>
     </build>
+    
     <dependencies>
         <dependency>
             <groupId>com.intel.mtwilson.services</groupId>
             <artifactId>mtwilson-repository-api</artifactId>
-            <version>${project.version}</version>        
         </dependency>
         <dependency>
             <groupId>com.intel.mtwilson.services</groupId>
             <artifactId>mtwilson-rpc-model</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.intel.mtwilson.services</groupId>
             <artifactId>mtwilson-rpc-jdbi</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>
             <artifactId>mtwilson-launcher-api</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
@@ -109,7 +104,6 @@
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-jaxrs2-server</artifactId>
-            <version>3.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
@@ -142,7 +136,6 @@
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-patch</artifactId>
-            <version>3.0-SNAPSHOT</version>
         </dependency>
         
         <!-- java object serialization for the mw_rpc table; we use xstream which depends on xpp3 which depends on xmlpull -->
@@ -174,18 +167,17 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
-                
+        
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-        
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <scope>test</scope>
         </dependency>
-
+        
         <!-- required for MessageBodyWorkers used in AsyncRpc,
             but marked as provided because inclusion of Jersey
             jars is webserver dependent; Glassfish4 already has
@@ -204,7 +196,6 @@
             <version>3.1.0</version>
             <scope>provided</scope>
         </dependency>
-                                
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

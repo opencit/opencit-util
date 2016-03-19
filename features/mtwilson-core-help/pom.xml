@@ -1,18 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-
-		  <groupId>com.intel.mtwilson.core</groupId>
+    
+    <groupId>com.intel.mtwilson.core</groupId>
     <artifactId>mtwilson-core-help</artifactId>
-		  <version>0.1-SNAPSHOT</version>
+    <!--<version>0.1-SNAPSHOT</version>-->
+    
     <description>Help page</description>
+    
     <parent>
         <groupId>com.intel.mtwilson.maven</groupId>
         <artifactId>mtwilson-core-feature-zip</artifactId>
         <version>3.0-SNAPSHOT</version>
         <relativePath/>
     </parent>
-
+    
     <build>
         <plugins>
             <plugin>
@@ -20,52 +21,23 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <inherited>true</inherited>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <inherited>true</inherited>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <inherited>true</inherited>
             </plugin>
-
-        </plugins>        
+        </plugins>
     </build>
-
-	<dependencyManagement>
-        <dependencies>
-
-        <dependency>
-    <groupId>com.intel.mtwilson.maven</groupId>
-    <artifactId>mtwilson-maven-bom-coreutil</artifactId>
-  <version>3.0-SNAPSHOT</version>
-  <type>pom</type>
-	<scope>import</scope>
-        </dependency>
-
-        <dependency>
-    <groupId>com.intel.mtwilson.maven</groupId>
-    <artifactId>mtwilson-maven-bom-external</artifactId>
-  <version>3.0-SNAPSHOT</version>
-  <type>pom</type>
-	<scope>import</scope>
-        </dependency>
-        </dependencies>
-
-		</dependencyManagement>
-
-
+    
     <dependencies>
-
-
         <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>
             <artifactId>mtwilson-launcher-api</artifactId>
-            <version>3.0-SNAPSHOT</version>
         </dependency>
         <!--
         <dependency>
@@ -76,7 +48,6 @@
         <dependency>
             <groupId>com.intel.mtwilson.services</groupId>
             <artifactId>mtwilson-setup-ext</artifactId>
-            <version>3.0-SNAPSHOT</version>
         </dependency>
       
         <dependency>
@@ -110,7 +81,6 @@
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-jaxrs2-server</artifactId>
-            <version>3.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
@@ -124,17 +94,13 @@
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-performance</artifactId>
         </dependency>
-      
-            
+        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
             <type>jar</type>
         </dependency>
-        
-        
-        
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -151,11 +117,10 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
-    
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
         </dependency>
-
     </dependencies>
+    
 </project>

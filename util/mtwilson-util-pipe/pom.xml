@@ -1,10 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    
+    <groupId>com.intel.mtwilson.util</groupId>
     <artifactId>mtwilson-util-pipe</artifactId>
-	<version>0.2-SNAPSHOT</version>
+    <!--<version>0.2-SNAPSHOT</version>-->
+    
     <packaging>jar</packaging>
     <name>mtwilson-util-pipe</name>
-
+    
     <parent>
         <groupId>com.intel.mtwilson.util</groupId>
         <artifactId>mtwilson-util</artifactId>
@@ -12,7 +15,6 @@
     </parent>
     
     <dependencies>
-
         <!-- logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -21,22 +23,21 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-			<scope>test</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-		
-        
-    <!-- used by AttributeEqualsFilter -->
-    <dependency>
-		<groupId>commons-beanutils</groupId>
-		<artifactId>commons-beanutils</artifactId>
-        <optional>true</optional>
-    </dependency>
-        
+        <!-- used by AttributeEqualsFilter -->
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
+    
     <properties />
+    
 </project>

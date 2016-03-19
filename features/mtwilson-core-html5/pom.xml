@@ -1,55 +1,48 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-
+    
     <groupId>com.intel.mtwilson.core</groupId>
     <artifactId>mtwilson-core-html5</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <!--<version>0.1-SNAPSHOT</version>-->
+    
     <packaging>jar</packaging>
     <description>Provides static HTML5 resources and mechanism for other JARs to provide more static HTML resources in publicResources folder</description>
+    
     <parent>
         <groupId>com.intel.mtwilson.maven</groupId>
         <artifactId>mtwilson-core-feature-zip</artifactId>
         <version>3.0-SNAPSHOT</version>
         <relativePath/>
     </parent>
-
-
-
+    
     <dependencies>
-
         <!--
-    <dependency>
-	<groupId>javax.servlet</groupId>
-	<artifactId>servlet-api</artifactId>
-	<version>2.5</version>
-    </dependency>
-       -->
-    <dependency>
-	<groupId>javax.servlet</groupId>
-	<artifactId>javax.servlet-api</artifactId>
-	<version>3.1.0</version>
-    </dependency>
-
-    <!-- uses the feature directory internally to list available features -->
         <dependency>
-    <groupId>com.intel.mtwilson.core</groupId>
-    <artifactId>mtwilson-core-feature-inventory</artifactId>
-    <version>0.1-SNAPSHOT</version>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
         </dependency>
-       
-                     
+        -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+        
+        <!-- uses the feature directory internally to list available features -->
+        <dependency>
+            <groupId>com.intel.mtwilson.core</groupId>
+            <artifactId>mtwilson-core-feature-inventory</artifactId>
+        </dependency>
+        
         <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>
             <artifactId>mtwilson-configuration</artifactId>
-            <version>3.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>
             <artifactId>mtwilson-launcher-api</artifactId>
-            <version>3.0-SNAPSHOT</version>
         </dependency>
-      
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-console</artifactId>
@@ -78,7 +71,7 @@
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-validation</artifactId>
         </dependency>
-
+        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -101,22 +94,22 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
-    
+        
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
-            <version>4.2</version>
+            <!--<version>4.2</version>-->
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.2</version>
+            <!--<version>4.2</version>-->
         </dependency>
-
+        
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
         </dependency>
-
-    </dependencies>  
+    </dependencies>
+    
 </project>

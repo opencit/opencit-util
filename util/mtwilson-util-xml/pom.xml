@@ -1,34 +1,37 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-
-  <artifactId>mtwilson-util-xml</artifactId>
-  <version>0.2-SNAPSHOT</version>
-  <packaging>jar</packaging>
-  <name>mtwilson-util-xml</name>
-  <description>XML utilities including JAXB convenience functions secured against XML entity injection</description>
+    <modelVersion>4.0.0</modelVersion>
+    
+    <groupId>com.intel.mtwilson.util</groupId>
+    <artifactId>mtwilson-util-xml</artifactId>
+    <!--<version>0.2-SNAPSHOT</version>-->
+    
+    <packaging>jar</packaging>
+    <name>mtwilson-util-xml</name>
+    <description>XML utilities including JAXB convenience functions secured against XML entity injection</description>
+    
     <parent>
-		<groupId>com.intel.mtwilson.util</groupId>
-		<artifactId>mtwilson-util</artifactId>
-		<version>3.0-SNAPSHOT</version>
+        <groupId>com.intel.mtwilson.util</groupId>
+        <artifactId>mtwilson-util</artifactId>
+        <version>3.0-SNAPSHOT</version>
     </parent>
-
-<dependencies>
-    <dependency>
-		<groupId>junit</groupId>
-		<artifactId>junit</artifactId>
-		<scope>test</scope>
-      <type>jar</type>
-    </dependency>
-    <dependency>
-		<groupId>org.slf4j</groupId>
-		<artifactId>slf4j-api</artifactId>
-    </dependency>
+    
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-        <optional>true</optional>
-        </dependency>        
-
+            <optional>true</optional>
+        </dependency>
+        
         <!-- required to use ClasspathResourceResolver because it extends org.opensaml.xml.parse.ClasspathResolver -->
         <dependency>
             <groupId>org.opensaml</groupId>
@@ -37,14 +40,13 @@
             <optional>true</optional>
         </dependency>
         
-        
         <!-- required to use ClasspathResourceResolver because it uses IOUtils to load resources -->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <optional>true</optional>
         </dependency>
-
+        
         <!-- required to use XmlDsigVerify because it uses X509Util from crypto and PemLikeParser from pem -->
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
@@ -56,6 +58,6 @@
             <artifactId>mtwilson-util-pem</artifactId>
             <optional>true</optional>
         </dependency>
-                
-  </dependencies>  
+    </dependencies>
+    
 </project>

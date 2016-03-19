@@ -118,10 +118,7 @@
                 <groupId>org.jdbi</groupId>
                 <artifactId>jdbi</artifactId>
                 <version>2.49</version>
-            </dependency>        
-
-
-
+            </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpcore</artifactId>
@@ -147,14 +144,11 @@
                 <artifactId>guava</artifactId>
                 <version>14.0.1</version>
             </dependency>
-
-		
             <dependency>
                 <groupId>org.glassfish</groupId>
                 <artifactId>javax.servlet</artifactId>
                 <version>3.1.1</version>
             </dependency>
-
             <dependency>
                 <groupId>org.glassfish.jersey.core</groupId>
                 <artifactId>jersey-client</artifactId>
@@ -190,7 +184,6 @@
                 <artifactId>jersey-media-json-jackson</artifactId>
                 <version>2.4.1</version>
             </dependency>
-
             <dependency>
                 <groupId>org.glassfish.hk2</groupId>
                 <artifactId>hk2-api</artifactId>
@@ -201,8 +194,7 @@
                 <artifactId>hk2-utils</artifactId>
                 <version>2.2.0</version>
             </dependency>
-			
-        
+            
             <!--  AttributeConverter interface and @Convert annotation are since javaee 7,  also javax.ws.rs.core.MultivaluedMap.addAll is since java7 -->
             <dependency>
                 <groupId>javax</groupId>
@@ -224,7 +216,7 @@
                 <artifactId>javax.persistence</artifactId>
                 <version>2.1.0</version>
             </dependency>
-
+            
             <!-- jackson 2.x, updated from version 2.3.2 to version 2.5.1 -->
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
@@ -266,7 +258,7 @@
                 <artifactId>jackson-dataformat-csv</artifactId>
                 <version>2.5.1</version>
             </dependency>
-    
+            
             <!-- other -->
             <dependency>
                 <groupId>joda-time</groupId>
@@ -277,9 +269,8 @@
                 <groupId>com.thoughtworks.xstream</groupId>
                 <artifactId>xstream</artifactId>
                 <version>1.4.7</version>
-            </dependency>			
-		
-		
+            </dependency>
+            
             <!-- dbcp -->
             <dependency>
                 <groupId>mysql</groupId>
@@ -291,12 +282,8 @@
                 <artifactId>postgresql</artifactId>
                 <version>9.1-901-1.jdbc4</version>
             </dependency>
-		
-		
         </dependencies>
-	
-	
     </dependencyManagement>
-
+    
 </project>
 

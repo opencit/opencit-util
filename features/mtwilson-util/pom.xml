@@ -1,18 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    
     <groupId>com.intel.mtwilson.services</groupId>
     <artifactId>mtwilson-util</artifactId>
+    
     <packaging>jar</packaging>
     <name>mtwilson-util</name>
-
+    
     <parent>
-  <groupId>com.intel.mtwilson</groupId>
-		<artifactId>mtwilson-maven-build-coreutil-features</artifactId>
+        <groupId>com.intel.mtwilson</groupId>
+        <artifactId>mtwilson-maven-build-coreutil-features</artifactId>
         <version>3.0-SNAPSHOT</version>
     </parent>
-
-
+    
     <build>
         <plugins>
             <plugin>
@@ -20,10 +20,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
         </plugins>
-
     </build>
-
-
+    
     <dependencies>
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
@@ -32,7 +30,6 @@
         <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>
             <artifactId>mtwilson-configuration</artifactId>
-            <version>${mtwilson.version}</version>
         </dependency>
     
         <!--
@@ -127,7 +124,6 @@
         <dependency>
             <groupId>com.intel.mtwilson.services</groupId>
             <artifactId>mtwilson-webservice-util</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <!--
         <dependency>

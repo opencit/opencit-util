@@ -15,8 +15,6 @@
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <mtwilson.version>${project.version}</mtwilson.version> <!-- mtwilson.version is the internal version number for software components, for convenience in keeping everything in sync when we build -->
-        <mtwilson.release>${project.version}</mtwilson.release> <!-- mtwilson.release is the official release number that should be reported by the applications and shown on the installer filename -->
         <jersey-version>1.9-ea04</jersey-version>
         <maven.build.timestamp.format>yyyyMMdd.HHmm</maven.build.timestamp.format>
     </properties>
@@ -39,26 +37,26 @@
       </plugins>      
     </reporting>  
     -->
-
+    
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>com.intel.mtwilson.maven</groupId>
                 <artifactId>mtwilson-maven-bom-coreutil</artifactId>
-                <version>${mtwilson.version}</version>
+                <version>3.0-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.intel.mtwilson.maven</groupId>
                 <artifactId>mtwilson-maven-bom-external</artifactId>
-                <version>${mtwilson.version}</version>
+                <version>3.0-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
-
+    
     <pluginRepositories>
         <pluginRepository>
             <id>m2.java.net</id>
@@ -70,8 +68,6 @@
     
     <build>
         <plugins>
-
-        
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -97,11 +93,8 @@
                     </archive>
                 </configuration>
             </plugin>
-            
-
-                
             <!--
-                      <plugin>
+            <plugin>
                 <groupId>emma</groupId>
                 <artifactId>maven-emma-plugin</artifactId> 
                 <version>0.5</version>
@@ -116,33 +109,32 @@
             </plugin>      
             -->
             <!--
-  <plugin>      
-    <groupId>org.codehaus.mojo</groupId>
-    <artifactId>emma-maven-plugin</artifactId>
-    <version>1.0-alpha-3</version>
-    <inherited>true</inherited>          
-    <executions>
-      <execution>
-          <id>emma-instrument</id>
-        <phase>process-classes</phase>               
-        <goals>
-          <goal>instrument</goal>
-        </goals>
-      </execution>
-    </executions>
-  </plugin>
-  <plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-surefire-plugin</artifactId>
-    <inherited>true</inherited>
-    <configuration>
-      <forkMode>once</forkMode>
-      <reportFormat>xml</reportFormat>
-      <classesDirectory>${project.build.directory}/generated-classes/emma/classes</classesDirectory>    
-    </configuration>        
-  </plugin>
+            <plugin>      
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>emma-maven-plugin</artifactId>
+                <version>1.0-alpha-3</version>
+                <inherited>true</inherited>          
+                <executions>
+                    <execution>
+                        <id>emma-instrument</id>
+                        <phase>process-classes</phase>               
+                        <goals>
+                            <goal>instrument</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <inherited>true</inherited>
+                <configuration>
+                    <forkMode>once</forkMode>
+                    <reportFormat>xml</reportFormat>
+                    <classesDirectory>${project.build.directory}/generated-classes/emma/classes</classesDirectory>    
+                </configuration>        
+            </plugin>
             -->
-				
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>aspectj-maven-plugin</artifactId>
@@ -180,11 +172,8 @@
                         <version>1.7.4</version>
                     </dependency>
                 </dependencies>
-
             </plugin>
-				
         </plugins>
-
         
         <pluginManagement>
             <plugins>
@@ -222,25 +211,21 @@
                     <artifactId>maven-source-plugin</artifactId>
                     <version>2.2</version>
                 </plugin>
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.12.4</version>
                 </plugin>
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
                     <version>1.5</version>
                 </plugin>
-      
+                
             </plugins>     
         </pluginManagement>
-
-        
     </build>
-  
+    
     <dependencies>
         <!-- for compile-time aspects declared in the plugins section -->
         <dependency>
@@ -262,6 +247,6 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
-
+    
 </project>
 
