@@ -35,6 +35,11 @@
             </dependency>
             <dependency>
                 <groupId>com.intel.mtwilson.integration</groupId>
+                <artifactId>mtwilson-launcher-api</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.integration</groupId>
                 <artifactId>mtwilson-password-vault</artifactId>
                 <version>3.0-SNAPSHOT</version>
             </dependency>
@@ -62,6 +67,11 @@
             </dependency>
             <dependency>
                 <groupId>com.intel.mtwilson.services</groupId>
+                <artifactId>mtwilson-http-security</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.services</groupId>
                 <artifactId>mtwilson-http-servlets</artifactId>
                 <version>3.0-SNAPSHOT</version>
             </dependency>
@@ -72,7 +82,22 @@
             </dependency>
             <dependency>
                 <groupId>com.intel.mtwilson.services</groupId>
+                <artifactId>mtwilson-localization</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.services</groupId>
+                <artifactId>mtwilson-repository-api</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.services</groupId>
                 <artifactId>mtwilson-rpc-jdbi</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.services</groupId>
+                <artifactId>mtwilson-rpc-model</artifactId>
                 <version>3.0-SNAPSHOT</version>
             </dependency>
             <dependency>
@@ -87,17 +112,25 @@
             </dependency>
             <dependency>
                 <groupId>com.intel.mtwilson.services</groupId>
+                <artifactId>mtwilson-shiro-util</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.services</groupId>
                 <artifactId>mtwilson-webservice-util</artifactId>
                 <version>3.0-SNAPSHOT</version>
             </dependency>
-            
             <!-- end dependencies to be renamed to mtwilson-core -->
-            
             
             <!-- core -->
             <dependency>
                 <groupId>com.intel.mtwilson.core</groupId>
                 <artifactId>mtwilson-core-data-bundle</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.core</groupId>
+                <artifactId>mtwilson-core-feature-inventory</artifactId>
                 <version>3.0-SNAPSHOT</version>
             </dependency>
             <dependency>
@@ -113,6 +146,11 @@
             <dependency>
                 <groupId>com.intel.mtwilson.core</groupId>
                 <artifactId>mtwilson-core-jetty9</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.core</groupId>
+                <artifactId>mtwilson-core-junit</artifactId>
                 <version>3.0-SNAPSHOT</version>
             </dependency>
             <dependency>
@@ -250,6 +288,16 @@
             <dependency>
                 <groupId>com.intel.mtwilson.util</groupId>
                 <artifactId>mtwilson-util-locale</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.util</groupId>
+                <artifactId>mtwilson-util-module</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.util</groupId>
+                <artifactId>mtwilson-util-module-annotations</artifactId>
                 <version>3.0-SNAPSHOT</version>
             </dependency>
             <dependency>
