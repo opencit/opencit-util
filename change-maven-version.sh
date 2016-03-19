@@ -26,23 +26,26 @@ if [ -z "$version" ]; then
 fi
 
 changeVersionCommand="mvn versions:set -DnewVersion=${version}"
-changeParentVersionCommand="mvn versions:update-parent -DnewVersion=${version}"
+changeParentVersionCommand="mvn versions:update-parent -DparentVersion=${version}"
 mvnInstallCommand="mvn clean install"
 
+(cd maven && $changeVersionCommand)
+if [ $? -ne 0 ]; then echo "Failed to change maven version on \"maven\" folder" >&2; exit 3; fi
+ant ready
+if [ $? -ne 0 ]; then echo "Failed to maven install \"maven\" projects" >&2; exit 3; fi
+$changeVersionCommand
 if [ $? -ne 0 ]; then echo "Failed to change maven version at top level" >&2; exit 3; fi
-(cd maven/mtwilson-maven-bom-coreutil && $changeVersionCommand)
-if [ $? -ne 0 ]; then echo "Failed to change maven version on \"maven/mtwilson-maven-bom-coreutil\" folder" >&2; exit 3; fi
-(cd maven/mtwilson-maven-bom-coreutil && $mvnInstallCommand)
-if [ $? -ne 0 ]; then echo "Failed to maven install \"maven/mtwilson-maven-bom-coreutil\"" >&2; exit 3; fi
-(cd maven/mtwilson-maven-bom-external && $changeVersionCommand)
-if [ $? -ne 0 ]; then echo "Failed to change maven version on \"maven/mtwilson-maven-bom-external\" folder" >&2; exit 3; fi
-(cd maven/mtwilson-maven-bom-external && $mvnInstallCommand)
-if [ $? -ne 0 ]; then echo "Failed to maven install \"maven/mtwilson-maven-bom-external\"" >&2; exit 3; fi
-(cd maven/mtwilson-core-application-zip && $changeVersionCommand)
-if [ $? -ne 0 ]; then echo "Failed to change maven version on \"maven/mtwilson-core-application-zip\" folder" >&2; exit 3; fi
-(cd maven/mtwilson-core-feature-zip && $changeVersionCommand)
-if [ $? -ne 0 ]; then echo "Failed to change maven version on \"maven/mtwilson-core-feature-zip\" folder" >&2; exit 3; fi
-(cd maven/mtwilson-maven-java && $changeVersionCommand)
-if [ $? -ne 0 ]; then echo "Failed to change maven version on \"maven/mtwilson-maven-java\" folder" >&2; exit 3; fi
+
+(cd features  && $changeVersionCommand)
+if [ $? -ne 0 ]; then echo "Failed to change maven version on \"features\" folder" >&2; exit 3; fi
 (cd features-deprecated  && $changeVersionCommand)
 if [ $? -ne 0 ]; then echo "Failed to change maven version on \"features-deprecated\" folder" >&2; exit 3; fi
+(cd features-linux  && $changeVersionCommand)
+if [ $? -ne 0 ]; then echo "Failed to change maven version on \"features-linux\" folder" >&2; exit 3; fi
+(cd integration  && $changeVersionCommand)
+if [ $? -ne 0 ]; then echo "Failed to change maven version on \"integration\" folder" >&2; exit 3; fi
+(cd util  && $changeVersionCommand)
+if [ $? -ne 0 ]; then echo "Failed to change maven version on \"util\" folder" >&2; exit 3; fi
+(cd packages  && $changeVersionCommand)
+if [ $? -ne 0 ]; then echo "Failed to change maven version on \"packages\" folder" >&2; exit 3; fi
+echo -e "\n\n\nChange PACKAGES manually!!!"
