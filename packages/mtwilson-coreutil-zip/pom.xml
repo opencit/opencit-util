@@ -1,31 +1,32 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-  <groupId>com.intel.mtwilson</groupId>
-  <artifactId>mtwilson-coreutil-zip</artifactId>
+    
+    <groupId>com.intel.mtwilson</groupId>
+    <artifactId>mtwilson-coreutil-zip</artifactId>
+    <version>3.0-SNAPSHOT</version>
+    
     <packaging>pom</packaging>
-
-<parent>
-    <groupId>com.intel.mtwilson.maven</groupId>
-    <artifactId>mtwilson-core-application-zip</artifactId>
-  <version>3.0-SNAPSHOT</version>
-  <relativePath/>
-</parent>	
-
-<dependencies>
-
+    
+    <parent>
+        <groupId>com.intel.mtwilson.maven</groupId>
+        <artifactId>mtwilson-core-application-zip</artifactId>
+        <version>3.0-SNAPSHOT</version>
+        <relativePath/>
+    </parent>
+    
+    <dependencies>
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-archive</artifactId>
         </dependency>
-    <dependency>
+        <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-authz-token</artifactId>
-    </dependency>
-    <dependency>
-		<groupId>com.intel.mtwilson.util</groupId>
-        <artifactId>mtwilson-util-classpath</artifactId>
-    </dependency>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-classpath</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-codec</artifactId>
@@ -34,142 +35,118 @@
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-collection</artifactId>
         </dependency>
-    <dependency>
-        <groupId>com.intel.mtwilson.util</groupId>
-        <artifactId>mtwilson-util-configuration</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>com.intel.mtwilson.util</groupId>
-        <artifactId>mtwilson-util-console</artifactId>
-    </dependency>
-	<dependency>
-		<groupId>com.intel.mtwilson.util</groupId>
-		<artifactId>mtwilson-util-crypto</artifactId>
-	</dependency>
-	<dependency>
-		<groupId>com.intel.mtwilson.util</groupId>
-		<artifactId>mtwilson-util-crypto-key</artifactId>
-	</dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-configuration</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-console</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-crypto</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-crypto-key</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-crypto-password</artifactId>
         </dependency>
-	<dependency>
-		<groupId>com.intel.mtwilson.util</groupId>
-		<artifactId>mtwilson-util-dbcp</artifactId>
-	</dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-dbcp</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-exec</artifactId>
         </dependency>
-	<dependency>
-		<groupId>com.intel.mtwilson.util</groupId>
-		<artifactId>mtwilson-util-extensions</artifactId>
-	</dependency>
-	<dependency>
-		<groupId>com.intel.mtwilson.util</groupId>
-		<artifactId>mtwilson-util-http</artifactId>
-	</dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-extensions</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-http</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-i18n</artifactId>
         </dependency>
-	<dependency>
-		<groupId>com.intel.mtwilson.util</groupId>
-		<artifactId>mtwilson-util-io</artifactId>
-	</dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-io</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-jackson</artifactId>
         </dependency>
-    <dependency>
+        <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-jdbc</artifactId>
-    </dependency>
-	<dependency>
-		<groupId>com.intel.mtwilson.util</groupId>
-		<artifactId>mtwilson-util-jpa</artifactId>
-	</dependency>
-	<dependency>
-		<groupId>com.intel.mtwilson.util</groupId>
-		<artifactId>mtwilson-util-locale</artifactId>
-	</dependency>
-    <dependency>
-		<groupId>com.intel.mtwilson.util</groupId>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-locale</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-net</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>com.intel.mtwilson.util</groupId>
-        <artifactId>mtwilson-util-objectpool</artifactId>
-    </dependency>
-	<dependency>
-		<groupId>com.intel.mtwilson.util</groupId>
-		<artifactId>mtwilson-util-pem</artifactId>
-	</dependency>
-    <dependency>
-        <groupId>com.intel.mtwilson.util</groupId>
-        <artifactId>mtwilson-util-performance</artifactId>
-    </dependency>
-	<dependency>
-		<groupId>com.intel.mtwilson.util</groupId>
-		<artifactId>mtwilson-util-pipe</artifactId>
-	</dependency>
-    <dependency>
-		<groupId>com.intel.mtwilson.util</groupId>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-objectpool</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-pem</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-performance</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-pipe</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-rfc822</artifactId>
-    </dependency>
-    <dependency>
+        </dependency>
+        <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-shiro</artifactId>
-    </dependency>
-    <dependency>
+        </dependency>
+        <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-tls-policy</artifactId>
-    </dependency>
-	<dependency>
-		<groupId>com.intel.mtwilson.util</groupId>
-		<artifactId>mtwilson-util-text-transform</artifactId>
-	</dependency>
-	<dependency>
-		<groupId>com.intel.mtwilson.util</groupId>
-		<artifactId>mtwilson-util-tpm12</artifactId>
-	</dependency>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-text-transform</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-tpm12</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-tree</artifactId>
         </dependency>
-	<dependency>
-		<groupId>com.intel.mtwilson.util</groupId>
-		<artifactId>mtwilson-util-validation</artifactId>
-	</dependency>
-    <dependency>
-		<groupId>com.intel.mtwilson.util</groupId>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-xml</artifactId>
-    </dependency>
-
-</dependencies>
-	
-	<dependencyManagement>
-        <dependencies>
-
-        <dependency>
-    <groupId>com.intel.mtwilson.maven</groupId>
-    <artifactId>mtwilson-maven-bom-coreutil</artifactId>
-  <version>3.0-SNAPSHOT</version>
-  <type>pom</type>
-	<scope>import</scope>
         </dependency>
-
-        <dependency>
-    <groupId>com.intel.mtwilson.maven</groupId>
-    <artifactId>mtwilson-maven-bom-external</artifactId>
-  <version>3.0-SNAPSHOT</version>
-  <type>pom</type>
-	<scope>import</scope>
-        </dependency>
-        </dependencies>
-
-		</dependencyManagement>
-	
-	
-	</project>
+    </dependencies>
+    
+</project>
