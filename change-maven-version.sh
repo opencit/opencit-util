@@ -26,7 +26,7 @@ if [ -z "$version" ]; then
 fi
 
 changeVersionCommand="mvn versions:set -DnewVersion=${version}"
-changeParentVersionCommand="mvn versions:update-parent -DparentVersion=${version}"
+changeParentVersionCommand="mvn versions:update-parent -DallowSnapshots=true -DparentVersion=${version}"
 mvnInstallCommand="mvn clean install"
 
 (cd maven && $changeVersionCommand)
@@ -48,4 +48,6 @@ if [ $? -ne 0 ]; then echo "Failed to change maven version on \"integration\" fo
 if [ $? -ne 0 ]; then echo "Failed to change maven version on \"util\" folder" >&2; exit 3; fi
 (cd packages  && $changeVersionCommand)
 if [ $? -ne 0 ]; then echo "Failed to change maven version on \"packages\" folder" >&2; exit 3; fi
+(cd packages  && $changeParentVersionCommand)
+if [ $? -ne 0 ]; then echo "Failed to change maven parent versions in \"packages\" folder" >&2; exit 3; fi
 echo -e "\n\n\nChange PACKAGES manually!!!"
