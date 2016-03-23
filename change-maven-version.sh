@@ -50,4 +50,3 @@ if [ $? -ne 0 ]; then echo "Failed to change maven version on \"util\" folder" >
 if [ $? -ne 0 ]; then echo "Failed to change maven version on \"packages\" folder" >&2; exit 3; fi
 (cd packages  && $changeParentVersionCommand)
 if [ $? -ne 0 ]; then echo "Failed to change maven parent versions in \"packages\" folder" >&2; exit 3; fi
-echo -e "\n\n\nChange PACKAGES manually!!!"
