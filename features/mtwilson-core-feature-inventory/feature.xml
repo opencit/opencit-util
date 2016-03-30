@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature xmlns="urn:mtwilson:feature:1.0">
 <id>mtwilson-core-feature</id>
-<version>0.1-SNAPSHOT</version>
+<version>3.1-SNAPSHOT</version>
 <name>mtwilson-core-feature</name>
 <provider><name>Intel Corporation</name></provider>
 <description>Feature information</description>

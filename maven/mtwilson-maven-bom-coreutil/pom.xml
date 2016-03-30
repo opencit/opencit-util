@@ -140,6 +140,11 @@
             </dependency>
             <dependency>
                 <groupId>com.intel.mtwilson.core</groupId>
+                <artifactId>mtwilson-core-html5-login-token</artifactId>
+                <version>3.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.core</groupId>
                 <artifactId>mtwilson-core-jetty9</artifactId>
                 <version>3.1-SNAPSHOT</version>
             </dependency>
@@ -151,6 +156,11 @@
             <dependency>
                 <groupId>com.intel.mtwilson.core</groupId>
                 <artifactId>mtwilson-core-login-token</artifactId>
+                <version>3.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.core</groupId>
+                <artifactId>mtwilson-core-setup</artifactId>
                 <version>3.1-SNAPSHOT</version>
             </dependency>
             <dependency>
@@ -273,6 +283,11 @@
             <dependency>
                 <groupId>com.intel.mtwilson.util</groupId>
                 <artifactId>mtwilson-util-jdbi</artifactId>
+                <version>3.1-SNAPSHOT</version>
+            </dependency>
+			<dependency>
+                <groupId>com.intel.mtwilson.util</groupId>
+                <artifactId>mtwilson-util-jersey2</artifactId>
                 <version>3.1-SNAPSHOT</version>
             </dependency>
             <dependency>
