@@ -108,7 +108,7 @@ public class Main {
         PropertiesConfiguration defaults = new PropertiesConfiguration();
         defaults.set("mtwilson.application.id", "mtwilson");
         defaults.set("mtwilson.application.name", "Mt Wilson");
-        defaults.set("mtwilson.configuation.file", "mtwilson.properties");
+        defaults.set("mtwilson.configuration.file", "mtwilson.properties");
         defaults.set("mtwilson.environment.prefix", "MTWILSON_");
         return defaults;
     }
