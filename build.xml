@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?> <project name="common-java" default="all" basedir=".">
+	<description>
+	Run "ant ready" to ensure you have all pre-requisites to build
+	Run "ant" or "ant build" to build the entire project
+	</description>
+	
+	<target name="info">
+		<echoproperties/>
+	</target>
+	
+	<target name="init">
+		<condition property="cmd.maven" value="mvn.cmd">
+			<os family="windows"/>
+		</condition>
+		<condition property="cmd.maven" value="mvn">
+			<os family="unix"/>
+		</condition>
+	</target>
+	
+	<target name="ready" depends="init">
+		<!-- the root pom -->
+		<exec executable="${cmd.maven}" resultproperty="mavenExitInstallPom">
+			<arg value="-DskipTests=true"/>
+			<arg value="-N"/>
+			<arg value="install"/>
+		</exec>
+	</target>
+	
+	<target name="clean" depends="init">
+		<!-- clean all projects -->
+		<exec executable="${cmd.maven}" resultproperty="mavenExitClean">
+			<arg value="-DskipTests=true"/>
+			<arg value="clean"/>
+		</exec>
+		<fail message="Failed to clean project" status="${mavenExitClean}">
+			<condition><not><equals arg1="${mavenExitClean}" arg2="0"/></not></condition>
+		</fail>
+	</target>
+	
+	<target name="build" depends="init">
+		<exec executable="${cmd.maven}" resultproperty="mavenExitInstall">
+                        <arg value="-DskipTests=true"/>
+                        <arg value="clean"/>
+                        <arg value="install"/>
+                </exec>
+                <fail message="Failed to build maven project" status="${mavenExitInstall}">
+                        <condition><not><equals arg1="${mavenExitInstall}" arg2="0"/></not></condition>
+                </fail>
+	</target>
+	<target name="all" depends="ready,clean,build"></target>
+	
+</project>
