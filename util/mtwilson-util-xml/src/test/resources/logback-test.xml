@@ -11,5 +11,6 @@
     
     <logger name="com.intel.dcsg.cpg.util" level="DEBUG"/>
     <logger name="com.intel.mtwilson.xml.ClasspathResourceResolver" level="TRACE"/>
+    <logger name="com.intel.dcsg.cpg.classpath" level="INFO"/>
     
 </configuration>

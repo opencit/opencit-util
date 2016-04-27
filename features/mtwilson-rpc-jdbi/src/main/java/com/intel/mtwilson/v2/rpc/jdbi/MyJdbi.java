@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.skife.jdbi.v2.tweak.ConnectionFactory;
 /**
  * References:
  * Validation queries: http://stackoverflow.com/questions/3668506/efficient-sql-test-query-or-validation-query-that-will-work-across-all-or-most
@@ -30,7 +29,10 @@ public class MyJdbi {
  public static RpcDAO rpc() throws SQLException {
 //     createTables();
          try {
-        DBI dbi = new DBI(new ExistingConnectionFactory(MyJdbc.openConnection()));
+             Connection connection = MyJdbc.openConnection();
+             log.debug("MyJdbi (mtwilson-core-rpc-jdbi) connection: {}", connection);
+        DBI dbi = new DBI(new ExistingConnectionFactory(connection));
+        log.debug("MyJdbi (mtwilson-core-rpc-jdbi) created DBI instance: {}", dbi);
     return dbi.open(RpcDAO.class);
          }
          catch(Exception e) {

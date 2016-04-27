@@ -7,24 +7,16 @@ package com.intel.mtwilson.rpc.v2.resource;
 import com.intel.mtwilson.rpc.v2.model.Rpc;
 import com.intel.mtwilson.rpc.v2.model.RpcFilterCriteria;
 import com.intel.mtwilson.rpc.v2.model.RpcCollection;
-import com.intel.mtwilson.jaxrs2.NoLinks;
-import com.intel.mtwilson.jaxrs2.server.resource.AbstractResource;
 import com.intel.mtwilson.jaxrs2.server.resource.DocumentRepository;
 import com.intel.dcsg.cpg.io.UUID;
 import com.intel.mtwilson.launcher.ws.ext.V2;
-//import javax.ejb.Stateless;
-import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import com.intel.mtwilson.rpc.v2.model.RpcLocator;
 import com.intel.mtwilson.rpc.v2.model.RpcPriv;
 import com.intel.mtwilson.v2.rpc.jdbi.MyJdbi;
 import com.intel.mtwilson.v2.rpc.jdbi.RpcDAO;
 import java.util.HashMap;
 import java.util.List;
-import javax.ws.rs.BeanParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 
 /**
  *
