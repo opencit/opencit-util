@@ -299,6 +299,11 @@
             
             <!-- additions -->
             <dependency>
+                <groupId>com.intel.mtwilson.core</groupId>
+                <artifactId>mtwilson-core-junit</artifactId>
+                <version>0.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
                 <groupId>com.intel.mtwilson.integration</groupId>
                 <artifactId>mtwilson-feature-xml</artifactId>
                 <version>3.0-SNAPSHOT</version>
