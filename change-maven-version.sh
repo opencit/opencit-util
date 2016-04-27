@@ -63,11 +63,9 @@ if [ $? -ne 0 ]; then echo "Failed to change maven version on \"features-linux\"
 if [ $? -ne 0 ]; then echo "Failed to change maven version on \"integration\" folder" >&2; exit 3; fi
 (cd util  && $changeVersionCommand)
 if [ $? -ne 0 ]; then echo "Failed to change maven version on \"util\" folder" >&2; exit 3; fi
-
-(cd packages  && $changeParentVersionCommand)
-if [ $? -ne 0 ]; then echo "Failed to change maven parent versions in \"packages\" folder" >&2; exit 3; fi
 (cd packages  && $changeVersionCommand)
 if [ $? -ne 0 ]; then echo "Failed to change maven version on \"packages\" folder" >&2; exit 3; fi
-
+(cd packages  && $changeParentVersionCommand)
+if [ $? -ne 0 ]; then echo "Failed to change maven parent versions in \"packages\" folder" >&2; exit 3; fi
 sed -i 's/\-[0-9\.]*\(\-SNAPSHOT\|\(\-\|\.zip$\|\.bin$\|\.jar$\)\)/-'${version}'\2/g' build.targets
 if [ $? -ne 0 ]; then echo "Failed to change versions in \"build.targets\" file" >&2; exit 3; fi

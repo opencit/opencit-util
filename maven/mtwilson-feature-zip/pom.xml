@@ -17,6 +17,25 @@
         <version>2.1-SNAPSHOT</version>
     </parent>
     
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.intel.mtwilson.maven</groupId>
+                <artifactId>mtwilson-maven-bom-coreutil</artifactId>
+                <version>2.1-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.maven</groupId>
+                <artifactId>mtwilson-maven-bom-external</artifactId>
+                <version>2.1-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    
     <profiles>
         <profile>
             <id>java-classes</id>
@@ -104,11 +123,9 @@
                     <exists>dist/zip</exists>
                 </file>
             </activation>
-	
+            
             <build>
                 <plugins>
-		
-		
                     <plugin>
                         <artifactId>maven-resources-plugin</artifactId>
                         <version>2.5</version>
@@ -199,5 +216,5 @@
             </build>
         </profile>
     </profiles>
-	
+    
 </project>
