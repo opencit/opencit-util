@@ -6,9 +6,12 @@ package com.intel.mtwilson.jaxrs2.provider;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.Module;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.intel.dcsg.cpg.extensions.Extensions;
+import java.util.List;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
@@ -62,6 +65,12 @@ public class JacksonXmlMapperProvider implements ContextResolver<XmlMapper> {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        
+        List<Module> jacksonModules = Extensions.findAll(Module.class);
+        for(Module module : jacksonModules) {
+            log.debug("JacksonXmlMapperProvider registering module: {} class: {}", module.getModuleName(), module.getClass().getName());
+            mapper.registerModule(module); // for example com.intel.mtwilson.jackson.bouncycastle.BouncyCastleModule, com.intel.mtwilson.jackson.validation.ValidationModule, com.intel.mtwilson.jackson.v2api.V2Module
+        }
         return mapper;
     }
  
