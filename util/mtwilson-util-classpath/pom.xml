@@ -13,16 +13,12 @@
     </parent>
 
 <!--
-
 To generate javadocs:  mvn -DskipTests=true -Drelease site:site
 They will be created in target/site/apidocs
-
-    -->
+-->
 
     <build>
-        
         <plugins>
-            
             <!-- begin copy artifacts plugin:  this is used only for testing the directory module repository -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -44,7 +40,6 @@ They will be created in target/site/apidocs
                 </executions>
             </plugin>	
             <!-- end copy artifacts plugin -->
-                                                                                                                                                         
         </plugins>
     </build>
 
@@ -85,7 +80,7 @@ They will be created in target/site/apidocs
                                     <goal>aggregate</goal>
                                 </goals>
                             </execution>
-                        </executions>			
+                        </executions>
                     </plugin>
                 </plugins>
             </build>

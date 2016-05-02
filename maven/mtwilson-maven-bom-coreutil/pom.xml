@@ -57,11 +57,6 @@
             </dependency>
             <dependency>
                 <groupId>com.intel.mtwilson.services</groupId>
-                <artifactId>mtwilson-jersey2-util</artifactId>
-                <version>3.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>com.intel.mtwilson.services</groupId>
                 <artifactId>mtwilson-http-servlets</artifactId>
                 <version>3.0-SNAPSHOT</version>
             </dependency>                
@@ -299,6 +294,94 @@
                 <groupId>com.intel.mtwilson.util</groupId>
                 <artifactId>mtwilson-util-xml</artifactId>
                 <version>0.2-SNAPSHOT</version>
+            </dependency>
+            
+            
+            <!-- additions -->
+            <dependency>
+                <groupId>com.intel.mtwilson.core</groupId>
+                <artifactId>mtwilson-core-junit</artifactId>
+                <version>0.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.integration</groupId>
+                <artifactId>mtwilson-feature-xml</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.integration</groupId>
+                <artifactId>mtwilson-launcher-api</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.integration</groupId>
+                <artifactId>mtwilson-version</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.services</groupId>
+                <artifactId>mtwilson-http-security</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.services</groupId>
+                <artifactId>mtwilson-localization</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.services</groupId>
+                <artifactId>mtwilson-repository-api</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.services</groupId>
+                <artifactId>mtwilson-rpc</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.services</groupId>
+                <artifactId>mtwilson-rpc-jdbi</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.services</groupId>
+                <artifactId>mtwilson-rpc-model</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.services</groupId>
+                <artifactId>mtwilson-shiro-util</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.services</groupId>
+                <artifactId>mtwilson-util</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.services</groupId>
+                <artifactId>mtwilson-version-ws-v2</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.services</groupId>
+                <artifactId>mtwilson-webservice-util</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.util</groupId>
+                <artifactId>mtwilson-util-jdbi</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.util</groupId>
+                <artifactId>mtwilson-util-jetty9</artifactId>
+                <version>3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.util</groupId>
+                <artifactId>mtwilson-util-jooq</artifactId>
+                <version>3.0-SNAPSHOT</version>
             </dependency>
 
         </dependencies>
