@@ -27,6 +27,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.BeanParam;
@@ -140,7 +141,8 @@ public class PasswordLogin {
         Date notAfter = LoginTokenUtils.getExpirationDate(notBefore, configuration);
         Integer used = 0; // new token
         Integer usedMax = null; // for logins we don't set a usage limit, just an expiration date
-        TokenCredential tokenCredential = new TokenCredential(tokenValue, notBefore, notAfter, used, usedMax);
+        Long keepalive = TimeUnit.MILLISECONDS.convert(Long.valueOf(configuration.get(LoginTokenUtils.LOGIN_TOKEN_EXPIRES_MINUTES,"30")), TimeUnit.MINUTES); // whenever a request is authenticated using the token, the notAFter date will be automatically updated to be this amount of keepalive milliseconds after that time; this is how we keep moving the idle session timeout into the future while the session is active
+        TokenCredential tokenCredential = new TokenCredential(tokenValue, notBefore, notAfter, used, usedMax, keepalive);
         
         MemoryTokenDatabase database = MemoryTokenRealm.getDatabase();
         database.add(tokenCredential, usernameWithPermissions);
