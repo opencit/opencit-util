@@ -38,6 +38,7 @@ public class TokenCredential {
     private Date notAfter;
     private Integer used;
     private Integer usedMax;
+    private Long keepalive; // milliseconds
 
     public TokenCredential() {
         this.value = null;
@@ -45,6 +46,7 @@ public class TokenCredential {
         this.notAfter = null;
         this.used = null;
         this.usedMax = null;
+        this.keepalive = null;
     }
 
     public TokenCredential(String value, Date notBefore, Date notAfter, Integer used, Integer usedMax) {
@@ -55,6 +57,15 @@ public class TokenCredential {
         this.usedMax = usedMax;
     }
 
+    public TokenCredential(String value, Date notBefore, Date notAfter, Integer used, Integer usedMax, Long keepalive) {
+        this.value = value;
+        this.notBefore = notBefore;
+        this.notAfter = notAfter;
+        this.used = used;
+        this.usedMax = usedMax;
+        this.keepalive = keepalive;
+    }
+    
     public String getValue() {
         return value;
     }
@@ -74,6 +85,11 @@ public class TokenCredential {
     public Integer getUsedMax() {
         return usedMax;
     }
+
+    public Long getKeepalive() {
+        return keepalive;
+    }
+    
     
     public void use() {
         if( used == null ) { used = 0; }
