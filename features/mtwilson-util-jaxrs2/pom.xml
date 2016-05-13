@@ -15,7 +15,6 @@
     </parent>
     
     <dependencies>
-        <dependency>
         <!-- projects in "util" must not depend on projects in "core"
         <dependency>
             <groupId>com.intel.mtwilson.services</groupId>
