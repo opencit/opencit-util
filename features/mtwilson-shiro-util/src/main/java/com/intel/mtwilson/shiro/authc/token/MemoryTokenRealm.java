@@ -6,7 +6,9 @@ package com.intel.mtwilson.shiro.authc.token;
 
 import com.intel.mtwilson.shiro.Username;
 import com.intel.mtwilson.shiro.UsernameWithPermissions;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
@@ -103,6 +105,15 @@ public class MemoryTokenRealm extends AuthorizingRealm {
         } catch (Exception e) {
             log.debug("doGetAuthenticationInfo error", e);
             throw new AuthenticationException("Internal server error", e); 
+        }
+        
+        // automatically keep session alive if the token was created with the keepalive feature specified
+        if( tokenCredential.getKeepalive() != null ) {
+            Calendar c = Calendar.getInstance();
+            c.setTimeInMillis(c.getTimeInMillis()+tokenCredential.getKeepalive());
+            Date notAfter = c.getTime();
+            TokenCredential updated = new TokenCredential(tokenCredential.getValue(), tokenCredential.getNotBefore(), notAfter, tokenCredential.getUsed(), tokenCredential.getUsedMax(), tokenCredential.getKeepalive());
+            database.update(tokenCredential.getValue(), updated);
         }
         
         SimplePrincipalCollection principals = new SimplePrincipalCollection();

@@ -13,6 +13,7 @@ import com.intel.mtwilson.configuration.ConfigurationFactory;
 import com.intel.mtwilson.jaxrs2.mediatype.DataMediaType;
 import com.intel.mtwilson.launcher.ws.ext.V2;
 import com.intel.mtwilson.shiro.UsernameWithPermissions;
+import com.intel.mtwilson.shiro.authc.token.FileTokenRealm;
 import com.intel.mtwilson.shiro.authc.token.MemoryTokenRealm;
 import com.intel.mtwilson.shiro.authc.token.TokenCredential;
 import java.io.IOException;
@@ -150,6 +151,11 @@ public class LoginTokensJaxrs {
         return createLoginTokenResponse;
     }
 
+    private TokenCredential updateToken(TokenCredential tokenCredential) {
+        TokenCredential updatedToken = new TokenCredential(tokenCredential.getValue(), tokenCredential.getNotBefore(), LoginTokenUtils.getExpirationDate(tokenCredential.getNotAfter(), configuration), tokenCredential.getUsed(), tokenCredential.getUsedMax());
+        return updatedToken;
+    }
+    
     /**
      * Unlike standard v2 resources, we intentionally do not put the token value
      * in the URL.  So it's 
@@ -192,15 +198,29 @@ public class LoginTokensJaxrs {
     public ExtendLoginTokenResponse extendTokenExpiration(ExtendLoginTokenRequest tokenExtendRequest, @Context final HttpServletRequest request, @Context final HttpServletResponse response) {
         log.debug("extendTokenExpiration");
         ExtendLoginTokenResponse extendTokenResponse = new ExtendLoginTokenResponse();
-        MemoryTokenRealm.MemoryTokenDatabase database = MemoryTokenRealm.getDatabase();
-        TokenCredential tokenCredential = database.findCredentialByTokenValue(tokenExtendRequest.getAuthorizationToken());
-        if( tokenCredential == null ) {
-            extendTokenResponse.getFaults().add(new TokenNotFound(tokenExtendRequest.getAuthorizationToken()));
-            return extendTokenResponse;
+        
+        TokenCredential tokenCredential, updatedToken;
+        
+        // first check the memory token database
+        MemoryTokenRealm.MemoryTokenDatabase memoryDatabase = MemoryTokenRealm.getDatabase();
+        tokenCredential = memoryDatabase.findCredentialByTokenValue(tokenExtendRequest.getAuthorizationToken());
+        if( tokenCredential != null ) {
+            updatedToken = updateToken(tokenCredential);
+            memoryDatabase.update(tokenCredential.getValue(), updatedToken);
+        }
+        else { // tokenCredential is null, so try the FileTokenRealm next
+            FileTokenRealm.FileTokenDatabase fileDatabase = FileTokenRealm.getDatabase();
+            tokenCredential = fileDatabase.findCredentialByTokenValue(tokenExtendRequest.getAuthorizationToken());
+            if( tokenCredential != null ) {
+                updatedToken = updateToken(tokenCredential);
+                fileDatabase.update(tokenCredential.getValue(), updatedToken);
+            }
+            else { // tokenCredential is not found in FileTokenRealm either, so exit
+                extendTokenResponse.getFaults().add(new TokenNotFound(tokenExtendRequest.getAuthorizationToken()));
+                return extendTokenResponse;
+            }
         }
         log.info("Expiry date before enxtension  :  " + tokenCredential.getNotAfter());
-        TokenCredential updatedToken = new TokenCredential(tokenCredential.getValue(), tokenCredential.getNotBefore(), LoginTokenUtils.getExpirationDate(tokenCredential.getNotAfter(), configuration), tokenCredential.getUsed(), tokenCredential.getUsedMax());
-        database.update(tokenCredential.getValue(), updatedToken);
 //        tokenCredential.setNotAfter(LoginTokenUtils.getExpirationDate(new Date(), configuration));
         log.info("Expiry date extended to :  " + updatedToken.getNotAfter());
 
