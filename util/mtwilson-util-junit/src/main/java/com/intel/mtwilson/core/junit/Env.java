@@ -23,8 +23,9 @@ public class Env {
      * @throws IOException 
      */
     public static Properties getProperties(String name) throws IOException {
-        File directory = new File(System.getProperty("user.home")+File.separator+"mtwilson"+File.separator+"env");
+        File directory = new File(System.getProperty("user.home")+File.separator+".junit"+File.separator+"env");
         File file = directory.toPath().resolve(name+".properties").toFile();
+        if( !file.exists() ) { return null; }
         try(FileInputStream in = new FileInputStream(file)) {
             Properties properties = new Properties();
             properties.load(in);
@@ -39,8 +40,9 @@ public class Env {
      * @throws IOException 
      */
     public static String getString(String filename) throws IOException {
-        File directory = new File(System.getProperty("user.home")+File.separator+"mtwilson"+File.separator+"env");
+        File directory = new File(System.getProperty("user.home")+File.separator+".junit"+File.separator+"env");
         File file = directory.toPath().resolve(filename).toFile();
+        if( !file.exists() ) { return null; }
         try(FileInputStream in = new FileInputStream(file)) {
             return IOUtils.toString(in, "UTF-8");
         }
