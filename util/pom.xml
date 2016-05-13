@@ -33,16 +33,12 @@
         <module>mtwilson-util-i18n</module>
         <module>mtwilson-util-io</module>
         <module>mtwilson-util-jackson</module>
-        <module>mtwilson-util-jaxrs2</module>
-        <module>mtwilson-util-jaxrs2-client</module>
-        <module>mtwilson-util-jaxrs2-client-jersey2.0</module>
-        <module>mtwilson-util-jaxrs2-server</module>
-        <module>mtwilson-util-jersey2</module>
         <module>mtwilson-util-jdbc</module>
         <module>mtwilson-util-jdbi</module>
         <module>mtwilson-util-jetty9</module>
         <module>mtwilson-util-jooq</module>
         <module>mtwilson-util-jpa</module>
+        <module>mtwilson-util-junit</module>
         <module>mtwilson-util-locale</module>
         <module>mtwilson-util-logback</module>	
         <module>mtwilson-util-module</module>
