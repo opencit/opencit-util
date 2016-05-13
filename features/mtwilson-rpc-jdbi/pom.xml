@@ -55,6 +55,13 @@
             <artifactId>mtwilson-util-jdbi</artifactId>
             <version>${project.version}</version>        
         </dependency>
+        
+        <dependency>
+    <groupId>com.intel.mtwilson.integration</groupId>
+    <artifactId>mtwilson-configuration</artifactId>
+            <version>${project.version}</version>        
+        </dependency>        
+        
 
         <dependency>
             <groupId>postgresql</groupId>

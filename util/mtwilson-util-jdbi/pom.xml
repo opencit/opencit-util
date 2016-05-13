@@ -29,6 +29,7 @@
 
     <dependencies>
 
+        <!--
     <dependency>
             <groupId>com.intel.mtwilson.integration</groupId>
             <artifactId>mtwilson-configuration</artifactId>
@@ -38,6 +39,7 @@
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-configuration</artifactId>
         </dependency>
+        -->
     <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-io</artifactId>
