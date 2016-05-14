@@ -22,4 +22,14 @@
         </plugins>
     </build>
     
+    <dependencies>
+
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-jaxrs2</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
+    </dependencies>
+
 </project>

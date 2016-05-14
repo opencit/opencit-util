@@ -9,16 +9,19 @@
     <description>JAX-RS 2.0 providers, features, and domain model classes applicable to both client and server</description>
     
     <parent>
-        <groupId>com.intel.mtwilson.util</groupId>
-        <artifactId>mtwilson-util</artifactId>
+        <groupId>com.intel.mtwilson</groupId>
+        <artifactId>mtwilson-maven-build-coreutil-features</artifactId>
         <version>3.1-SNAPSHOT</version>
     </parent>
     
     <dependencies>
+        <!-- projects in "util" must not depend on projects in "core"
         <dependency>
             <groupId>com.intel.mtwilson.services</groupId>
             <artifactId>mtwilson-repository-api</artifactId>
         </dependency>
+        -->
+
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-extensions</artifactId>
