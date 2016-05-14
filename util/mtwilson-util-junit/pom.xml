@@ -12,10 +12,9 @@
     </description>
     
     <parent>
-        <groupId>com.intel.mtwilson.maven</groupId>
-        <artifactId>mtwilson-maven-java</artifactId>
+        <groupId>com.intel.mtwilson.util</groupId>
+        <artifactId>mtwilson-util</artifactId>
         <version>3.1-SNAPSHOT</version>
-        <relativePath/>
     </parent>
     
     <dependencies>

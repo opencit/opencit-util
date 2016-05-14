@@ -24,7 +24,6 @@
         <module>mtwilson-core-html5-login-anon</module>
         <module>mtwilson-core-html5-login-token</module>
         <module>mtwilson-core-jetty9</module>
-        <module>mtwilson-core-junit</module>
         <module>mtwilson-core-login-token</module>
         <module>mtwilson-core-setup</module>
         <module>mtwilson-core-version</module>
@@ -48,6 +47,13 @@
         <module>mtwilson-version</module>
         <module>mtwilson-version-ws-v2</module>
         <module>mtwilson-webservice-util</module>
+	
+		<!-- NOTE: these are moved from "util" to "core" because they depend on other projects that are in "core".  Issue #5331. -->
+        <module>mtwilson-util-jaxrs2</module>
+        <module>mtwilson-util-jaxrs2-client</module>
+        <module>mtwilson-util-jaxrs2-client-jersey2.0</module>
+        <module>mtwilson-util-jaxrs2-server</module>
+        <module>mtwilson-util-jersey2</module>
     </modules>
     
     <build>
