@@ -11,6 +11,22 @@
 console.log("mtwilson-core-html5-login-anon:  start.js loaded");
 
 //setTimeout(function() {
+function UserProfile(data) {
+    var self = this;
+    self.username = ko.observable(data.username);
+    self.authorizationToken = ko.observable(data.authorizationToken);
+    self.authorizationTokenExpires = ko.observable();
+    self.authenticated = ko.observable(false);
+    self.error = ko.observable(data.error);
+}
+function LoginViewModel() {
+    var self = this;
+    self.userProfile = new UserProfile({});
+}
+
+// extern: mainViewModel defiend in mtwilson-core-html5
+mainViewModel.loginViewModel = new LoginViewModel();
+
 
 $.ajax({
     type: "POST",
@@ -26,6 +42,7 @@ $.ajax({
          */
 
         var authorizationToken = data.authorization_token;
+        mainViewModel.loginViewModel.userProfile.authorizationToken(authorizationToken);
 
         // send the authorization token automatically with every ajax request
         $(document).ajaxSend(function(event, jqxhr, settings) {

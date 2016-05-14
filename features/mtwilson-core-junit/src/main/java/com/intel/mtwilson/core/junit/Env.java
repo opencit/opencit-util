@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+import org.apache.commons.io.IOUtils;
 
 /**
  *
@@ -28,6 +29,20 @@ public class Env {
             Properties properties = new Properties();
             properties.load(in);
             return properties;
+        }
+    }
+
+    /**
+     * 
+     * @param filename including extension, so to read cit-attestation.properties pass in "cit3-attestation.properties"
+     * @return
+     * @throws IOException 
+     */
+    public static String getString(String filename) throws IOException {
+        File directory = new File(System.getProperty("user.home")+File.separator+"mtwilson"+File.separator+"env");
+        File file = directory.toPath().resolve(filename).toFile();
+        try(FileInputStream in = new FileInputStream(file)) {
+            return IOUtils.toString(in, "UTF-8");
         }
     }
     
