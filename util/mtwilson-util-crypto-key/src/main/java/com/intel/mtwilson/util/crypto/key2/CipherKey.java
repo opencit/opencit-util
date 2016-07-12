@@ -4,6 +4,8 @@
  */
 package com.intel.mtwilson.util.crypto.key2;
 
+import java.util.Arrays;
+
 /**
  *
  * @author jbuhacoff
@@ -13,7 +15,20 @@ public class CipherKey extends CipherKeyAttributes {
     private byte[] encoded;
     
 
-    
+    public void clear() {
+        // encoded key
+        if( encoded != null ) {
+            Arrays.fill(encoded, (byte)0);
+        }
+        // cipher attributes
+        setAlgorithm(null);
+        setKeyId(null);
+        setKeyLength(null);
+        setMode(null);
+        setPaddingMode(null);
+        // all extended attributes
+        map().clear();
+    }
     
     /**
      * The encoded key, in the format specified by its attributes

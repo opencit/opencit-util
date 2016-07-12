@@ -136,6 +136,10 @@ public class SimpleKeystore {
         this(new FileResource(file), password);
     }
 
+    public SimpleKeystore(File file, Password password) throws KeyManagementException {
+        this(new FileResource(file), password);
+    }
+    
     public Resource getResource() {
         return keystoreResource;
     }

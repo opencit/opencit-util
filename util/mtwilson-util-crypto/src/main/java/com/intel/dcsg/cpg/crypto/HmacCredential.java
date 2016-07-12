@@ -4,6 +4,7 @@
  */
 package com.intel.dcsg.cpg.crypto;
 
+import com.intel.dcsg.cpg.crypto.key.password.Password;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -19,16 +20,22 @@ import org.slf4j.LoggerFactory;
  */
 public class HmacCredential implements Credential {
     private static Logger log = LoggerFactory.getLogger(HmacCredential.class);
-    private String username;
-    private String password;
+    private final String username;
+    private final Password password;
     private final String signatureAlgorithm = "HmacSHA256";
-    private byte[] identity;
+    private final byte[] identity;
     
     public HmacCredential(String clientId, String secretKey) {
+        username = clientId;
+        password = new Password(secretKey);
+        identity = getIdentity(clientId);
+    }
+    public HmacCredential(String clientId, Password secretKey) {
         username = clientId;
         password = secretKey;
         identity = getIdentity(clientId);
     }
+
     
     private byte[] getIdentity(String name) {
         try {
@@ -60,7 +67,7 @@ public class HmacCredential implements Credential {
      */
     @Override
     public byte[] signature(byte[] document) throws NoSuchAlgorithmException, InvalidKeyException {
-        SecretKeySpec key = new SecretKeySpec(password.getBytes(), signatureAlgorithm);
+        SecretKeySpec key = new SecretKeySpec(password.toByteArray(), signatureAlgorithm);
         Mac mac = Mac.getInstance(signatureAlgorithm); // a string like "HmacSHA256"
         mac.init(key);
         return mac.doFinal(document);

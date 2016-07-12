@@ -9,6 +9,7 @@ import javax.annotation.Priority;
 import javax.ws.rs.client.ClientRequestContext;
 import com.intel.mtwilson.security.http.HmacAuthorization;
 import com.intel.dcsg.cpg.crypto.HmacCredential;
+import com.intel.dcsg.cpg.crypto.key.password.Password;
 import java.io.IOException;
 import javax.ws.rs.Priorities;
 
@@ -35,9 +36,13 @@ import javax.ws.rs.Priorities;
 public class HmacAuthorizationFilter implements ClientRequestFilter {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(HmacAuthorizationFilter.class);
 
-    private HmacAuthorization auth;
+    private final HmacAuthorization auth;
     
     public HmacAuthorizationFilter(String clientId, String secretKey) {
+        auth = new HmacAuthorization(new HmacCredential(clientId, secretKey));
+    }
+    
+    public HmacAuthorizationFilter(String clientId, Password secretKey) {
         auth = new HmacAuthorization(new HmacCredential(clientId, secretKey));
     }
     

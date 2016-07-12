@@ -3,6 +3,7 @@
  * All rights reserved.
  */
 package com.intel.mtwilson.security.http.jaxrs;
+import com.intel.dcsg.cpg.crypto.key.password.Password;
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.annotation.Priority;
 import javax.ws.rs.client.ClientRequestContext;
@@ -29,11 +30,15 @@ import javax.ws.rs.Priorities;
 public class TokenAuthorizationFilter implements ClientRequestFilter {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TokenAuthorizationFilter.class);
 
-    private String tokenValue;
+    private final Password tokenValue;
     
     public TokenAuthorizationFilter(String tokenValue) {
+        this.tokenValue = new Password(tokenValue);
+    }
+    public TokenAuthorizationFilter(Password tokenValue) {
         this.tokenValue = tokenValue;
     }
+
     
     /**
      * This method assumes that the entity body of the request is either null or a String or
@@ -48,7 +53,7 @@ public class TokenAuthorizationFilter implements ClientRequestFilter {
                         throws IOException { 
         // Modify the request
         try {
-            String header = String.format("Token %s", tokenValue);
+            String header = String.format("Token %s", new String(tokenValue.toCharArray()));
             log.debug("Authorization: {}", header);
             requestContext.getHeaders().add("Authorization", header);
             

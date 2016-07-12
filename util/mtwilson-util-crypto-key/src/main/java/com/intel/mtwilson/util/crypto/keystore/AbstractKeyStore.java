@@ -29,10 +29,9 @@ import java.util.List;
 public abstract class AbstractKeyStore implements Closeable {
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AbstractKeyStore.class);
-    private String keystoreType;
-    private Resource keystoreResource;
-    private File keystoreFile;
-    private char[] keystorePassword;
+    private final String keystoreType;
+    private final Resource keystoreResource;
+    private final char[] keystorePassword;
     private KeyStore keystore;
     private boolean modified = false;
 //    private KeyProtectionDelegate keyProtectionDelegate;
@@ -47,7 +46,7 @@ public abstract class AbstractKeyStore implements Closeable {
      */
     public AbstractKeyStore(String keystoreType, File keystoreFile, char[] keystorePassword) throws KeyStoreException, IOException {
         this.keystoreType = keystoreType;
-        this.keystoreFile = keystoreFile;
+        this.keystoreResource = new FileResource(keystoreFile);
         this.keystorePassword = keystorePassword;
         open();
     }
@@ -68,9 +67,6 @@ public abstract class AbstractKeyStore implements Closeable {
     
     private void open() throws KeyStoreException, IOException {
         this.keystore = KeyStore.getInstance(keystoreType);
-        if( keystoreFile != null ) {
-            keystoreResource = new FileResource(keystoreFile); // getInputStream() returns null input stream if file not found 
-        }
         if( keystoreResource == null ) {
             throw new IllegalArgumentException("Keystore resource not specified");
         }
@@ -79,21 +75,6 @@ public abstract class AbstractKeyStore implements Closeable {
         } catch (GeneralSecurityException e) {
             throw new KeyStoreException("Cannot open keystore", e);
         }
-        /*
-        if (keystoreFile.exists()) {
-            try (InputStream in = new FileInputStream(keystoreFile)) {
-                keystore.load(in, keystorePassword);
-            } catch (GeneralSecurityException e) {
-                throw new KeyStoreException("Cannot open keystore", e);
-            }
-        } else {
-            try {
-                keystore.load(null, keystorePassword);
-            } catch (GeneralSecurityException e) {
-                throw new KeyStoreException("Cannot open keystore", e);
-            }
-        }
-        */
     }
 
     /**

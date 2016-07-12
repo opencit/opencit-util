@@ -34,6 +34,10 @@ public class PasswordKeyStore extends AbstractKeyStore implements Closeable {
     private KeyProtectionDelegate keyProtectionDelegate;
     private SecretKeyFactory factory;
     
+    public PasswordKeyStore(Resource keystoreResource, Password keystorePassword) throws KeyStoreException, IOException, NoSuchAlgorithmException {
+        this("JCEKS", keystoreResource, keystorePassword);
+    }
+    
     /**
      * 
      * @param keystoreType should be JCEKS or other keystore type which is capable of storing SecretKey entries
@@ -71,6 +75,7 @@ public class PasswordKeyStore extends AbstractKeyStore implements Closeable {
     /**
      * Precondition: keystore file exists (or throws FileNotFoundException)
      *
+     * @param alias of the entry to retrieve
      * @return
      * @throws KeyStoreException
      * @throws FileNotFoundException
