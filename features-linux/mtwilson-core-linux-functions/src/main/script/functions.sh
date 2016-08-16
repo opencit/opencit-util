@@ -1579,7 +1579,7 @@ postgres_version_report() {
 # we need the postgres client to create or patch the database, but
 # the server can be installed anywhere
 postgres_install() {
-  POSTGRES_CLIENT_YUM_PACKAGES=""
+  POSTGRES_CLIENT_YUM_PACKAGES="postgresql.x86_64"
   #POSTGRES_CLIENT_APT_PACKAGES="postgresql-client-common"
   POSTGRES_CLIENT_APT_PACKAGES="postgresql-client-9.3"
   postgres_detect >> $INSTALL_LOG_FILE
@@ -1645,7 +1645,7 @@ add_postgresql_install_packages() {
 # - POSTGRES_REQUIRED_VERSION
 # installs postgres server 
 postgres_server_install(){
-  POSTGRES_SERVER_YUM_PACKAGES=""
+  POSTGRES_SERVER_YUM_PACKAGES="postgresql-server.x86_64 postgresql-contrib.x86_64"
   POSTGRES_SERVER_APT_PACKAGES="postgresql-9.3 pgadmin3 postgresql-contrib-9.3"
 
   postgres_clear; postgres_server_detect >> $INSTALL_LOG_FILE
