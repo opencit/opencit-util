@@ -840,6 +840,27 @@ zypper_detect() {
   zypper=`which zypper 2>/dev/null`
 }
 
+
+# Check if a package is already installed
+is_package_installed() {
+  local package_name="$1"
+  if yum_detect; then
+    yum list installed $package_name > /dev/null 2>&1
+    result=$?
+  elif aptget_detect; then
+    dpkg-query --show $package_name > /dev/null 2>&1
+    result=$?
+  fi
+  if [ $result -eq 0 ]; then return 0; else return 1; fi
+}
+
+# check if a command is already on path
+is_command_available() {
+  which $* > /dev/null 2>&1
+  local result=$?
+  if [ $result -eq 0 ]; then return 0; else return 1; fi
+}  
+
 trousers_detect() {
   trousers=`which tcsd 2>/dev/null`
 }
