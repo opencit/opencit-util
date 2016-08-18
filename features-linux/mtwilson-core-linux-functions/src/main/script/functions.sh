@@ -855,6 +855,13 @@ is_package_installed() {
   if [ $result -eq 0 ]; then return 0; else return 1; fi
 }
 
+# check if a command is already on path
+is_command_available() {
+  which $* > /dev/null 2>&1
+  local result=$?
+  if [ $result -eq 0 ]; then return 0; else return 1; fi
+}  
+
 trousers_detect() {
   trousers=`which tcsd 2>/dev/null`
 }
