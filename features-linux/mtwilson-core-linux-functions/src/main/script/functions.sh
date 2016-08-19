@@ -1037,7 +1037,7 @@ add_package_repository() {
 
 update_packages() {
   if yum_detect; then
-    yum -y update
+    yum -y -x 'kernel*,redhat-release*' update
   elif aptget_detect; then
     apt-get -y update
   elif zypper_detect; then
