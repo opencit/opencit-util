@@ -1,7 +1,7 @@
 #!/bin/bash
 # WARNING:
-# *** do NOT use TABS for indentation, use SPACES
-# *** TABS will cause errors in some linux distributions
+# *** do NOT use TABS for indentation, use SPACES (tabs will cause errors in some linux distributions)
+# *** do NOT use 'exit' to return from the functions in this file, use 'return' ONLY (exit will cause unit testing hassles)
 
 # CONFIGURATION:
 
@@ -719,7 +719,10 @@ update_property_in_file() {
   local value="${3}"
   local encrypted="false"
 
-  if ! validate_path_configuration "$filename"; then exit -1; fi
+  # disabling this check... this is a utility function, it is the
+  # responsibility of all callers to ensure they are using it to
+  # edit files in known locations and not pass in the wrong paths
+  #if ! validate_path_configuration "$filename"; then exit -1; fi
   if [ -f "$filename" ]; then
     # Decrypt if needed
     if file_encrypted "$filename"; then
