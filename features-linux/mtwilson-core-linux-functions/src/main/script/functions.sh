@@ -227,7 +227,7 @@ function validate_path_configuration() {
   fi
   file_path=`readlink -m "$file_path"` #make file path absolute
   
-  if [[ "$file_path" != '/etc/'* && "$file_path" != '/opt/'* ]]; then
+  if [[ "$file_path" != '/etc/'* && "$file_path" != '/opt/'* && "$file_path" != *'.env' ]]; then
     echo_failure "Configuration path validation failed. Verify path meets acceptable directory constraints: $file_path"
     return 1
   fi
@@ -1040,7 +1040,7 @@ add_package_repository() {
 
 update_packages() {
   if yum_detect; then
-    yum -y update
+    yum -y -x 'kernel*,redhat-release*' update
   elif aptget_detect; then
     apt-get -y update
   elif zypper_detect; then
@@ -3174,7 +3174,7 @@ tomcat_create_ssl_cert() {
   local serverName="${1}"
   serverName=$(echo $serverName | sed -e 's/ //g' | sed -e 's/,$//')
 
-    local keystorePassword="$MTWILSON_TLS_KEYSTORE_PASS"   #changeit
+  local keystorePassword="$MTWILSON_TLS_KEYSTORE_PASS"   #changeit
   local keystore="${TOMCAT_HOME}/ssl/.keystore"
   local tomcatServerXml="${TOMCAT_HOME}/conf/server.xml"
   local configDir="/opt/mtwilson/configuration"
@@ -3185,7 +3185,21 @@ tomcat_create_ssl_cert() {
 
   if [ -z "$MTWILSON_TLS_KEYSTORE_PASS" ] || [ "$MTWILSON_TLS_KEYSTORE_PASS" == "changeit" ]; then MTWILSON_TLS_KEYSTORE_PASS=$(generate_password 32); fi
   keystorePassword="$MTWILSON_TLS_KEYSTORE_PASS"   #changeit
+
+  # decrypt file
+  if file_encrypted "${mtwilsonPropertiesFile}"; then
+    encrypted="true"
+    decrypt_file "${mtwilsonPropertiesFile}" "$MTWILSON_PASSWORD"
+  fi
+
+  # read value
   keystorePasswordOld=$(read_property_from_file "mtwilson.tls.keystore.password" "${mtwilsonPropertiesFile}")
+
+  # Return the file to encrypted state, if it was before
+  if [ "$encrypted" == "true" ]; then
+    encrypt_file "${mtwilsonPropertiesFile}" "$MTWILSON_PASSWORD"
+  fi
+
   keystorePasswordOld=${keystorePasswordOld:-"changeit"}
 
   # Create an array of host ips and dns names from csv list passed into function
@@ -4655,17 +4669,18 @@ change_db_pass() {
     postgres_version
     postgres_test_connection_report
     if [ $? -ne 0 ]; then exit; fi
-    temp=$("$psql" -h "$DATABASE_HOSTNAME" -d "$DATABASE_SCHEMA" -c "ALTER USER $DATABASE_USERNAME WITH PASSWORD '$new_db_pass';")
-    echo ""
-    if [ $? -ne 0 ]; then echo_failure "Issue building postgres or expect command."; exit; fi
+    temp=$(cd /tmp && "$psql" -h "$DATABASE_HOSTNAME" -d "$DATABASE_SCHEMA" -U "$DATABASE_USERNAME" -c "ALTER USER $DATABASE_USERNAME WITH PASSWORD '$new_db_pass';")
+    if [ $? -ne 0 ]; then echo_failure -e "\nIssue building postgres or expect command."; exit; fi
     # Edit postgres password file if it exists
     if [ -f ~/.pgpass ]; then
+      echo
       echo -n "Updating database password value in .pgpass file...."
-      sed -i 's/\(.*\):\(.*\)/\1:'"$new_db_pass"'/' ~/.pgpass
+      sed -i 's|\(.*:'"$DATABASE_SCHEMA"':'"$DATABASE_USERNAME"':\).*|\1'"$new_db_pass"'|' ~/.pgpass
       #temp=`cat ~/.pgpass | cut -f1,2,3,4 -d":"`
       #temp="$temp:$new_db_pass"
       #echo $temp > ~/.pgpass;
     fi
+    postgres_restart
     echo_success "Done"
   fi
 
@@ -4830,4 +4845,60 @@ key_restore() {
   fi
 
   echo_success "Keys restored from: $keyBackupFile"
+}
+
+# called by installer to automatically configure the server for localhost integration
+shiro_localhost_integration() {
+  local shiroIniPath="${1}"
+  local iplist;
+  local finalIps;
+  iplist="127.0.0.1"
+  
+  OIFS=$IFS
+  IFS=',' read -ra newIps <<< "$iplist"
+  IFS=$OIFS
+  
+  iniHostRealmPropertyExists=$(cat "${shiroIniPath}" | grep '^iniHostRealm=' 2>/dev/null)
+  if [ -z "${iniHostRealmPropertyExists}" ]; then
+    sed -i 's|\(^securityManager.realms*\)|iniHostRealm=\n\1|' "${shiroIniPath}"
+  fi
+  iniHostRealmAllowPropertyExists=$(cat "${shiroIniPath}" | grep '^iniHostRealm.allow=' 2>/dev/null)
+  if [ -z "${iniHostRealmAllowPropertyExists}" ]; then
+    sed -i 's|\(^securityManager.realms*\)|iniHostRealm.allow=\n\1|' "${shiroIniPath}"
+  fi
+  hostMatcherPropertyExists=$(cat "${shiroIniPath}" | grep '^hostMatcher=' 2>/dev/null)
+  if [ -z "${hostMatcherPropertyExists}" ]; then
+    sed -i 's|\(^securityManager.realms*\)|hostMatcher=\n\1|' "${shiroIniPath}"
+  fi
+  iniHostRealmCredentialsMatcherPropertyExists=$(cat "${shiroIniPath}" | grep '^iniHostRealm.credentialsMatcher=' 2>/dev/null)
+  if [ -z "${iniHostRealmCredentialsMatcherPropertyExists}" ]; then
+    sed -i 's|\(^securityManager.realms*\)|iniHostRealm.credentialsMatcher=\n\1|' "${shiroIniPath}"
+  fi
+  
+  update_property_in_file "iniHostRealm" "${shiroIniPath}" 'com.intel.mtwilson.shiro.authc.host.IniHostRealm'
+  update_property_in_file "hostMatcher" "${shiroIniPath}" 'com.intel.mtwilson.shiro.authc.host.HostCredentialsMatcher'
+  update_property_in_file "iniHostRealm.credentialsMatcher" "${shiroIniPath}" '$hostMatcher'
+  
+  #iniHostRealm.allow
+  hostAllow=$(read_property_from_file iniHostRealm.allow ${shiroIniPath})
+  finalIps="$hostAllow"
+  for i in "${newIps[@]}"; do
+    OIFS=$IFS
+    IFS=',' read -ra oldIps <<< "$finalIps"
+    IFS=$OIFS
+    if [[ "${oldIps[*]}" != *"$i"* ]]; then
+      if [ -z "$finalIps" ]; then
+        finalIps="$i"
+      else
+        finalIps+=",$i"
+      fi
+    fi
+  done
+  update_property_in_file "iniHostRealm.allow" "${shiroIniPath}" "$finalIps";
+  
+  #securityManager.realms
+  securityManagerPropertyHasIniHostRealm=$(cat "${shiroIniPath}" | grep '^securityManager.realms' 2>/dev/null | grep '$iniHostRealm' 2>/dev/null)
+  if [ -z "${securityManagerPropertyHasIniHostRealm}" ]; then
+    sed -i 's|\(^securityManager.realms.*\)|\1, $iniHostRealm|' "${shiroIniPath}"
+  fi
 }
