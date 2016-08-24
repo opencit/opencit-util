@@ -82,59 +82,59 @@ echo_info() {
 
 
 parse_args() {
-if [ "x$*" == "x" ] || [ "$1" == "--help" ]; then
-  echo "Usage: monitor.sh target.bin [target.bin.mark] [/tmp/cit/monitor/target.bin]"
-  exit 1
-elif [ "$1" == "--status" ]; then
-  shift
-  if [ -n "$1" ] && [ -d "$1" ] && [ -f "$1/status" ]; then
-    workdir=$1
-    cat $workdir/status
-    exit 0
-  fi
-  exit 1
-elif [ "$1" == "--pid" ]; then
-  shift
-  if [ -n "$1" ] && [ -d "$1" ] && [ -f "$1/pid" ]; then
-    workdir=$1
-    target_pid=$(cat $workdir/pid 2>/dev/null)
-    if is_target_running $target_pid; then echo $target_pid; fi
-    exit 0
-  fi
-  exit 1
-elif [ "$1" == "--noexec" ]; then
-  MONITOR_NOEXEC=yes
-  shift
-  if [ "$1" == "--wait" ]; then
-    MONITOR_NOEXEC_WAIT=yes
-    shift
-  fi
-  if [ -n "$1" ] && [ -d "$1" ] && [ -f "$1/status" ]; then
-    workdir=$1
-    target=$(basename $1)
-    markerfile=
+    if [ "x$*" == "x" ] || [ "$1" == "--help" ]; then
+      echo "Usage: monitor.sh target.bin [target.bin.mark] [/tmp/cit/monitor/target.bin]"
+      exit 1
+    elif [ "$1" == "--status" ]; then
+      shift
+      if [ -n "$1" ] && [ -d "$1" ] && [ -f "$1/status" ]; then
+        workdir=$1
+        cat $workdir/status
+        exit 0
+      fi
+      exit 1
+    elif [ "$1" == "--pid" ]; then
+      shift
+      if [ -n "$1" ] && [ -d "$1" ] && [ -f "$1/pid" ]; then
+        workdir=$1
+        target_pid=$(cat $workdir/pid 2>/dev/null)
+        if is_target_running $target_pid; then echo $target_pid; fi
+        exit 0
+      fi
+      exit 1
+    elif [ "$1" == "--noexec" ]; then
+      MONITOR_NOEXEC=yes
+      shift
+      if [ "$1" == "--wait" ]; then
+        MONITOR_NOEXEC_WAIT=yes
+        shift
+      fi
+      if [ -n "$1" ] && [ -d "$1" ] && [ -f "$1/status" ]; then
+        workdir=$1
+        target=$(basename $1)
+        markerfile=
 
-    if is_target_active_running; then
-      monitor_target
-      exit $?
-    elif [ "$MONITOR_NOEXEC_WAIT" ]; then
+        if is_target_active_running; then
+          monitor_target
+          exit $?
+        elif [ "$MONITOR_NOEXEC_WAIT" ]; then
+          monitor_target
+          exit $?
+        fi
+      fi
+      echo "target is not currently running"
+      exit 1
+    else
+      target=$1
+      markerfile=$2
+      workdir=$3
+      # regular operation
+      create_workdir
+      init_markers
+      execute_target
       monitor_target
       exit $?
     fi
-  fi
-  echo "target is not currently running"
-  exit 1
-else
-  target=$1
-  markerfile=$2
-  workdir=$3
-  # regular operation
-  create_workdir
-  init_markers
-  execute_target
-  monitor_target
-  exit $?
-fi
 }
 
 create_workdir() {
@@ -151,13 +151,14 @@ create_workdir() {
     filename=$(basename $target)
     workdir=/tmp/cit/monitor/$filename
   fi 
-  mkdir -p $workdir/markers
+  mkdir -p $workdir
   echo "PENDING" > $workdir/status
 }
 
 init_markers() {
   # split the marker file into individual numbered lines in separate files
   # the grep removes empty lines
+  mkdir -p $workdir/markers
   max=$(cat $markerfile | grep -v -e '^$' | wc -l)
   for i in `seq 1 $max`
   do
@@ -186,7 +187,7 @@ execute_target() {
 is_target_running() {
     local target_pid="$1"
     if [ -n "$target_pid" ]; then
-        local pid_status=$(ps --pid $target_pid -o pid= -o comm= | awk '{print $1}')
+        local pid_status=$(ps --pid $target_pid -o pid= -o comm=  | head -n 1 | awk '{print $1}' 2>/dev/null)
         if [ -n "$pid_status" ]; then return 0; fi
     fi
     return 1
@@ -296,71 +297,71 @@ update_progress() {
 
 monitor_target() {
 
-# we're looking for the following things:
-# 1. check that the target is still running
-# 2. identify the next marker in the output
-progress=0
-next=1
-percent=0
-bricks=0
-spaces=0
-bar_width=50
+    # we're looking for the following things:
+    # 1. check that the target is still running
+    # 2. identify the next marker in the output
+    progress=0
+    next=1
+    percent=0
+    bricks=0
+    spaces=0
+    bar_width=50
 
 
-while [ $progress -lt $max ] && is_target_running; do
-  # echo progress without newline and with escape symbols,
-  # the backslash r puts the cursor at the beginning of the line
-  progress_bar
-  update_progress
-  sleep 1
-done
-
-# final check, update, and display
-update_progress
-echo $progress > $workdir/progress
-progress_bar
-
-# remove the temporary marker files
-rm -rf $workdir/markers
-
-if [ -n "$MONITOR_NOEXEC" ]; then
-  # wait until the target exits and writes the code
-  while [ -z "$target_exit_code" ]; do
-    if [ -f $workdir/exit ]; then
-      target_exit_code=$(cat $workdir/exit)
-    else
+    while [ $progress -lt $max ] && is_target_running $target_pid; do
+      # echo progress without newline and with escape symbols,
+      # the backslash r puts the cursor at the beginning of the line
+      progress_bar
+      update_progress
       sleep 1
+    done
+
+    # final check, update, and display
+    update_progress
+    echo $progress > $workdir/progress
+    progress_bar
+
+    # remove the temporary marker files
+    rm -rf $workdir/markers
+
+    if [ -n "$MONITOR_NOEXEC" ]; then
+      # wait until the target exits and writes the code
+      while [ -z "$target_exit_code" ]; do
+        if [ -f $workdir/exit ]; then
+          target_exit_code=$(cat $workdir/exit)
+        else
+          sleep 1
+        fi
+      done
+    else
+      # normal operation
+      # either target finished successfully or exited early
+      # check the exit code
+      wait $target_pid
+      target_exit_code=$?
+      echo $target_exit_code > $workdir/exit
+      if [ $target_exit_code -eq 0 ]; then
+        echo "DONE" > $workdir/status
+      else
+        echo "ERROR" > $workdir/status
+      fi
     fi
-  done
-else
-  # normal operation
-  # either target finished successfully or exited early
-  # check the exit code
-  wait $target_pid
-  target_exit_code=$?
-  echo $target_exit_code > $workdir/exit
-  if [ $target_exit_code -eq 0 ]; then
-    echo "DONE" > $workdir/status
-  else
-    echo "ERROR" > $workdir/status
-  fi
-fi
 
-if [ $target_exit_code -eq 0 ]; then
-  echo -en "$TERM_COLOR_GREEN"
-  progress_bar
-  echo -en "$TERM_COLOR_NORMAL"
-else
-  echo -en "$TERM_COLOR_RED"
-  progress_bar
-  echo -en "$TERM_COLOR_NORMAL"
-fi
+    if [ $target_exit_code -eq 0 ]; then
+      echo -en "$TERM_COLOR_GREEN"
+      progress_bar
+      echo -en "$TERM_COLOR_NORMAL"
+    else
+      echo -en "$TERM_COLOR_RED"
+      progress_bar
+      echo -en "$TERM_COLOR_NORMAL"
+    fi
 
-# finish with a newline
-echo
+    # finish with a newline
+    echo
 
-# exit with target's exit code
-return $target_exit_code
+    # exit with target's exit code
+    return $target_exit_code
 }
 
 parse_args $*
