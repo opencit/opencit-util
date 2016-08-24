@@ -363,4 +363,4 @@ echo
 return $target_exit_code
 }
 
-parse_args
+parse_args $*
