@@ -47,11 +47,42 @@ export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # useful constant for the green color at 100%
 TERM_COLOR_GREEN="\\033[1;32m"
+TERM_COLOR_CYAN="\\033[1;36m"
 TERM_COLOR_RED="\\033[1;31m"
+TERM_COLOR_YELLOW="\\033[1;33m"
 TERM_COLOR_NORMAL="\\033[0;39m"
 
+echo_success() {
+  if [ "$TERM_DISPLAY_MODE" = "color" ]; then echo -en "${TERM_COLOR_GREEN}"; fi
+  echo ${@:-"[  OK  ]"}
+  if [ "$TERM_DISPLAY_MODE" = "color" ]; then echo -en "${TERM_COLOR_NORMAL}"; fi
+  return 0
+}
+
+echo_failure() {
+  if [ "$TERM_DISPLAY_MODE" = "color" ]; then echo -en "${TERM_COLOR_RED}"; fi
+  echo ${@:-"[FAILED]"}
+  if [ "$TERM_DISPLAY_MODE" = "color" ]; then echo -en "${TERM_COLOR_NORMAL}"; fi
+  return 1
+}
+
+echo_warning() {
+  if [ "$TERM_DISPLAY_MODE" = "color" ]; then echo -en "${TERM_COLOR_YELLOW}"; fi
+  echo ${@:-"[WARNING]"}
+  if [ "$TERM_DISPLAY_MODE" = "color" ]; then echo -en "${TERM_COLOR_NORMAL}"; fi
+  return 1
+}
+
+echo_info() {
+  if [ "$TERM_DISPLAY_MODE" = "color" ]; then echo -en "${TERM_COLOR_CYAN}"; fi
+  echo ${@:-"[INFO]"}
+  if [ "$TERM_DISPLAY_MODE" = "color" ]; then echo -en "${TERM_COLOR_NORMAL}"; fi
+  return 1
+}
+
+
 parse_args() {
-if [ "$1" == "--help" ]; then
+if [ "x$*" == "x" ] || [ "$1" == "--help" ]; then
   echo "Usage: monitor.sh target.bin [target.bin.mark] [/tmp/cit/monitor/target.bin]"
   exit 1
 elif [ "$1" == "--status" ]; then
@@ -250,7 +281,7 @@ update_progress() {
   # may still catch the next one.
   for i in `seq $next $max`
   do
-    marker=$(cat $workdir/markers/$i)
+    marker=$(cat $workdir/markers/$i 2>/dev/null)
     #echo "marker=$marker"
     found=$(grep -m 1 "$marker" $workdir/stdout)
     if [[ -n "$found" ]]; then
@@ -331,3 +362,5 @@ echo
 # exit with target's exit code
 return $target_exit_code
 }
+
+parse_args
