@@ -3913,6 +3913,39 @@ mtwilson_running_report_wait() {
   fi
 }
 
+tagent_running() {
+  TRUSTAGENT_API_BASEURL=${TRUSTAGENT_API_BASEURL:-"https://127.0.0.1:1443/v2"}
+  TRUSTAGENT_RUNNING=""
+  TRUSTAGENT_RUNNING=$(wget $TRUSTAGENT_API_BASEURL/version -O - -q --no-check-certificate --no-proxy)
+}
+
+tagent_running_report() {
+  echo -n "Checking if trust agent is running... "
+  tagent_running
+  if [ -n "$TRUSTAGENT_RUNNING" ]; then
+    echo_success "Running"
+  else
+    echo_failure "Not running"
+  fi
+}
+
+tagent_running_report_wait() {
+  echo -n "Checking if trust agent is running..."
+  tagent_running
+  for (( c=1; c<=10; c++ ))
+  do
+    if [ -z "$TRUSTAGENT_RUNNING" ]; then
+      echo -n "."
+      sleep 5
+      tagent_running
+    fi
+  done
+  if [ -n "$TRUSTAGENT_RUNNING" ]; then
+    echo_success "Running"
+  else
+    echo_failure "Not running"
+  fi
+}
 
 ### FUNCTION LIBRARY: web service on top of web server
 
