@@ -213,6 +213,14 @@ echo_warning() {
   return 1
 }
 
+
+echo_info() {
+  if [ "$TERM_DISPLAY_MODE" = "color" ]; then echo -en "${TERM_COLOR_CYAN}"; fi
+  echo ${@:-"[INFO]"}
+  if [ "$TERM_DISPLAY_MODE" = "color" ]; then echo -en "${TERM_COLOR_NORMAL}"; fi
+  return 1
+}
+
 function validate_path_configuration() {
   local file_path="${1}"
   
@@ -911,7 +919,7 @@ register_startup_script() {
     if [ -f "/etc/systemd/system/${startup_name}.service" ]; then
       rm -f "/etc/systemd/system/${startup_name}.service"
     fi
-    echo -e "[Unit]\nDescription=${startup_name}\n\n[Service]\nType=forking\nExecStart=${absolute_filename} start\nExecStop=${absolute_filename} stop\n\n[Install]\nWantedBy=multi-user.target\n" > "/etc/systemd/system/${startup_name}.service"
+    echo -e "[Unit]\nDescription=${startup_name}\n\n[Service]\nType=forking\nExecStart=${absolute_filename} start\nExecStop=${absolute_filename} stop\nTimeoutSec=300\n\n[Install]\nWantedBy=multi-user.target\n" > "/etc/systemd/system/${startup_name}.service"
     chmod 664 "/etc/systemd/system/${startup_name}.service"
     "$systemctlCommand" daemon-reload
     "$systemctlCommand" enable "${startup_name}.service"
