@@ -3898,7 +3898,7 @@ mtwilson_running_report() {
 mtwilson_running_report_wait() {
   echo -n "Checking if mtwilson is running..."
   mtwilson_running
-  for (( c=1; c<=10; c++ ))
+  for (( c=1; c<=120; c++ ))
   do
     if [ -z "$MTWILSON_RUNNING" ]; then
       echo -n "."
@@ -3932,7 +3932,7 @@ tagent_running_report() {
 tagent_running_report_wait() {
   echo -n "Checking if trust agent is running..."
   tagent_running
-  for (( c=1; c<=10; c++ ))
+  for (( c=1; c<=120; c++ ))
   do
     if [ -z "$TRUSTAGENT_RUNNING" ]; then
       echo -n "."
