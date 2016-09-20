@@ -285,7 +285,7 @@ public class StartHttpServer implements Runnable {
                 sslConnectionFactory.setKeyStorePassword(new String(keystorePassword.toCharArray()));
             }
 //            sslConnectionFactory.setIncludeProtocols("TLSv1", "TLSv1.1", "TLSv1.2");
-            sslConnectionFactory.setExcludeProtocols("SSL", "SSLv2", "SSLv2Hello", "SSLv3");
+            sslConnectionFactory.setExcludeProtocols("SSL", "SSLv2", "SSLv2Hello", "SSLv3", "TLSv1", "TLSv1.1");
             sslConnectionFactory.setIncludeCipherSuites(
                     "TLS_DHE_RSA.*", "TLS_ECDHE.*"
             );
