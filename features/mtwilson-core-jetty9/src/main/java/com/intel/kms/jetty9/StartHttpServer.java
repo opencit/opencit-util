@@ -70,34 +70,6 @@ public class StartHttpServer implements Runnable {
     public static Server jetty;
     private Configuration configuration;
     
-    public StartHttpServer() {
-        try {
-            if (configuration == null) {
-                configuration = ConfigurationFactory.getConfiguration();
-            }
-        } catch (IOException e) {
-            log.debug("cannot load jetty configuration");
-            throw new RuntimeException(e);
-        }
-        
-        int minThreads = Integer.parseInt(configuration.get(JETTY_THREAD_MIN, "0"));
-        int maxThreads = Integer.parseInt(configuration.get(JETTY_THREAD_MAX, "0"));
-        
-        if (minThreads < 1) {
-            minThreads = computeMinThreads();
-        }
-        if (maxThreads < 1) {
-            maxThreads = Math.max(computeMaxThreads(), 300);
-        }
-
-        if (minThreads > maxThreads) {
-            minThreads = Math.max(1, maxThreads - 1);
-        }
-        
-        QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads, minThreads);
-        jetty = new Server(threadPool);
-    }
-    
     private int computeMinThreads() {
         return Runtime.getRuntime().availableProcessors() + 1;
     }
@@ -134,9 +106,24 @@ public class StartHttpServer implements Runnable {
     @Override
     public void run() {
         try {
-            if (configuration == null) {
-                configuration = ConfigurationFactory.getConfiguration();
+            configuration = ConfigurationFactory.getConfiguration();
+            int minThreads = Integer.parseInt(configuration.get(JETTY_THREAD_MIN, "0"));
+            int maxThreads = Integer.parseInt(configuration.get(JETTY_THREAD_MAX, "0"));
+            
+            if (minThreads < 1) {
+                minThreads = computeMinThreads();
             }
+            if (maxThreads < 1) {
+                maxThreads = Math.max(computeMaxThreads(), 300);
+            }
+            
+            if (minThreads > maxThreads) {
+                minThreads = Math.max(1, maxThreads - 1);
+            }
+            
+            QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads, minThreads);
+            jetty = new Server(threadPool);
+            
             startJettyHttpServer();
         } catch (IOException e) {
             log.debug("cannot start jetty http server");
