@@ -19,7 +19,7 @@ public class AnyProtocolSelector implements ProtocolSelector {
 
     @Override
     public String preferred() {
-        return "TLS";
+        return "TLSv1.2";
     }
     
 }
