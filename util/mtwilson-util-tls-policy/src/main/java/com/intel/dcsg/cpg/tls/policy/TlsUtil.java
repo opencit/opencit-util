@@ -205,22 +205,23 @@ public class TlsUtil {
      * @return 
      */
     public static String getSafeContextName(String contextName) {
-        if( contextName == null ) { return "TLS"; }
-        if( contextName.startsWith("SSL") ) { return "TLS"; } // CVE-2014-3566 says don't use SSL;   
-        return contextName;
+        if( contextName == null ) { return "TLSv1.2"; }
+        if( contextName.startsWith("SSL") ) { return "TLSv1.2"; } // CVE-2014-3566 says don't use SSL;   
+        //return contextName;
+        return "TLSv1.2";
     }
 
     public static String[] getSafeContextNames(String[] contextName) {
         HashSet<String> safe = new HashSet<>();
         if( contextName == null ) {
-            safe.add("TLS");
+            safe.add("TLSv1.2");
             return safe.toArray(new String[1]);
         }
         for( int i=0; i<contextName.length; i++) {
-            if( contextName[i].startsWith("SSL") ) { safe.add("TLS"); }
+            if( contextName[i].startsWith("SSL") ) { safe.add("TLSv1.2"); }
         }
         if( safe.isEmpty() ) {
-            safe.add("TLS");
+            safe.add("TLSv1.2");
             return safe.toArray(new String[1]);
         }
         return safe.toArray(new String[0]);

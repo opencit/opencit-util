@@ -2833,6 +2833,8 @@ glassfish_create_ssl_cert() {
     cp "$keystore" "$configDir/mtwilson-tls.jks"
     mtwilson_tls_cert_sha1=`openssl sha1 -hex "$configDir/ssl.crt" | awk -F '=' '{ print $2 }' | tr -d ' '`
     update_property_in_file "mtwilson.api.tls.policy.certificate.sha1" "$configDir/mtwilson.properties" "$mtwilson_tls_cert_sha1"
+    mtwilson_tls_cert_sha256=`openssl sha256 -hex "$configDir/ssl.crt" | awk -F '=' '{ print $2 }' | tr -d ' '`
+    update_property_in_file "mtwilson.api.tls.policy.certificate.sha256" "$configDir/mtwilson.properties" "$mtwilson_tls_cert_sha256"
   else
     echo_warning "No SSL certificate found in Glassfish keystore"
   fi
@@ -3254,11 +3256,11 @@ tomcat_create_ssl_cert() {
       #sed -i.bak 's|sslProtocol=\"TLS\" />|sslEnabledProtocols=\"TLSv1,TLSv1.1,TLSv1.2\" keystoreFile=\"'"$keystore"'\" keystorePass=\"'"$keystorePassword"'\" />|g' "$tomcatServerXml"
       #sed -i 's/keystorePass=.*\b/keystorePass=\"'"$keystorePassword"'/g' "$tomcatServerXml"
       xmlstarlet ed --inplace --delete '/Server/Service/Connector[@SSLEnabled="true"][@protocol="HTTP/1.1"]/@sslProtocol' "$tomcatServerXml"
-      xmlstarlet ed --inplace --insert '/Server/Service/Connector[@SSLEnabled="true"][@protocol="HTTP/1.1"][not(@sslEnabledProtocols)]' --type attr -n sslEnabledProtocols -v 'TLSv1,TLSv1.1,TLSv1.2' "$tomcatServerXml"
+      xmlstarlet ed --inplace --insert '/Server/Service/Connector[@SSLEnabled="true"][@protocol="HTTP/1.1"][not(@sslEnabledProtocols)]' --type attr -n sslEnabledProtocols -v 'TLSv1.2' "$tomcatServerXml"
       xmlstarlet ed --inplace --insert '/Server/Service/Connector[@SSLEnabled="true"][@protocol="HTTP/1.1"][not(@keystoreFile)]' --type attr -n keystoreFile -v "$keystore" "$tomcatServerXml"
       xmlstarlet ed --inplace --insert '/Server/Service/Connector[@SSLEnabled="true"][@protocol="HTTP/1.1"][not(@keystorePass)]' --type attr -n keystorePass -v "$keystorePassword" "$tomcatServerXml"
       #update for upgrades; attribute already exists
-      xmlstarlet ed --inplace --update '/Server/Service/Connector[@SSLEnabled="true"][@protocol="HTTP/1.1"]/@sslEnabledProtocols' -v 'TLSv1,TLSv1.1,TLSv1.2' "$tomcatServerXml"
+      xmlstarlet ed --inplace --update '/Server/Service/Connector[@SSLEnabled="true"][@protocol="HTTP/1.1"]/@sslEnabledProtocols' -v 'TLSv1.2' "$tomcatServerXml"
       xmlstarlet ed --inplace --update '/Server/Service/Connector[@SSLEnabled="true"][@protocol="HTTP/1.1"]/@keystoreFile' -v "$keystore" "$tomcatServerXml"
       xmlstarlet ed --inplace --update '/Server/Service/Connector[@SSLEnabled="true"][@protocol="HTTP/1.1"]/@keystorePass' -v "$keystorePassword" "$tomcatServerXml"
 
@@ -3286,7 +3288,9 @@ tomcat_create_ssl_cert() {
     cp "$keystore" "$configDir/mtwilson-tls.jks"
     mtwilson_tls_cert_sha1=`openssl sha1 -hex "$configDir/ssl.crt" | awk -F '=' '{ print $2 }' | tr -d ' '`
     update_property_in_file "mtwilson.api.tls.policy.certificate.sha1" "$configDir/mtwilson.properties" "$mtwilson_tls_cert_sha1"
-  else
+    mtwilson_tls_cert_sha256=`openssl sha256 -hex "$configDir/ssl.crt" | awk -F '=' '{ print $2 }' | tr -d ' '`
+    update_property_in_file "mtwilson.api.tls.policy.certificate.sha256" "$configDir/mtwilson.properties" "$mtwilson_tls_cert_sha256"
+else
     echo_warning "No SSL certificate found in Tomcat keystore"
   fi
 }
