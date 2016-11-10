@@ -24,6 +24,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 /**
@@ -63,9 +64,23 @@ public class StartHttpServer implements Runnable {
     // configuration keys
     public final static String JETTY_HYPERTEXT = "jetty.hypertext";
     public final static String JETTY_WEBXML = "jetty.webxml";
-    public static final Server jetty = new Server();
+    public final static String JETTY_THREAD_MIN = "jetty.thread.min";
+    public final static String JETTY_THREAD_MAX = "jetty.thread.max";
+    public final static int JETTY_THREAD_MAX_MULTIPLIER = 16;
+    //If we need to limit the access of the server to a specific host
+    public static final String JETTY_HOST = "jetty.host";
+	
+    public static Server jetty;
     private Configuration configuration;
-
+    
+    private int computeMinThreads() {
+        return Runtime.getRuntime().availableProcessors() + 1;
+    }
+    
+    private int computeMaxThreads() {
+        return Runtime.getRuntime().availableProcessors() * JETTY_THREAD_MAX_MULTIPLIER;
+    }
+    
     public void setConfiguration(Configuration configuration) {
         this.configuration = configuration;
     }
@@ -90,11 +105,33 @@ public class StartHttpServer implements Runnable {
     public Integer getHttpsPort() {
         return Integer.valueOf(configuration.get(JettyPorts.JETTY_SECURE_PORT, "443"));
     }
+	
+    public String getHost() {
+        return configuration.get(JETTY_HOST);  // will return null if not set
+    }
+	
 
     @Override
     public void run() {
         try {
             configuration = ConfigurationFactory.getConfiguration();
+            int minThreads = Integer.parseInt(configuration.get(JETTY_THREAD_MIN, "0"));
+            int maxThreads = Integer.parseInt(configuration.get(JETTY_THREAD_MAX, "0"));
+            
+            if (minThreads < 1) {
+                minThreads = computeMinThreads();
+            }
+            if (maxThreads < 1) {
+                maxThreads = Math.max(computeMaxThreads(), 300);
+            }
+            
+            if (minThreads > maxThreads) {
+                minThreads = Math.max(1, maxThreads - 1);
+            }
+            
+            QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads, minThreads);
+            jetty = new Server(threadPool);
+            
             startJettyHttpServer();
         } catch (IOException e) {
             log.debug("cannot start jetty http server");
@@ -234,6 +271,12 @@ public class StartHttpServer implements Runnable {
         http.setPort(getHttpPort());
         log.debug("{}={}", JettyPorts.JETTY_PORT, http.getPort());
 
+		String host = getHost();
+		if (host != null) {
+			http.setHost(host);
+			log.debug("Setting host for jetty server (http)={}", host);
+		}		
+		
         // https connector
         try {
             SslContextFactory sslConnectionFactory = new SslContextFactory();
@@ -243,7 +286,7 @@ public class StartHttpServer implements Runnable {
                 sslConnectionFactory.setKeyStorePassword(new String(keystorePassword.toCharArray()));
             }
 //            sslConnectionFactory.setIncludeProtocols("TLSv1", "TLSv1.1", "TLSv1.2");
-            sslConnectionFactory.setExcludeProtocols("SSL", "SSLv2", "SSLv2Hello", "SSLv3");
+            sslConnectionFactory.setExcludeProtocols("SSL", "SSLv2", "SSLv2Hello", "SSLv3", "TLSv1", "TLSv1.1");
             sslConnectionFactory.setIncludeCipherSuites(
                     "TLS_DHE_RSA.*", "TLS_ECDHE.*"
             );
@@ -254,6 +297,10 @@ public class StartHttpServer implements Runnable {
             sslConnectionFactory.setRenegotiationAllowed(false);
             ServerConnector https = new ServerConnector(jetty, new ConnectionFactory[]{new SslConnectionFactory(sslConnectionFactory, "http/1.1"), new HttpConnectionFactory(httpsConfiguration)});
             https.setPort(getHttpsPort());
+			if (host != null) {
+				https.setHost(host);
+				log.debug("Setting host for jetty server (https) ={}", host);
+			}
             log.debug("{}={}", JettyPorts.JETTY_SECURE_PORT, https.getPort());
 
             jetty.setConnectors(new Connector[]{http, https});
