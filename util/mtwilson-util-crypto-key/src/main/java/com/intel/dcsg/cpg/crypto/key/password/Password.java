@@ -77,7 +77,10 @@ public class Password {
      * @param charset
      * @return a byte array representing the password in the encoding specified by the charset argument
      */
-    public byte[] toByteArray(Charset charset) { return charset.encode(CharBuffer.wrap(password)).array(); }
+    public byte[] toByteArray(Charset charset) { 
+		ByteBuffer encoded = charset.encode(CharBuffer.wrap(password));
+		return Arrays.copyOf(encoded.array(), encoded.limit());
+	}
     
     /**
      * Replaces each character in the password with NULL then empties the password.
