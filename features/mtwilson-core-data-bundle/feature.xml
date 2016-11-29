@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature xmlns="urn:mtwilson:feature:1.0">
 <id>mtwilson-core-data-bundle</id>
-<version>3.1-SNAPSHOT</version>
+<version>3.2-SNAPSHOT</version>
 <name>Data Bundle</name>
 <provider><name>Intel Corporation</name></provider>
 <description>Data bundle</description>

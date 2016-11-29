@@ -3,7 +3,7 @@
     
     <groupId>com.intel.mtwilson.maven</groupId>
     <artifactId>mtwilson-core-feature-zip</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>3.2-SNAPSHOT</version>
     
     <packaging>pom</packaging>
     <description>
@@ -13,7 +13,7 @@
     <parent>
         <groupId>com.intel.mtwilson</groupId>
         <artifactId>mtwilson-maven-build-coreutil-maven</artifactId>
-        <version>3.1-SNAPSHOT</version>
+        <version>3.2-SNAPSHOT</version>
     </parent>
     
     <dependencyManagement>
@@ -21,14 +21,14 @@
             <dependency>
                 <groupId>com.intel.mtwilson.maven</groupId>
                 <artifactId>mtwilson-maven-bom-coreutil</artifactId>
-                <version>3.1-SNAPSHOT</version>
+                <version>3.2-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.intel.mtwilson.maven</groupId>
                 <artifactId>mtwilson-maven-bom-external</artifactId>
-                <version>3.1-SNAPSHOT</version>
+                <version>3.2-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
