@@ -1,7 +1,7 @@
 #!/bin/bash
 # WARNING:
-# *** do NOT use TABS for indentation, use SPACES
-# *** TABS will cause errors in some linux distributions
+# *** do NOT use TABS for indentation, use SPACES (tabs will cause errors in some linux distributions)
+# *** do NOT use 'exit' to return from the functions in this file, use 'return' ONLY (exit will cause unit testing hassles)
 
 # CONFIGURATION:
 
@@ -107,31 +107,30 @@ sed_escape() {
 }
 
 # FUNCTION LIBRARY: This function returns either rhel fedora ubuntu suse
-function getFlavour()
-{
-    flavour=""
-    grep -c -i ubuntu /etc/*-release > /dev/null
-    if [ $? -eq 0 ] ; then
-            flavour="ubuntu"
-    fi
-    grep -c -i "red hat" /etc/*-release > /dev/null
-    if [ $? -eq 0 ] ; then
-            flavour="rhel"
-    fi
-    grep -c -i fedora /etc/*-release > /dev/null
-    if [ $? -eq 0 ] ; then
-            flavour="fedora"
-    fi
-    grep -c -i suse /etc/*-release > /dev/null
-    if [ $? -eq 0 ] ; then
-            flavour="suse"
-    fi
-    if [ "$flavour" == "" ] ; then
-            echo "Unsupported linux flavor, Supported versions are ubuntu, rhel, fedora"
-            exit
-    else
-            echo $flavour
-    fi
+function getFlavour() {
+  flavour=""
+  grep -c -i ubuntu /etc/*-release > /dev/null
+  if [ $? -eq 0 ] ; then
+    echo "ubuntu"
+    return 0
+  fi
+  grep -c -i "red hat" /etc/*-release > /dev/null
+  if [ $? -eq 0 ] ; then
+    echo "rhel"
+    return 0
+  fi
+  grep -c -i fedora /etc/*-release > /dev/null
+  if [ $? -eq 0 ] ; then
+    echo "fedora"
+    return 0
+  fi
+  grep -c -i suse /etc/*-release > /dev/null
+  if [ $? -eq 0 ] ; then
+    echo "suse"
+    return 0
+  fi
+  echo "Unsupported linux flavor, Supported versions are ubuntu, rhel, fedora"
+  return 1
 }
 
 function getUserProfileFile()
@@ -214,6 +213,14 @@ echo_warning() {
   return 1
 }
 
+
+echo_info() {
+  if [ "$TERM_DISPLAY_MODE" = "color" ]; then echo -en "${TERM_COLOR_CYAN}"; fi
+  echo ${@:-"[INFO]"}
+  if [ "$TERM_DISPLAY_MODE" = "color" ]; then echo -en "${TERM_COLOR_NORMAL}"; fi
+  return 1
+}
+
 function validate_path_configuration() {
   local file_path="${1}"
   
@@ -228,7 +235,7 @@ function validate_path_configuration() {
   fi
   file_path=`readlink -m "$file_path"` #make file path absolute
   
-  if [[ "$file_path" != '/etc/'* && "$file_path" != '/opt/'* ]]; then
+  if [[ "$file_path" != '/etc/'* && "$file_path" != '/opt/'* && "$file_path" != *'.env' ]]; then
     echo_failure "Configuration path validation failed. Verify path meets acceptable directory constraints: $file_path"
     return 1
   fi
@@ -720,7 +727,10 @@ update_property_in_file() {
   local value="${3}"
   local encrypted="false"
 
-  if ! validate_path_configuration "$filename"; then exit -1; fi
+  # disabling this check... this is a utility function, it is the
+  # responsibility of all callers to ensure they are using it to
+  # edit files in known locations and not pass in the wrong paths
+  #if ! validate_path_configuration "$filename"; then exit -1; fi
   if [ -f "$filename" ]; then
     # Decrypt if needed
     if file_encrypted "$filename"; then
@@ -841,6 +851,27 @@ zypper_detect() {
   zypper=`which zypper 2>/dev/null`
 }
 
+
+# Check if a package is already installed
+is_package_installed() {
+  local package_name="$1"
+  if yum_detect; then
+    yum list installed $package_name > /dev/null 2>&1
+    result=$?
+  elif aptget_detect; then
+    dpkg-query --show $package_name > /dev/null 2>&1
+    result=$?
+  fi
+  if [ $result -eq 0 ]; then return 0; else return 1; fi
+}
+
+# check if a command is already on path
+is_command_available() {
+  which $* > /dev/null 2>&1
+  local result=$?
+  if [ $result -eq 0 ]; then return 0; else return 1; fi
+}  
+
 trousers_detect() {
   trousers=`which tcsd 2>/dev/null`
 }
@@ -888,7 +919,7 @@ register_startup_script() {
     if [ -f "/etc/systemd/system/${startup_name}.service" ]; then
       rm -f "/etc/systemd/system/${startup_name}.service"
     fi
-    echo -e "[Unit]\nDescription=${startup_name}\n\n[Service]\nType=forking\nExecStart=${absolute_filename} start\nExecStop=${absolute_filename} stop\n\n[Install]\nWantedBy=multi-user.target\n" > "/etc/systemd/system/${startup_name}.service"
+    echo -e "[Unit]\nDescription=${startup_name}\n\n[Service]\nType=forking\nExecStart=${absolute_filename} start\nExecStop=${absolute_filename} stop\nTimeoutSec=300\n\n[Install]\nWantedBy=multi-user.target\n" > "/etc/systemd/system/${startup_name}.service"
     chmod 664 "/etc/systemd/system/${startup_name}.service"
     "$systemctlCommand" daemon-reload
     "$systemctlCommand" enable "${startup_name}.service"
@@ -969,6 +1000,62 @@ function disable_tcp_timestamps() {
   fi
   
   echo 0 > /proc/sys/net/ipv4/tcp_timestamps
+}
+
+add_package_repository() {
+  local repo_url=${1}
+  local distro_release=${2}
+  local repo_key_path=${3}
+  
+  #Repository URL must be specified
+  if [ -z "${repo_url}" ]; then
+    echo_failure "Add package repository failed. Repository URL not defined."
+    return 1
+  fi
+  
+  # detect available package management tools. start with the less likely ones to differentiate.
+  yum_detect; yast_detect; zypper_detect; rpm_detect; aptget_detect; dpkg_detect;
+  
+  if [[ -n "$aptget" ]]; then
+    local sources_list_file="/etc/apt/sources.list"
+    if [ -z "${distro_release}" ]; then
+      echo_failure "Add package repository failed. Distribution release not defined."
+      return 1
+    fi
+    if [ -z "${repo_key_path}" ]; then
+      echo_failure "Add package repository failed. Repository key path not defined."
+      return 1
+    fi
+    local repo_not_already_added=$(cat ${sources_list_file} | grep ${repo_url})
+    if [ -z "${repo_not_already_added}" ]; then
+      echo "deb ${repo_url} ${distro_release} main" >> "${sources_list_file}"
+    fi
+    apt-key add "${repo_key_path}"
+    if [ $? -ne 0 ]; then echo_failure "Failed to add postgresql repository public key to local package manager utility."; return 1; fi
+    echo "Running apt-get update. This may take a while..."
+    apt-get update > /dev/null
+  #elif [[ -n "$yast" ]]; then
+    # code goes here
+  elif [[ -n "$yum" ]]; then
+    yum -y localinstall "${repo_url}"
+  #elif [[ -n "$zypper" ]]; then
+    # code goes here
+  else
+    echo_failure "Package manager not supported."
+    return 2
+  fi
+}
+
+update_packages() {
+  if yum_detect; then
+    yum -y -x 'kernel*,redhat-release*' update
+  elif aptget_detect; then
+    apt-get -y update
+  elif zypper_detect; then
+    zypper -y update
+  else
+    echo "Unsupported operation: auto update only implemented for yum, apt, and zypper at this time"
+  fi
 }
 
 # Ensure the package actually needs to be installed before calling this function.
@@ -1579,7 +1666,7 @@ postgres_version_report() {
 # we need the postgres client to create or patch the database, but
 # the server can be installed anywhere
 postgres_install() {
-  POSTGRES_CLIENT_YUM_PACKAGES=""
+  POSTGRES_CLIENT_YUM_PACKAGES="postgresql93"
   #POSTGRES_CLIENT_APT_PACKAGES="postgresql-client-common"
   POSTGRES_CLIENT_APT_PACKAGES="postgresql-client-9.3"
   postgres_detect >> $INSTALL_LOG_FILE
@@ -1607,45 +1694,50 @@ add_postgresql_install_packages() {
   local yast_packages=$(eval "echo \$${cprefix}_YAST_PACKAGES")
   local zypper_packages=$(eval "echo \$${cprefix}_ZYPPER_PACKAGES")
   
+  local repo_url=
+  local distro_release=
+  local repo_key_path=
+  
   # detect available package management tools. start with the less likely ones to differentiate.
   yum_detect; yast_detect; zypper_detect; rpm_detect; aptget_detect; dpkg_detect;
-  #echo_warning "aptget = $aptget, apt_packages = $apt_packages"
+  
+  echo "Checking to see if postgresql package is available for install..."
   if [[ -n "$aptget" && -n "$apt_packages" ]]; then
-    echo "Checking to see if postgresql package is available for install..."
     pgAddPackRequired=`apt-cache search \`echo $apt_packages | cut -d' ' -f1\``
-    #echo_warning "found packages $pgAddPackRequired"
-    if [ -z "$pgAddPackRequired" ]; then
-      prompt_with_default ADD_POSTGRESQL_REPO "Add \"$apt_packages\" key and packages to local apt repository? " "no"
-      if [ "$ADD_POSTGRESQL_REPO" == "no" ]; then
-        echo_failure "User declined to add \"$apt_packages\" to local apt repository. Exiting installation..."
-        exit -1
-      fi
-      echo_warning "Adding \"$apt_packages\" package(s) to installer repository..."
-      codename=`cat /etc/*-release | grep DISTRIB_CODENAME | sed 's/DISTRIB_CODENAME=//'`
-      echo "deb http://apt.postgresql.org/pub/repos/apt/ $codename-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
-      # mtwilson-server installer now includes ACCC4CF8.asc and copies it to /etc/apt/trusted.gpg.d
-      # so we avoid a download
-      #echo "Postgresql apt-key add status: " `wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -`
-      apt-key add /etc/apt/trusted.gpg.d/ACCC4CF8.asc
-      echo "Running apt-get update; this may take a while..."
-      apt-get update >> $INSTALL_LOG_FILE
-      #echo "Running apt-get upgrade; this may take a while..."
-      #apt-get upgrade -y >> $INSTALL_LOG_FILE
-    fi
+    repo_url="http://apt.postgresql.org/pub/repos/apt/"
+    distro_release=`cat /etc/*-release | grep DISTRIB_CODENAME | sed 's/DISTRIB_CODENAME=//'`
+    distro_release="${distro_release}-pgdg"
+    repo_key_path="/etc/apt/trusted.gpg.d/ACCC4CF8.asc"
   #elif [[ -n "$yast" && -n "$yast_packages" ]]; then
     # code goes here
-  #elif [[ -n "$yum" && -n "$yum_packages" ]]; then
-    # code goes here
+  elif [[ -n "$yum" && -n "$yum_packages" ]]; then
+    pgAddPackRequired=$(yum list $yum_packages 2>/dev/null | grep -E 'Available Packages|Installed Packages')
+    repo_url="https://download.postgresql.org/pub/repos/yum/9.3/redhat/rhel-7-x86_64/pgdg-redhat93-9.3-2.noarch.rpm"
+    distro_release=
+    repo_key_path=
   #elif [[ -n "$zypper" && -n "$zypper_packages" ]]; then
     # code goes here
+  else
+    echo_failure "Package manager not supported."
+    return 2
   fi
+  #if postgresql package already available, return with no error code; no need to add repo
+  if [ -n "$pgAddPackRequired" ]; then
+    return 0
+  fi
+  prompt_with_default ADD_POSTGRESQL_REPO "Add postgresql repository to local package manager? " "no"
+  if [ "$ADD_POSTGRESQL_REPO" == "no" ]; then
+    echo_failure "User declined to add postgresql repository to local package manager."
+    return 1
+  fi
+  add_package_repository "${repo_url}" "${distro_release}" "${repo_key_path}"
 }
 
 # Environment:
 # - POSTGRES_REQUIRED_VERSION
 # installs postgres server 
 postgres_server_install(){
-  POSTGRES_SERVER_YUM_PACKAGES=""
+  POSTGRES_SERVER_YUM_PACKAGES="postgresql93-server pgadmin3_93 postgresql93-contrib"
   POSTGRES_SERVER_APT_PACKAGES="postgresql-9.3 pgadmin3 postgresql-contrib-9.3"
 
   postgres_clear; postgres_server_detect >> $INSTALL_LOG_FILE
@@ -1663,12 +1755,27 @@ postgres_server_install(){
   fi
   
   if [[ -z "$postgres_com" ]]; then
-    echo_failure "Unable to auto-install Postgres server" | tee -a $INSTALL_LOG_FILE
-    echo "Postgres download URL:"  >> $INSTALL_LOG_FILE
+    echo_failure "Unable to auto-install postgresql server" | tee -a $INSTALL_LOG_FILE
+    echo "Postgresql download URL:"  >> $INSTALL_LOG_FILE
     echo "http://www.postgresql.org/download/" >> $INSTALL_LOG_FILE
     return 1
   fi
-
+  
+  flavor=$(getFlavour)
+  case $flavor in
+    "rhel")
+      short_version_number=$(echo $POSTGRES_SERVER_VERSION_SHORT | sed 's|\.||')
+      postgresql_setup_binary=$(find / -name postgresql${short_version_number}-setup 2>/dev/null)
+      $postgresql_setup_binary initdb
+      systemctlCommand=`which systemctl 2>/dev/null`
+      if [ -z "$systemctlCommand" ]; then
+        echo_failure "Cannot find systemd binary to enable postgresql startup service"
+        return 1
+      fi
+      "$systemctlCommand" enable "postgresql-${POSTGRES_SERVER_VERSION_SHORT}"
+      "$systemctlCommand" start "postgresql-${POSTGRES_SERVER_VERSION_SHORT}"
+      ;;
+  esac
 }
 
 # Environment:
@@ -1750,6 +1857,12 @@ postgres_server_detect() {
   if [ -n "$postgresql_installed" ]; then
     postgres_com="service postgresql"
   fi
+  
+  local is_systemd=$($postgres_com status 2>/dev/null | grep -E 'Active:')
+  if [ -n "$is_systemd" ]; then
+    postgres_com="service postgresql-${POSTGRES_SERVER_VERSION_SHORT}"
+  fi
+  
   postgres_pghb_conf=$(find / -name pg_hba.conf 2>/dev/null | grep $best_version_short | head -n 1)
   postgres_conf=$(find / -name postgresql.conf 2>/dev/null | grep $best_version_short | head -n 1)
   if [ -z "$postgres_pghb_conf" ]; then postgres_pghb_conf=$(find / -name pg_hba.conf 2>/dev/null | head -n 1); fi
@@ -1796,7 +1909,6 @@ postgres_require() {
   fi
 }
 
-
 # Environment:
 # - POSTGRES_REQUIRED_VERSION\
 # format like this -> psql -h 127.0.0.1 -p 5432 -d mw_as -U root -c "\l"
@@ -1829,7 +1941,6 @@ postgres_test_connection() {
   #rm -f /tmp/intel.postgres.err
 
   return 1
-
 }
 
 # Environment:
@@ -1933,10 +2044,12 @@ if postgres_server_detect ; then
   fi
 
   if [ "$(whoami)" == "root" ]; then
+    #comment out ident line so our connection can be made
+    sed -i 's|\(^host[ ]*all[ ]*all[ ]*127.0.0.1/32[ ]*ident\)|#\1|g' $postgres_pghb_conf
+    
     postgres_pghb_conf_has_entry=$(cat $postgres_pghb_conf | grep '^host[ ]*all[ ]*all[ ]*127.0.0.1/32[ ]*password')
     if [ -z "$postgres_pghb_conf_has_entry" ]; then
-    
-      if [ -n "$postgres_pghb_conf" ]; then 
+      if [ -n "$postgres_pghb_conf" ]; then
         has_host=`grep "^host" $postgres_pghb_conf | grep "127.0.0.1" | grep -E "password|trust"`
         if [ -z "$has_host" ]; then
           echo host  all  all  127.0.0.1/32  password >> $postgres_pghb_conf
@@ -2720,6 +2833,8 @@ glassfish_create_ssl_cert() {
     cp "$keystore" "$configDir/mtwilson-tls.jks"
     mtwilson_tls_cert_sha1=`openssl sha1 -hex "$configDir/ssl.crt" | awk -F '=' '{ print $2 }' | tr -d ' '`
     update_property_in_file "mtwilson.api.tls.policy.certificate.sha1" "$configDir/mtwilson.properties" "$mtwilson_tls_cert_sha1"
+    mtwilson_tls_cert_sha256=`openssl sha256 -hex "$configDir/ssl.crt" | awk -F '=' '{ print $2 }' | tr -d ' '`
+    update_property_in_file "mtwilson.api.tls.policy.certificate.sha256" "$configDir/mtwilson.properties" "$mtwilson_tls_cert_sha256"
   else
     echo_warning "No SSL certificate found in Glassfish keystore"
   fi
@@ -3069,7 +3184,7 @@ tomcat_create_ssl_cert() {
   local serverName="${1}"
   serverName=$(echo $serverName | sed -e 's/ //g' | sed -e 's/,$//')
 
-    local keystorePassword="$MTWILSON_TLS_KEYSTORE_PASS"   #changeit
+  local keystorePassword="$MTWILSON_TLS_KEYSTORE_PASS"   #changeit
   local keystore="${TOMCAT_HOME}/ssl/.keystore"
   local tomcatServerXml="${TOMCAT_HOME}/conf/server.xml"
   local configDir="/opt/mtwilson/configuration"
@@ -3080,7 +3195,21 @@ tomcat_create_ssl_cert() {
 
   if [ -z "$MTWILSON_TLS_KEYSTORE_PASS" ] || [ "$MTWILSON_TLS_KEYSTORE_PASS" == "changeit" ]; then MTWILSON_TLS_KEYSTORE_PASS=$(generate_password 32); fi
   keystorePassword="$MTWILSON_TLS_KEYSTORE_PASS"   #changeit
+
+  # decrypt file
+  if file_encrypted "${mtwilsonPropertiesFile}"; then
+    encrypted="true"
+    decrypt_file "${mtwilsonPropertiesFile}" "$MTWILSON_PASSWORD"
+  fi
+
+  # read value
   keystorePasswordOld=$(read_property_from_file "mtwilson.tls.keystore.password" "${mtwilsonPropertiesFile}")
+
+  # Return the file to encrypted state, if it was before
+  if [ "$encrypted" == "true" ]; then
+    encrypt_file "${mtwilsonPropertiesFile}" "$MTWILSON_PASSWORD"
+  fi
+
   keystorePasswordOld=${keystorePasswordOld:-"changeit"}
 
   # Create an array of host ips and dns names from csv list passed into function
@@ -3127,11 +3256,11 @@ tomcat_create_ssl_cert() {
       #sed -i.bak 's|sslProtocol=\"TLS\" />|sslEnabledProtocols=\"TLSv1,TLSv1.1,TLSv1.2\" keystoreFile=\"'"$keystore"'\" keystorePass=\"'"$keystorePassword"'\" />|g' "$tomcatServerXml"
       #sed -i 's/keystorePass=.*\b/keystorePass=\"'"$keystorePassword"'/g' "$tomcatServerXml"
       xmlstarlet ed --inplace --delete '/Server/Service/Connector[@SSLEnabled="true"][@protocol="HTTP/1.1"]/@sslProtocol' "$tomcatServerXml"
-      xmlstarlet ed --inplace --insert '/Server/Service/Connector[@SSLEnabled="true"][@protocol="HTTP/1.1"][not(@sslEnabledProtocols)]' --type attr -n sslEnabledProtocols -v 'TLSv1,TLSv1.1,TLSv1.2' "$tomcatServerXml"
+      xmlstarlet ed --inplace --insert '/Server/Service/Connector[@SSLEnabled="true"][@protocol="HTTP/1.1"][not(@sslEnabledProtocols)]' --type attr -n sslEnabledProtocols -v 'TLSv1.2' "$tomcatServerXml"
       xmlstarlet ed --inplace --insert '/Server/Service/Connector[@SSLEnabled="true"][@protocol="HTTP/1.1"][not(@keystoreFile)]' --type attr -n keystoreFile -v "$keystore" "$tomcatServerXml"
       xmlstarlet ed --inplace --insert '/Server/Service/Connector[@SSLEnabled="true"][@protocol="HTTP/1.1"][not(@keystorePass)]' --type attr -n keystorePass -v "$keystorePassword" "$tomcatServerXml"
       #update for upgrades; attribute already exists
-      xmlstarlet ed --inplace --update '/Server/Service/Connector[@SSLEnabled="true"][@protocol="HTTP/1.1"]/@sslEnabledProtocols' -v 'TLSv1,TLSv1.1,TLSv1.2' "$tomcatServerXml"
+      xmlstarlet ed --inplace --update '/Server/Service/Connector[@SSLEnabled="true"][@protocol="HTTP/1.1"]/@sslEnabledProtocols' -v 'TLSv1.2' "$tomcatServerXml"
       xmlstarlet ed --inplace --update '/Server/Service/Connector[@SSLEnabled="true"][@protocol="HTTP/1.1"]/@keystoreFile' -v "$keystore" "$tomcatServerXml"
       xmlstarlet ed --inplace --update '/Server/Service/Connector[@SSLEnabled="true"][@protocol="HTTP/1.1"]/@keystorePass' -v "$keystorePassword" "$tomcatServerXml"
 
@@ -3159,7 +3288,9 @@ tomcat_create_ssl_cert() {
     cp "$keystore" "$configDir/mtwilson-tls.jks"
     mtwilson_tls_cert_sha1=`openssl sha1 -hex "$configDir/ssl.crt" | awk -F '=' '{ print $2 }' | tr -d ' '`
     update_property_in_file "mtwilson.api.tls.policy.certificate.sha1" "$configDir/mtwilson.properties" "$mtwilson_tls_cert_sha1"
-  else
+    mtwilson_tls_cert_sha256=`openssl sha256 -hex "$configDir/ssl.crt" | awk -F '=' '{ print $2 }' | tr -d ' '`
+    update_property_in_file "mtwilson.api.tls.policy.certificate.sha256" "$configDir/mtwilson.properties" "$mtwilson_tls_cert_sha256"
+else
     echo_warning "No SSL certificate found in Tomcat keystore"
   fi
 }
@@ -3771,7 +3902,7 @@ mtwilson_running_report() {
 mtwilson_running_report_wait() {
   echo -n "Checking if mtwilson is running..."
   mtwilson_running
-  for (( c=1; c<=10; c++ ))
+  for (( c=1; c<=120; c++ ))
   do
     if [ -z "$MTWILSON_RUNNING" ]; then
       echo -n "."
@@ -3786,6 +3917,39 @@ mtwilson_running_report_wait() {
   fi
 }
 
+tagent_running() {
+  TRUSTAGENT_API_BASEURL=${TRUSTAGENT_API_BASEURL:-"https://127.0.0.1:1443/v2"}
+  TRUSTAGENT_RUNNING=""
+  TRUSTAGENT_RUNNING=$(wget $TRUSTAGENT_API_BASEURL/version -O - -q --no-check-certificate --no-proxy)
+}
+
+tagent_running_report() {
+  echo -n "Checking if trust agent is running... "
+  tagent_running
+  if [ -n "$TRUSTAGENT_RUNNING" ]; then
+    echo_success "Running"
+  else
+    echo_failure "Not running"
+  fi
+}
+
+tagent_running_report_wait() {
+  echo -n "Checking if trust agent is running..."
+  tagent_running
+  for (( c=1; c<=120; c++ ))
+  do
+    if [ -z "$TRUSTAGENT_RUNNING" ]; then
+      echo -n "."
+      sleep 5
+      tagent_running
+    fi
+  done
+  if [ -n "$TRUSTAGENT_RUNNING" ]; then
+    echo_success "Running"
+  else
+    echo_failure "Not running"
+  fi
+}
 
 ### FUNCTION LIBRARY: web service on top of web server
 
@@ -4550,17 +4714,18 @@ change_db_pass() {
     postgres_version
     postgres_test_connection_report
     if [ $? -ne 0 ]; then exit; fi
-    temp=$("$psql" -h "$DATABASE_HOSTNAME" -d "$DATABASE_SCHEMA" -c "ALTER USER $DATABASE_USERNAME WITH PASSWORD '$new_db_pass';")
-    echo ""
-    if [ $? -ne 0 ]; then echo_failure "Issue building postgres or expect command."; exit; fi
+    temp=$(cd /tmp && "$psql" -h "$DATABASE_HOSTNAME" -d "$DATABASE_SCHEMA" -U "$DATABASE_USERNAME" -c "ALTER USER $DATABASE_USERNAME WITH PASSWORD '$new_db_pass';")
+    if [ $? -ne 0 ]; then echo_failure -e "\nIssue building postgres or expect command."; exit; fi
     # Edit postgres password file if it exists
     if [ -f ~/.pgpass ]; then
+      echo
       echo -n "Updating database password value in .pgpass file...."
-      sed -i 's/\(.*\):\(.*\)/\1:'"$new_db_pass"'/' ~/.pgpass
+      sed -i 's|\(.*:'"$DATABASE_SCHEMA"':'"$DATABASE_USERNAME"':\).*|\1'"$new_db_pass"'|' ~/.pgpass
       #temp=`cat ~/.pgpass | cut -f1,2,3,4 -d":"`
       #temp="$temp:$new_db_pass"
       #echo $temp > ~/.pgpass;
     fi
+    postgres_restart
     echo_success "Done"
   fi
 
@@ -4725,4 +4890,60 @@ key_restore() {
   fi
 
   echo_success "Keys restored from: $keyBackupFile"
+}
+
+# called by installer to automatically configure the server for localhost integration
+shiro_localhost_integration() {
+  local shiroIniPath="${1}"
+  local iplist;
+  local finalIps;
+  iplist="127.0.0.1"
+  
+  OIFS=$IFS
+  IFS=',' read -ra newIps <<< "$iplist"
+  IFS=$OIFS
+  
+  iniHostRealmPropertyExists=$(cat "${shiroIniPath}" | grep '^iniHostRealm=' 2>/dev/null)
+  if [ -z "${iniHostRealmPropertyExists}" ]; then
+    sed -i 's|\(^securityManager.realms*\)|iniHostRealm=\n\1|' "${shiroIniPath}"
+  fi
+  iniHostRealmAllowPropertyExists=$(cat "${shiroIniPath}" | grep '^iniHostRealm.allow=' 2>/dev/null)
+  if [ -z "${iniHostRealmAllowPropertyExists}" ]; then
+    sed -i 's|\(^securityManager.realms*\)|iniHostRealm.allow=\n\1|' "${shiroIniPath}"
+  fi
+  hostMatcherPropertyExists=$(cat "${shiroIniPath}" | grep '^hostMatcher=' 2>/dev/null)
+  if [ -z "${hostMatcherPropertyExists}" ]; then
+    sed -i 's|\(^securityManager.realms*\)|hostMatcher=\n\1|' "${shiroIniPath}"
+  fi
+  iniHostRealmCredentialsMatcherPropertyExists=$(cat "${shiroIniPath}" | grep '^iniHostRealm.credentialsMatcher=' 2>/dev/null)
+  if [ -z "${iniHostRealmCredentialsMatcherPropertyExists}" ]; then
+    sed -i 's|\(^securityManager.realms*\)|iniHostRealm.credentialsMatcher=\n\1|' "${shiroIniPath}"
+  fi
+  
+  update_property_in_file "iniHostRealm" "${shiroIniPath}" 'com.intel.mtwilson.shiro.authc.host.IniHostRealm'
+  update_property_in_file "hostMatcher" "${shiroIniPath}" 'com.intel.mtwilson.shiro.authc.host.HostCredentialsMatcher'
+  update_property_in_file "iniHostRealm.credentialsMatcher" "${shiroIniPath}" '$hostMatcher'
+  
+  #iniHostRealm.allow
+  hostAllow=$(read_property_from_file iniHostRealm.allow ${shiroIniPath})
+  finalIps="$hostAllow"
+  for i in "${newIps[@]}"; do
+    OIFS=$IFS
+    IFS=',' read -ra oldIps <<< "$finalIps"
+    IFS=$OIFS
+    if [[ "${oldIps[*]}" != *"$i"* ]]; then
+      if [ -z "$finalIps" ]; then
+        finalIps="$i"
+      else
+        finalIps+=",$i"
+      fi
+    fi
+  done
+  update_property_in_file "iniHostRealm.allow" "${shiroIniPath}" "$finalIps";
+  
+  #securityManager.realms
+  securityManagerPropertyHasIniHostRealm=$(cat "${shiroIniPath}" | grep '^securityManager.realms' 2>/dev/null | grep '$iniHostRealm' 2>/dev/null)
+  if [ -z "${securityManagerPropertyHasIniHostRealm}" ]; then
+    sed -i 's|\(^securityManager.realms.*\)|\1, $iniHostRealm|' "${shiroIniPath}"
+  fi
 }

@@ -43,13 +43,13 @@ public class PublicKeyTlsPolicy extends X509ExtendedServerTrustManager implement
     public PublicKeyTlsPolicy(PublicKeyRepository repository) {
         this.repository = repository;
         this.delegate = null;
-        this.selector = new ConfigurableProtocolSelector("TLS", "TLSv1.1", "TLSv1.2"); // default to any version of TLS
+        this.selector = new ConfigurableProtocolSelector("TLSv1.2", "TLSv1.1", "TLS"); // default to any version of TLS
     }
 
     public PublicKeyTlsPolicy(PublicKeyRepository repository, TrustDelegate delegate) {
         this.repository = repository;
         this.delegate = delegate;
-        this.selector = new ConfigurableProtocolSelector("TLS", "TLSv1.1", "TLSv1.2"); // default to any version of TLS
+        this.selector = new ConfigurableProtocolSelector("TLSv1.2", "TLSv1.1", "TLS"); // default to any version of TLS
     }
 
     public PublicKeyTlsPolicy(PublicKeyRepository repository, TrustDelegate delegate, ProtocolSelector selector) {
