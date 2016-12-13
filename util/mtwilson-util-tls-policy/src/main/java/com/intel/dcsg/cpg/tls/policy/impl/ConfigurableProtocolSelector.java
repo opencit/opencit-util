@@ -15,7 +15,7 @@ import java.util.Set;
  */
 public class ConfigurableProtocolSelector implements ProtocolSelector {
     private final HashSet<String> protocols = new HashSet<String>();
-    private String preferred = "TLS";
+    private String preferred = "TLSv1.2";
 
     public ConfigurableProtocolSelector() {
     }

@@ -158,6 +158,8 @@
 
     // `time_low`
     var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
+	if (!isFinite(tl))
+   		throw new RangeError('Divide by zero error');
     b[i++] = tl >>> 24 & 0xff;
     b[i++] = tl >>> 16 & 0xff;
     b[i++] = tl >>> 8 & 0xff;
@@ -165,6 +167,8 @@
 
     // `time_mid`
     var tmh = (msecs / 0x100000000 * 10000) & 0xfffffff;
+	if (!isFinite(tmh))
+   		throw new RangeError('Divide by zero error');
     b[i++] = tmh >>> 8 & 0xff;
     b[i++] = tmh & 0xff;
 
