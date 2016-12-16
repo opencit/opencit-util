@@ -21,7 +21,7 @@ public class PublicKeyDigestTlsPolicy extends PublicKeyTlsPolicy {
     private DigestRepository repository;
 
     public PublicKeyDigestTlsPolicy(DigestRepository repository) {
-        super(null, null, new ConfigurableProtocolSelector("TLS", "TLSv1.1", "TLSv1.2"));
+        super(null, null, new ConfigurableProtocolSelector("TLSv1.2", "TLSv1.1", "TLS"));
         if( repository == null ) {
             throw new IllegalArgumentException("Repository is required"); // programmer error, throw an exception now so it's clear what happened instead of letting a NullPointerException be thrown during the SSL handshake when isCertificateTrusted is called
         }
