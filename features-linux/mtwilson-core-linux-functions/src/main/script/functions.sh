@@ -310,6 +310,23 @@ shell_include_files() {
   done
 }
 
+# joins the items of an array with a delimiter value
+# parameters: space-separated list of delimiter value and array to be joined
+# example:  join_by : $array[@]
+join_by() {
+  local IFS="$1"
+  shift
+  echo "$*"
+}
+
+# finds all directories with name specified within a given directory
+# parameters: space-separated list of directory to search within and name of directory to search for
+# example:  find_subdirectories /opt/mtwilson bin
+find_subdirectories() {
+  local IFS=$'\n'
+  find $1 \( -name $2 -type d \)
+}
+
 
 ### FUNCTION LIBRARY: information functions
 
