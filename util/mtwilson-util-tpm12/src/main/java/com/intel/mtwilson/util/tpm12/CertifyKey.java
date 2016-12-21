@@ -173,13 +173,14 @@ public class CertifyKey {
     
     public static boolean isBindingKey(TpmCertifyKey certifiedKey) {
         int TPM_KEY_BIND = 0x0014; // This SHALL indicate a key that can be used for TPM_Bind and TPM_UnBind operations only
+        int TPM_ES_RSAESPKCSv15 = 0x0002;
         int TPM_ES_RSAESOAEP_SHA1_MGF1 = 0x0003;
         int TPM_VOLATILE = 0x00000004;
         if( certifiedKey.getTpmKeyUsage() != TPM_KEY_BIND ) {
             log.debug("Invalid key type specified during creation. Using {} instead of {}.", certifiedKey.getTpmKeyUsage(), TPM_KEY_BIND);
             return false;
         }
-        if( certifiedKey.getKeyParms().getEncScheme() != TPM_ES_RSAESOAEP_SHA1_MGF1 ) {
+        if( certifiedKey.getKeyParms().getEncScheme() != TPM_ES_RSAESPKCSv15 && certifiedKey.getKeyParms().getEncScheme() != TPM_ES_RSAESOAEP_SHA1_MGF1 ) {
             log.debug("Invalid encryption scheme used. Using {} scheme instead of RSA.", certifiedKey.getKeyParms().getEncScheme());
             return false;
         }
