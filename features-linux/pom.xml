@@ -15,6 +15,7 @@
     
     <modules>
         <module>mtwilson-core-linux-functions</module>
+		<module>mtwilson-core-linux-progress-monitor</module>
     </modules>
     
 </project>
