@@ -88,7 +88,7 @@ public class DataBindTest {
 
         byte[] encrypted = cipher.doFinal(new DataBind.TpmBoundData(DataBind.VERSION_1_1, DataBind.TpmPayloadType.TPM_PT_BIND, inputSecretKey).toByteArray()); // throws BadPaddingException
 */
-        byte[] encrypted = DataBind.bind(inputSecretKey, tpmPublicKey);
+        byte[] encrypted = DataBind.bind(inputSecretKey, tpmPublicKey, 0x0003);
         
         log.debug("encrypted secret key: {}", Base64.encodeBase64String(encrypted));
         /**

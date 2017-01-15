@@ -121,6 +121,9 @@ public class DataBind {
         public byte[] toByteArray() { return ByteArray.concat(ver.toByteArray(), payload.toByteArray(), payloadData); }
     }
     
+    public static int TPM_ES_RSAESPKCSv15 = 0x0002;
+    public static int TPM_ES_RSAESOAEP_SHA1_MGF1 = 0x0003;
+    
     protected static PSource getPSource() {
         return new PSource.PSpecified(new byte[] { 'T', 'C', 'P', 'A' });
     }
@@ -132,23 +135,32 @@ public class DataBind {
         
     }
     * */
-    protected static Cipher getCipher(PublicKey publicKey) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+    protected static Cipher getCipher(PublicKey publicKey, int encScheme) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+    	Cipher cipher;
+    	if (encScheme == TPM_ES_RSAESOAEP_SHA1_MGF1) {
 //            Cipher cipher = Cipher.getInstance("RSA"); // throws NoSuchAlgorithmException, NoSuchPaddingException
         Provider bc = new BouncyCastleProvider();
 //        Security.addProvider(new BouncyCastleProvider());        // required because without it, next line throws java.security.NoSuchAlgorithmException: Cannot find any provider supporting RSA/ECB/OAEP
         
 //            Cipher cipher = Cipher.getInstance("RSA/ECB/OAEP", bc); // commented out because when specifying OAEP it goes to a list of pre-defined ones, instead of using the parameter spec provided below, so because "OAEP" itself is not in the bouncycastle list it rhwos:   javax.crypto.NoSuchPaddingException: OAEP unavailable with RSA
-            Cipher cipher = Cipher.getInstance("RSA", bc); // 
+        	cipher = Cipher.getInstance("RSA", bc); // 
             cipher.init(Cipher.ENCRYPT_MODE,publicKey, getOAEPParameterSpec()); // throws InvalidKeyException, InvalidAlgorithmParameterException
-            return cipher;
+    	} else if (encScheme == TPM_ES_RSAESPKCSv15) {
+    		cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+        	cipher.init(Cipher.ENCRYPT_MODE,publicKey);
+    	} else {
+    		cipher = Cipher.getInstance("RSA");
+        	cipher.init(Cipher.ENCRYPT_MODE,publicKey);
+    	}
+    	return cipher;
     }
     
-    public static byte[] bind(byte[] plaintext, TpmPublicKey tpmPublicKey) throws GeneralSecurityException {
-        return bind(plaintext, tpmPublicKey.toPublicKey());
+    public static byte[] bind(byte[] plaintext, TpmPublicKey tpmPublicKey, int encScheme) throws GeneralSecurityException {
+        return bind(plaintext, tpmPublicKey.toPublicKey(), encScheme);
     }
     
-    public static byte[] bind(byte[] plaintext, PublicKey publicKey) throws GeneralSecurityException {
-        Cipher cipher = getCipher(publicKey); // throws NoSuchAlgorithmException, InvalidKeyException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException
+    public static byte[] bind(byte[] plaintext, PublicKey publicKey, int encScheme) throws GeneralSecurityException {
+        Cipher cipher = getCipher(publicKey, encScheme); // throws NoSuchAlgorithmException, InvalidKeyException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException
 //        byte[] encrypted = cipher.wrap(secretKey); // throws IllegalBlockSizeException
 
         byte[] encrypted = cipher.doFinal(new DataBind.TpmBoundData(DataBind.VERSION_1_1, DataBind.TpmPayloadType.TPM_PT_BIND, plaintext).toByteArray()); // throws BadPaddingException
