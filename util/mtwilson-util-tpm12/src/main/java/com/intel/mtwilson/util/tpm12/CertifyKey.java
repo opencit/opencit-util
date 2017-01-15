@@ -38,6 +38,7 @@ public class CertifyKey {
     // We are using this OID as we could not find any specific OID for the certifyKey structure.
     public static final String TCG_STRUCTURE_CERTIFY_INFO_OID = "2.5.4.133.3.2.41"; 
     public static final String TCG_STRUCTURE_CERTIFY_INFO_SIGNATURE_OID = "2.5.4.133.3.2.41.1";
+    public static final String TCG_STRUCTURE_CERTIFY_INFO_ENC_SCHEME_OID = "2.5.4.133.3.2.41.2";
 
     public static boolean verifyTpmBindingKeyCertificate(X509Certificate keyCertificate, PublicKey aikPublicKey) {
         /*
