@@ -33,15 +33,12 @@ TERM_COLOR_NORMAL="\\033[0;39m"
 #DEFAULT_POSTGRES_DATABASE="mw_as"
 
 DEFAULT_JAVA_REQUIRED_VERSION="1.7"
-DEFAULT_GLASSFISH_REQUIRED_VERSION="4.0"
 DEFAULT_TOMCAT_REQUIRED_VERSION="7.0"
 DEFAULT_MYSQL_REQUIRED_VERSION="5.0"
 DEFAULT_POSTGRES_REQUIRED_VERSION="9.3"
 
 DEFAULT_MTWILSON_API_BASEURL="http://127.0.0.1:"
 DEFAULT_TOMCAT_API_PORT="8443"
-DEFAULT_GLASSFISH_API_PORT="8181"
-#DEFAULT_API_PORT=$DEFAULT_GLASSFISH_API_PORT
 
 export INSTALL_LOG_FILE=${INSTALL_LOG_FILE:-/tmp/mtwilson-install.log}
 
@@ -572,7 +569,6 @@ using_tomcat() {
       return 1
     fi
   else
-    glassfish_detect 2>&1 > /dev/null
     tomcat_detect 2>&1 > /dev/null
     if [ -n "$TOMCAT_HOME" ]; then
       return 0
@@ -592,9 +588,8 @@ using_jetty() {
       return 1
     fi
   else
-    glassfish_detect 2>&1 > /dev/null
     tomcat_detect 2>&1 > /dev/null
-    if [ -z "$GLASSFISH_HOME" ] && [ -z "$TOMCAT_HOME" ]; then
+    if [ -z "$TOMCAT_HOME" ]; then
       return 0
     else
       return 1
@@ -3250,11 +3245,7 @@ print_env_summary_report() {
 
 mtwilson_running() {
   echo "Checking if mtwilson is running." >> $INSTALL_LOG_FILE
-  if using_glassfish; then
-    MTWILSON_API_BASEURL=${MTWILSON_API_BASEURL:-"https://127.0.0.1:8181/mtwilson/v2"}
-  else
-    MTWILSON_API_BASEURL=${MTWILSON_API_BASEURL:-"https://127.0.0.1:8443/mtwilson/v2"}
-  fi
+  MTWILSON_API_BASEURL=${MTWILSON_API_BASEURL:-"https://127.0.0.1:8443/mtwilson/v2"}
   MTWILSON_RUNNING=""
   
   MTWILSON_API_BASEURL_V2=`echo $MTWILSON_API_BASEURL | sed 's/\/mtwilson\/v1/\/mtwilson\/v2/'`
@@ -3413,12 +3404,7 @@ webservice_stop() {
 webservice_start_report() {
     local webservice_application_name="$1"
     webservice_require
-    if using_glassfish; then
-      glassfish_running
-      if [ -z "$GLASSFISH_RUNNING" ]; then
-          glassfish_start_report
-      fi
-    elif using_tomcat; then
+    if using_tomcat; then
       tomcat_running
       if [ -z "$TOMCAT_RUNNING" ]; then
           tomcat_start_report
@@ -3436,9 +3422,7 @@ webservice_start_report() {
 webservice_stop_report() {
     local webservice_application_name="$1"
     webservice_require
-    if using_glassfish; then
-      glassfish_running
-    elif using_tomcat; then
+    if using_tomcat; then
       tomcat_running
     fi
     webservice_running "${webservice_application_name}"
@@ -3530,17 +3514,13 @@ webservice_require(){
 ### FUNCTION LIBRARY: DATABASE FUNCTIONS
 
 database_restart(){
-  if using_glassfish; then
-    glassfish_restart
-  elif using_tomcat; then
+  if using_tomcat; then
     tomcat_restart
   fi
 }
 
 database_shutdown(){
-  if using_glassfish; then
-    glassfish_shutdown
-  elif using_tomcat; then
+ if using_tomcat; then
     tomcat_shutdown
   fi
 }
