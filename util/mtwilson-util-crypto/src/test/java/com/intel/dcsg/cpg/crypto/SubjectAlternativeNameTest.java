@@ -64,7 +64,7 @@ public class SubjectAlternativeNameTest {
         X509Certificate caCert = RsaUtil.generateX509Certificate("Test CA Cert", caKeys, 30);
         KeyPair subjectKeys = RsaUtil.generateRsaKeyPair(1024);
         // Using the original factory method:  (has limitation on distinguished name, you only provide the value for CN and it automatically adds CN= and also the others)
-        CertificateIssuerName issuerName = new CertificateIssuerName(X500Name.asX500Name(caCert.getSubjectX500Principal()));
+        X500Name issuerName = X500Name.asX500Name(caCert.getSubjectX500Principal());
         X509Certificate subjectCert1 = RsaUtil.createX509CertificateWithIssuer(subjectKeys.getPublic(), "test1", "ip:1.2.3.4", 30/*days*/, caKeys.getPrivate(), issuerName);
         writeCert(subjectCert1, "test1.crt");
         // Using the new X509Builder method: (does not limit subject name)

@@ -24,7 +24,7 @@ import org.bouncycastle.asn1.DEROctetString;
  */
 public class X509BuilderTest {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(X509BuilderTest.class);
-
+    
     @Test
     public void testCreateWithNoncriticalExtension() throws NoSuchAlgorithmException, IOException, CertificateEncodingException {
         byte[] randomData = RandomUtil.randomByteArray(16);
