@@ -97,7 +97,7 @@
         <exec executable="/bin/bash">
 		      <arg value="klocwork.sh"/>
 		</exec>
-    </target>
+     </target>
 
 	   <target name="build-with-scans">
 	        <parallel>

@@ -163,7 +163,7 @@ exit -1; fi
 	echo "Running Build Project..."
 	buildProject
 	echo "Running Upload Results..."
-#	uploadResults
+	uploadResults
 
 	echo_success "Finished execution..."
 
