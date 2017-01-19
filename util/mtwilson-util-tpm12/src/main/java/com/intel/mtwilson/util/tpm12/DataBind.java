@@ -12,6 +12,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.spec.MGF1ParameterSpec;
+import java.util.HashMap;
+import java.util.Map;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.OAEPParameterSpec;
@@ -92,7 +94,43 @@ public class DataBind {
         private TpmPayloadType(byte value) { this.value = value; }
         public byte[] toByteArray() { return new byte[] { value }; }
     }
-    
+
+
+    public static enum EncScheme {
+        TPM_ES_RSAESPKCSv15((int) 0x0002),
+        TPM_ES_RSAESOAEP_SHA1_MGF((int) 0x0003);
+        public final int value;
+
+        private EncScheme(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        private static Map<Integer, EncScheme> map = new HashMap<>();
+
+        static {
+            for (EncScheme encScheme : EncScheme.values()) {
+                map.put(encScheme.value, encScheme);
+            }
+        }
+        public static EncScheme valueOf(int value) {
+            return map.get(value);
+        }
+
+        @Override
+        public String toString() {
+            return "EncScheme{" +
+                    "value=" + value +
+                    '}';
+        }
+    }
+
+
+
+
     /**
      * From trousers-0.3.13/src/include/tss/tpm.h:
      * <pre>
@@ -121,6 +159,7 @@ public class DataBind {
         public byte[] toByteArray() { return ByteArray.concat(ver.toByteArray(), payload.toByteArray(), payloadData); }
     }
     
+
     protected static PSource getPSource() {
         return new PSource.PSpecified(new byte[] { 'T', 'C', 'P', 'A' });
     }
@@ -132,27 +171,53 @@ public class DataBind {
         
     }
     * */
-    protected static Cipher getCipher(PublicKey publicKey) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+    protected static Cipher getCipher(PublicKey publicKey, EncScheme encScheme) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+        Cipher cipher = null;
+        if (encScheme == EncScheme.TPM_ES_RSAESOAEP_SHA1_MGF) {
 //            Cipher cipher = Cipher.getInstance("RSA"); // throws NoSuchAlgorithmException, NoSuchPaddingException
-        Provider bc = new BouncyCastleProvider();
+            Provider bc = new BouncyCastleProvider();
 //        Security.addProvider(new BouncyCastleProvider());        // required because without it, next line throws java.security.NoSuchAlgorithmException: Cannot find any provider supporting RSA/ECB/OAEP
-        
+
 //            Cipher cipher = Cipher.getInstance("RSA/ECB/OAEP", bc); // commented out because when specifying OAEP it goes to a list of pre-defined ones, instead of using the parameter spec provided below, so because "OAEP" itself is not in the bouncycastle list it rhwos:   javax.crypto.NoSuchPaddingException: OAEP unavailable with RSA
-            Cipher cipher = Cipher.getInstance("RSA", bc); // 
-            cipher.init(Cipher.ENCRYPT_MODE,publicKey, getOAEPParameterSpec()); // throws InvalidKeyException, InvalidAlgorithmParameterException
-            return cipher;
+            cipher = Cipher.getInstance("RSA", bc); //
+            cipher.init(Cipher.ENCRYPT_MODE, publicKey, getOAEPParameterSpec()); // throws InvalidKeyException, InvalidAlgorithmParameterException
+        } else if (encScheme == EncScheme.TPM_ES_RSAESPKCSv15) {
+            cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+        }
+        return cipher;
+    }
+
+
+    protected static Cipher getCipher(PublicKey publicKey) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+        return getCipher(publicKey, EncScheme.TPM_ES_RSAESOAEP_SHA1_MGF);
+    }
+
+
+    public static byte[] bind(byte[] plaintext, TpmPublicKey tpmPublicKey, EncScheme encScheme) throws GeneralSecurityException {
+        return bind(plaintext, tpmPublicKey.toPublicKey(), encScheme);
     }
     
-    public static byte[] bind(byte[] plaintext, TpmPublicKey tpmPublicKey) throws GeneralSecurityException {
-        return bind(plaintext, tpmPublicKey.toPublicKey());
-    }
-    
-    public static byte[] bind(byte[] plaintext, PublicKey publicKey) throws GeneralSecurityException {
-        Cipher cipher = getCipher(publicKey); // throws NoSuchAlgorithmException, InvalidKeyException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException
+    public static byte[] bind(byte[] plaintext, PublicKey publicKey, EncScheme encScheme) throws GeneralSecurityException {
+        Cipher cipher = getCipher(publicKey, encScheme); // throws NoSuchAlgorithmException, InvalidKeyException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException
 //        byte[] encrypted = cipher.wrap(secretKey); // throws IllegalBlockSizeException
 
         byte[] encrypted = cipher.doFinal(new DataBind.TpmBoundData(DataBind.VERSION_1_1, DataBind.TpmPayloadType.TPM_PT_BIND, plaintext).toByteArray()); // throws BadPaddingException
         return encrypted;
     }
+
+    public static byte[] bind(byte[] plaintext, TpmPublicKey tpmPublicKey) throws GeneralSecurityException {
+        return bind(plaintext, tpmPublicKey.toPublicKey(), EncScheme.TPM_ES_RSAESOAEP_SHA1_MGF);
+    }
+
+    public static byte[] bind(byte[] plaintext, PublicKey publicKey) throws GeneralSecurityException {
+        Cipher cipher = getCipher(publicKey, EncScheme.TPM_ES_RSAESOAEP_SHA1_MGF); // throws NoSuchAlgorithmException, InvalidKeyException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException
+//        byte[] encrypted = cipher.wrap(secretKey); // throws IllegalBlockSizeException
+
+        byte[] encrypted = cipher.doFinal(new DataBind.TpmBoundData(DataBind.VERSION_1_1, DataBind.TpmPayloadType.TPM_PT_BIND, plaintext).toByteArray()); // throws BadPaddingException
+        return encrypted;
+    }
+
     
 }
+
