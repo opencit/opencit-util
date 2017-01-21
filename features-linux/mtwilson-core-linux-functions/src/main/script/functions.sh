@@ -33,15 +33,12 @@ TERM_COLOR_NORMAL="\\033[0;39m"
 #DEFAULT_POSTGRES_DATABASE="mw_as"
 
 DEFAULT_JAVA_REQUIRED_VERSION="1.8"
-DEFAULT_GLASSFISH_REQUIRED_VERSION="4.0"
 DEFAULT_TOMCAT_REQUIRED_VERSION="7.0"
 DEFAULT_MYSQL_REQUIRED_VERSION="5.0"
 DEFAULT_POSTGRES_REQUIRED_VERSION="9.3"
 
 DEFAULT_MTWILSON_API_BASEURL="http://127.0.0.1:"
 DEFAULT_TOMCAT_API_PORT="8443"
-DEFAULT_GLASSFISH_API_PORT="8181"
-#DEFAULT_API_PORT=$DEFAULT_GLASSFISH_API_PORT
 
 export INSTALL_LOG_FILE=${INSTALL_LOG_FILE:-/tmp/mtwilson-install.log}
 
@@ -563,24 +560,7 @@ wait_until_file_exists() {
   while [ ! -f "$markerfile" ]; do sleep 1; done
 }
 
-# Usage example:   if using_glassfish; then echo "Using glassfish"; fi
-using_glassfish() {
-  if [[ -n "$WEBSERVICE_VENDOR" ]]; then
-    if [[ "${WEBSERVICE_VENDOR}" == "glassfish" ]]; then
-      return 0
-    else
-      return 1
-    fi
-  else
-    glassfish_detect 2>&1 > /dev/null
-    tomcat_detect 2>&1 > /dev/null
-    if [ -n "$GLASSFISH_HOME" ]; then
-      return 0
-    else
-      return 1
-    fi
-  fi
-}
+
 using_tomcat() {
   if [[ -n "$WEBSERVICE_VENDOR" ]]; then
     if [[ "${WEBSERVICE_VENDOR}" == "tomcat" ]]; then
@@ -589,7 +569,6 @@ using_tomcat() {
       return 1
     fi
   else
-    glassfish_detect 2>&1 > /dev/null
     tomcat_detect 2>&1 > /dev/null
     if [ -n "$TOMCAT_HOME" ]; then
       return 0
@@ -599,7 +578,7 @@ using_tomcat() {
   fi
 }
 # currently jetty is indicated either by WEBSERVER_VENDOR=jetty or by
-# absence of both tomcat and glassfish. there's not an independent
+# absence of tomcat . there's not an independent
 # function for jetty_detect.
 using_jetty() {
   if [[ -n "$WEBSERVER_VENDOR" ]]; then
@@ -609,9 +588,8 @@ using_jetty() {
       return 1
     fi
   else
-    glassfish_detect 2>&1 > /dev/null
     tomcat_detect 2>&1 > /dev/null
-    if [ -z "$GLASSFISH_HOME" ] && [ -z "$TOMCAT_HOME" ]; then
+    if [ -z "$TOMCAT_HOME" ]; then
       return 0
     else
       return 1
@@ -2261,477 +2239,6 @@ postgres_create_ssl() {
 
 ### FUNCTION LIBRARY: glassfish
 
-glassfish_clear() {
-  GLASSFISH_HOME=""
-  glassfish_bin=""
-  glassfish=""
-}
-
-glassfish_ready_report() {
-  if [[ -z "$GLASSFISH_HOME" ]]; then echo_warning "GLASSFISH_HOME variable is not set"; return 1; fi
-  if [[ -z "$glassfish_bin" ]]; then echo_warning "Glassfish binary path is not set"; return 1; fi
-  if [[ ! -f "$glassfish_bin" ]]; then echo_warning "Cannot find Glassfish binary at $glassfish_bin"; return 1; fi
-  if [[ -z "$glassfish" ]]; then echo_warning "Glassfish command is not set"; return 1; fi
-  echo_success "Using Glassfish at $GLASSFISH_HOME"
-  return 0
-}
-
-
-glassfish_ready() {
-  glassfish_ready_report > /dev/null
-  return $?
-}
-
-# How to use;   GLASSFISH_VERSION=`glassfish_version`
-# If you pass a parameter, it is the path to a glassfish "asadmin" binary 
-# If you do not pass a parameter, the "glassfish" variable is used as the path to the binary
-glassfish_version() {
-
-  if [[ -z $JAVA_HOME && -z $JRE_HOME ]]; then java_detect; fi
-  if [[ -z $JAVA_HOME && -z $JRE_HOME ]]; then return 1; fi
-
-  if [[ -n "$glassfish" ]]; then
-    # extract the version number from a string like: glassfish version "3.0"
-    local current_glassfish_version=`$glassfish version 2>&1 | grep -i glassfish | grep -i version | awk '{ print $8 }'`
-    if [ -n "$current_glassfish_version" ]; then
-      echo $current_glassfish_version
-      return 0
-    fi
-    return 2
-  fi
-  return 1
-}
-
-# Environment:
-# - glassfish_required_version
-glassfish_version_report() {
-  local min_version="${1:-${GLASSFISH_REQUIRED_VERSION:-$DEFAULT_GLASSFISH_REQUIRED_VERSION}}"
-  GLASSFISH_VERSION=`glassfish_version`
-  if is_version_at_least "$GLASSFISH_VERSION" "${min_version}"; then
-    echo_success "Glassfish version $GLASSFISH_VERSION is ok"
-    return 0
-  else
-    echo_warning "Glassfish version $GLASSFISH_VERSION is not supported, minimum is ${min_version}"
-    return 1
-  fi
-}
-
-# detects possible glassfish installations
-# does nothing if GLASSFISH_HOME is already set; unset with glassfish_clear before calling to force detection
-# Environment:
-# - GLASSFISH_REQUIRED_VERSION (or provide it as a parameter)
-# Parameters:
-# - minimum required version
-glassfish_detect() {
-  local min_version="${1:-${GLASSFISH_REQUIRED_VERSION:-${DEFAULT_GLASSFISH_REQUIRED_VERSION}}}"
-  if [[ (-z $JAVA_HOME && -z $JRE_HOME) || -z $java ]]; then java_detect; fi
-  if [[ (-z $JAVA_HOME && -z $JRE_HOME) || -z $java ]]; then return 1; fi
-  if [[ -n "$java" ]]; then    
-    local java_bindir=`dirname "$java"`
-  fi
-
-  # start with GLASSFISH_HOME if it is already configured
-  if [ "$(whoami)" == "root" ]; then
-    if [ -n "$GLASSFISH_HOME" ] && [[ "$GLASSFISH_HOME" == /opt/mtwilson* ]]; then
-      glassfish_bin="$GLASSFISH_HOME/bin/asadmin"
-      if [ -z "$glassfish" ] || [[ "$glassfish" != *"$glassfish_bin"* ]]; then
-        if [ -n "$java" ]; then    
-          # the glassfish admin tool read timeout is in milliseconds, so 900,000 is 900 seconds
-          glassfish="env PATH=$java_bindir:$PATH AS_ADMIN_READTIMEOUT=900000 $glassfish_bin"
-          if [ -f "$GLASSFISH_HOME/config/admin.passwd" ] && [ -f "$GLASSFISH_HOME/config/admin.user" ]; then
-            gfuser=`cat $GLASSFISH_HOME/config/admin.user | cut -d'=' -f2`
-            if [ -n "$gfuser" ]; then
-              glassfish+=" --user=$gfuser --passwordfile=$GLASSFISH_HOME/config/admin.passwd"
-            fi
-          fi
-        else
-          glassfish="env AS_ADMIN_READTIMEOUT=900000 $glassfish_bin"
-          if [ -f "$GLASSFISH_HOME/config/admin.passwd" ] && [ -f "$GLASSFISH_HOME/config/admin.user" ]; then
-            gfuser=`cat $GLASSFISH_HOME/config/admin.user | cut -d'=' -f2`
-            if [ -n "$gfuser" ]; then
-              glassfish+=" --user=$gfuser --passwordfile=$GLASSFISH_HOME/config/admin.passwd"
-            fi
-          fi
-        fi
-      fi
-      if [ -n "$glassfish" ]; then
-        GLASSFISH_VERSION=`glassfish_version`
-        if is_version_at_least "$GLASSFISH_VERSION" "${min_version}"; then
-          return 0
-        fi
-      fi
-    fi
-    searchdir=/
-  else
-    searchdir=/opt/mtwilson
-  fi
-
-  GLASSFISH_CANDIDATES=`find /opt/mtwilson -name domains 2>/dev/null | grep glassfish/domains`
-  if [ -z "$GLASSFISH_CANDIDATES" ]; then
-    GLASSFISH_CANDIDATES=`find $searchdir -name domains 2>/dev/null | grep glassfish/domains`
-  fi
-  glassfish_clear
-  for c in $GLASSFISH_CANDIDATES; do
-      local parent=`dirname "$c"`
-      if [ -f "$parent/bin/asadmin" ]; then
-        GLASSFISH_HOME="$parent"
-        glassfish_bin="$GLASSFISH_HOME/bin/asadmin"
-        # the glassfish admin tool read timeout is in milliseconds, so 900,000 is 900 seconds
-        glassfish="env PATH=$java_bindir:$PATH AS_ADMIN_READTIMEOUT=900000 $glassfish_bin"
-        if [ -f "$GLASSFISH_HOME/config/admin.passwd" ] && [ -f "$GLASSFISH_HOME/config/admin.user" ]; then
-          gfuser=`cat $GLASSFISH_HOME/config/admin.user | cut -d'=' -f2`
-          if [ -n "$gfuser" ]; then
-            glassfish+=" --user=$gfuser --passwordfile=$GLASSFISH_HOME/config/admin.passwd"
-          fi
-        fi
-        GLASSFISH_VERSION=`glassfish_version`
-        if is_version_at_least "$GLASSFISH_VERSION" "${min_version}"; then
-          return 0
-        fi
-      fi
-  done
-  #echo_failure "Cannot find Glassfish"
-  glassfish_clear
-  return 1
-  # read the admin username and pasword, if present. format of both files is shell  VARIABLE=VALUE
-#  if [ -f /etc/glassfish/admin.user ]; then
-#    export AS_ADMIN_USER=`read_property_from_file AS_ADMIN_USER /etc/glassfish/admin.user`
-#  fi
-#  if [ -f /etc/glassfish/admin.passwd ]; then
-#    export AS_ADMIN_PASSWORDFILE=/etc/glassfish/admin.passwd
-#  fi
-}
-
-# must load from config file or call glassfish_detect prior to calling this function
-glassfish_env_report() {
-  echo "GLASSFISH_HOME=$GLASSFISH_HOME"
-  echo "glassfish_bin=$glassfish_bin"
-  echo "glassfish=\"$glassfish\""
-}
-
-
-# Environment:
-# - glassfish_required_version (or provide it as a parameter)
-glassfish_require() {
-  local min_version="${1:-${GLASSFISH_REQUIRED_VERSION:-${DEFAULT_GLASSFISH_REQUIRED_VERSION}}}"
-  if not glassfish_ready; then
-    glassfish_detect ${min_version} > /dev/null
-  fi
-  if not glassfish_ready; then
-    echo_failure "Cannot find Glassfish server version $min_version or later"
-    exit 1
-  fi
-}
-
-# usage:  if no_glassfish 3.0; then echo_failure "Cannot find Glassfish"; exit 1; fi
-no_glassfish() {
-  if glassfish_require $1; then return 1; else return 0; fi
-}
-
-# Run this AFTER glassfish_install
-# optional global variables:  
-#   glassfish_username (default value glassfish)
-#   GLASSFISH_HOME (default value /usr/share/glassfish4)
-# works on Debian, Ubuntu, CentOS, RedHat, SUSE
-# Username should not contain any spaces or punctuation
-# Optional arguments:  one or more directories for glassfish user to own
-glassfish_permissions() {
-  local chown_locations="$@"
-  local username=${MTWILSON_USERNAME:-mtwilson}
-  local user_exists=`cat /etc/passwd | grep "^${username}"`
-  if [ -z "$user_exists" ]; then
-    echo_failure "User [$username] does not exists"
-    return 1
-  fi
-  local file
-  for file in $(find "${chown_locations}" 2>/dev/null); do
-    if [[ -n "$file" && -e "$file" ]]; then
-      owner=`stat -c '%U' $file`
-      if [ $owner != ${username} ]; then
-        if [ -w "$file" ]; then
-          chown -R "${username}:${username}" "$file"
-        else
-          echo_failure "Current user [$(whoami)] does not have permission to change file [$file]"
-          return 1
-        fi
-      fi
-    fi
-  done
-}
-
-# sets a system property for logback configuration file location
-# requires a running glassfish
-glassfish_logback() {
-  # see if it's already set
-  local prev_logback=`$glassfish list-system-properties 2>/dev/null | grep "logback.configurationFile"| head -n 1`
-  # loop just in case there is more than one defined
-#  while [ -n "${prev_logback}" ]
-#  do
-    echo "Deleting existing system property ${prev_logback}"
-    $glassfish delete-system-property "${prev_logback}" 2>/dev/null >/dev/null
-#    prev_logback=`$glassfish list-system-properties 2>/dev/null | grep "logback.configurationFile" | head -n 1`
-#  done
-  $glassfish create-system-properties logback.configurationFile=/etc/intel/cloudsecurity/logback.xml
-}
-
-# set the -Xmx and -XX:MaxPermSize memory parameters for the glassfish JVM
-glassfish_memory() {
-  local jvm_memory="${1:-2048}"
-  local jvm_maxperm="${2:-512}"
-  # glassfish must be started in order to do this
-  
-  # first we have to find the current options and remove them
-  local prev_jvm_memory=`$glassfish list-jvm-options | grep "\-Xmx" | head -n 1`
-  local prev_jvm_maxperm=`$glassfish list-jvm-options | grep "\-XX:MaxPermSize" | head -n 1`
-  # loop just in case there is more than one defined
-  while [ -n "${prev_jvm_memory}" ]
-  do
-    echo "Deleting existing option ${prev_jvm_memory}"
-    $glassfish delete-jvm-options "${prev_jvm_memory}"
-    prev_jvm_memory=`$glassfish list-jvm-options | grep "\-Xmx" | head -n 1`
-  done
-  # loop just in case there is more than one defined
-  while [ -n "${prev_jvm_maxperm}" ]
-  do
-    # must escape the colon between XX and MaxPermSize
-    prev_jvm_maxperm=`echo ${prev_jvm_maxperm} | sed -re "s/:/\\\\\\\\:/"`
-    echo "Deleting existing option ${prev_jvm_maxperm}"
-    $glassfish delete-jvm-options "${prev_jvm_maxperm}"
-    prev_jvm_maxperm=`$glassfish list-jvm-options | grep "\-XX:MaxPermSize" | head -n 1`
-  done
-  $glassfish create-jvm-options "-Xmx${jvm_memory}m:-XX\\:MaxPermSize=${jvm_maxperm}m"
-}
-
-# reset glassfish overall logging handler to turn on logging
-# this is required because glassfish 3.1.1 and later...
-#  UI has a bug that causes the
-# logging handler to be set to OFF whenever a user saves any change to
-# other logging levels. 
-# references:
-# http://java.net/jira/browse/GLASSFISH-17037
-# http://stackoverflow.com/questions/9373629/glassfish-3-1-1-suddenly-stopped-writing-to-server-log
-glassfish_enable_logging() {
-  $glassfish set-log-levels com.sun.enterprise.server.logging.GFFileHandler=ALL
-}
-
-# glassfish must already be running to execute "enable-secure-domain",  so glassfish_start is required before calling this function
-glassfish_admin_user() {  
-  #echo "You must choose an administrator username and password for Glassfish"
-  echo "The Glassfish control panel is at https://${MTWILSON_SERVER:-127.0.0.1}:4848"
-  #prompt_with_default AS_ADMIN_USER "Glassfish admin username:" ${WEBSERVICE_MANAGER_USERNAME}
-  #prompt_with_default_password AS_ADMIN_PASSWORD "Glassfish admin password:" ${WEBSERVICE_MANAGER_PASSWORD}
-
-  expect=`which expect`  
-  glassfish_detect
-
-  GF_CONFIG_PATH="$GLASSFISH_HOME/config"
-  export AS_ADMIN_USER=$WEBSERVICE_MANAGER_USERNAME
-  export AS_ADMIN_PASSWORD=$WEBSERVICE_MANAGER_PASSWORD
-  export AS_ADMIN_PASSWORD_OLD=`cat $GF_CONFIG_PATH/admin.passwd 2>/dev/null | head -n 1 | cut -d'=' -f2`
-  export AS_ADMIN_PASSWORDFILE=$GF_CONFIG_PATH/admin.passwd
-  
-#  if [ ! -f $GF_CONFIG_PATH/admin.user ]; then
-    echo "AS_ADMIN_USER=${AS_ADMIN_USER}" > $GF_CONFIG_PATH/admin.user
-#  fi
-  
-#  if [ ! -f $GF_CONFIG_PATH/admin.passwd ]; then
-    echo "AS_ADMIN_PASSWORD=${AS_ADMIN_PASSWORD_OLD}" > $GF_CONFIG_PATH/admin.passwd
-    echo "AS_ADMIN_NEWPASSWORD=${AS_ADMIN_PASSWORD}" >> $GF_CONFIG_PATH/admin.passwd
-#  fi
-
-#  if [ ! -f $GF_CONFIG_PATH/admin.passwd.old ]; then
-    echo "AS_ADMIN_PASSWORD=${AS_ADMIN_PASSWORD_OLD}" > $GF_CONFIG_PATH/admin.passwd.old
-#  fi
-
-  chmod 600 $GF_CONFIG_PATH/admin.user $GF_CONFIG_PATH/admin.passwd $GF_CONFIG_PATH/admin.passwd.old
-  glassfish_permissions "${GLASSFISH_HOME}"
-  #echo "AS_ADMIN_MASTERPASSWORD=changeit" >> /etc/glassfish/admin.passwd
-
-  #echo "Glassfish will now ask you for the same information:"
-  # $glassfish is an alias for full path of asadmin
-  
-#(
-#$expect << EOD
-#spawn $glassfish --user=$WEBSERVICE_MANAGER_USERNAME --passwordfile=$GF_CONFIG_PATH/admin.passwd.old change-admin-password
-#expect "Enter the new admin password>"
-#send "$WEBSERVICE_MANAGER_PASSWORD\r"
-#expect "Enter the new admin password again>"
-#send "$WEBSERVICE_MANAGER_PASSWORD\r"
-#interact
-#expect eof
-#EOD
-#) > /dev/null 2>&1
-
-  # needed in case glassfish_detect has already added --user and --passwordfile options
-  changeAdminPassOptions=
-  if [[ "$glassfish" != *"--user="* ]]; then
-    changeAdminPassOptions+=" --user=$AS_ADMIN_USER"
-  fi
-  if [[ "$glassfish" != *"--passwordfile="* ]]; then
-    changeAdminPassOptions+=" --passwordfile=$GF_CONFIG_PATH/admin.passwd"
-  fi
-  $glassfish $changeAdminPassOptions change-admin-password     # no quotes; command doesn't handle well
-
-  # set the password file appropriately for further reads
-  echo "AS_ADMIN_PASSWORD=${AS_ADMIN_PASSWORD}" > $GF_CONFIG_PATH/admin.passwd
-  glassfish_detect
-  $glassfish enable-secure-admin
-  $glassfish restart-domain domain1
-}
-
-# pre-conditions:   GLASSFISH_HOME  must be set  (find it with glassfish_detect)
-# returns success (0) if glassfish is running, error (1) if it is not running
-# in order to prevent repetitive calls it also sets the GLASSFISH_RUNNING variable.
-# if glassfish is running, it also sets the $GLASSFISH_PID variable to the process id.
-# so you can write  if glassfish_running; echo "ok"; fi
-# and after that also   if [ "$GLASSFISH_RUNNING" == "yes" ]; then echo "ok"; fi
-glassfish_running() {  
-  GLASSFISH_RUNNING=''
-  if [ -z "$GLASSFISH_HOME" ]; then
-    glassfish_detect 2>&1 > /dev/null
-  fi
-  if [ -n "$GLASSFISH_HOME" ]; then
-    GLASSFISH_PID=`ps gauwxx | grep java | grep -v grep | grep "$GLASSFISH_HOME" | awk '{ print $2 }'`
-    if [ -n "$GLASSFISH_PID" ]; then
-      GLASSFISH_RUNNING=yes
-      return 0
-    fi
-  fi
-  return 1
-}
-
-# you should call glassfish_clear and glassfish_detect before calling this
-# if you don't already have a $glassfish variable with the glassfish admin password
-glassfish_running_report() {
-  echo -n "Checking Glassfish process... "
-  if glassfish_running; then
-    echo_success "Running (pid $GLASSFISH_PID)"
-  else
-    echo_failure "Not running"
-  fi
-}
-glassfish_start() {
-  glassfish_require 2>&1 > /dev/null
-  if glassfish_running; then
-    echo_warning "Glassfish already running [PID: $GLASSFISH_PID]"
-  elif [ -n "$glassfish" ]; then
-    echo -n "Waiting for Glassfish services to startup..."
-    ($glassfish start-domain) 2>&1 > /dev/null #NOT in background, takes some time to start, and will report a running pid in the interim
-    while ! glassfish_running; do
-      sleep 1
-    done
-    echo_success " Done"
-  fi
-}
-glassfish_shutdown() {
-  glassfish_running
-  if [ -n "$GLASSFISH_PID" ]; then
-    kill -9 $GLASSFISH_PID
-  fi
-}
-glassfish_stop() {
-  glassfish_require 2>&1 > /dev/null
-  if ! glassfish_running; then
-    echo_warning "Glassfish already stopped"
-  elif [ -n "$glassfish" ]; then
-    echo -n "Waiting for Glassfish services to shutdown..."
-    ($glassfish stop-domain &) 2>&1 > /dev/null
-    sleep 5
-    while glassfish_running; do
-      glassfish_shutdown
-      sleep 3
-    done
-    echo_success " Done"
-  fi
-}
-glassfish_async_stop() {
-  glassfish_require 2>&1 > /dev/null
-  if ! glassfish_running; then
-    echo_warning "Glassfish already stopped"
-  elif [ -n "$glassfish" ]; then
-    echo -n "Shutting down Glassfish services in the background..."
-    ($glassfish stop-domain &) 2>&1 > /dev/null
-    echo_success " Done"
-  fi
-}
-glassfish_restart() {
-  #if [ -n "$glassfish" ]; then
-  #    $glassfish restart-domain
-  #fi
-  glassfish_stop
-  glassfish_start
-  glassfish_running_report
-}
-glassfish_start_report() {
-  action_condition GLASSFISH_RUNNING "Starting Glassfish" "glassfish_start > /dev/null; glassfish_running;"
-}
-glassfish_uninstall() {
-  glassfish_require
-  echo "Stopping Glassfish..."
-  glassfish_shutdown
-  # application files
-  echo "Removing Glassfish in /usr/share/glassfish4..."
-  rm -rf /usr/share/glassfish4
-}
-
-# Must call java_require before calling this.
-# Parameters:
-# - certificate alias to report on (default is s1as, the glassfish default ssl cert alias)
-glassfish_sslcert_report() {
-  local alias="${1:-s1as}"
-  local keystorePassword="${MTWILSON_TLS_KEYSTORE_PASSWORD:-$MTW_TLS_KEYSTORE_PASS}"
-  local domain_found=`$glassfish list-domains | head -n 1 | awk '{ print $1 }'`
-  local keystore=${GLASSFISH_HOME}/domains/${domain_found}/config/keystore.jks
-  java_keystore_cert_report "$keystore" "$keystorePassword" "$alias"
-}
-
-# used by attestation_service_install to create a new domain just for attestation service
-# parameters:  domain name, domain dir (absolute path)
-# example: glassfish_create_domain "intel-as" "${ATTESTATION_SERVICE_HOME}/glassfish/domain"
-#Default port 4848 for Admin is in use. Using 39766
-#Default port 8080 for HTTP Instance is in use. Using 41112
-#Default port 7676 for JMS is in use. Using 52108
-#Default port 3700 for IIOP is in use. Using 46322
-#Default port 8181 for HTTP_SSL is in use. Using 42364
-#
-glassfish_create_domain() {
-  local domain_name=${1}
-  local domain_dir=${2}
-  if [ -n "$glassfish" ]; then
-    $glassfish create-domain --domaindir "${domain_dir}" "${domain_name}"
-    $glassfish start-domain --domaindir "${domain_dir}" "${domain_name}"
-  fi
-}
-
-glassfish_delete_domain() {
-  local domain_name=${1}
-  local domain_dir=${2}
-
-  if [ -n "$glassfish" ]; then
-    local domain_found=`$glassfish list-domains --domaindir "${domain_dir}" | grep "${domain_name}"`
-    if [ -n "$domain_found" ]; then
-      $glassfish delete-domain --domaindir "${domain_dir}" "${domain_name}"      
-    fi
-  fi
-}
-
-glassfish_create_ssl_cert_prompt() {
-    ifconfig=$(which ifconfig 2>/dev/null)
-    ifconfig=${ifconfig:-"/sbin/ifconfig"}
-    #echo_warning "This feature has been disabled: glassfish_create_ssl_cert_prompt"
-    #return
-    # SSL Certificate setup
-    #local should_create_sslcert
-    prompt_yes_no GLASSFISH_CREATE_SSL_CERT "Do you want to set up an SSL certificate for Glassfish?"
-    echo
-    if [ "${GLASSFISH_CREATE_SSL_CERT}" == "yes" ]; then
-      if no_java ${JAVA_REQUIRED_VERSION:-$DEFAULT_JAVA_REQUIRED_VERSION}; then echo "Cannot find Java ${JAVA_REQUIRED_VERSION:-$DEFAULT_JAVA_REQUIRED_VERSION} or later"; return 1; fi
-      glassfish_require
-      DEFAULT_GLASSFISH_SSL_CERT_CN=`"$ifconfig" | grep "inet addr" | awk '{ print $2 }' | awk -F : '{ print $2 }' | sed -e ':a;N;$!ba;s/\n/,/g'`
-      prompt_with_default GLASSFISH_SSL_CERT_CN "Domain name[s] for SSL Certificate:" ${DEFAULT_GLASSFISH_SSL_CERT_CN:-127.0.0.1}
-      glassfish_create_ssl_cert "${GLASSFISH_SSL_CERT_CN}"
-    fi
-}
 
 function valid_ip() {
     local  ip=$1
@@ -2748,157 +2255,8 @@ function valid_ip() {
     return $stat
 }
 
-# Parameters:
-# - serverName (hostname in the URL, such as 127.0.0.1, 192.168.1.100, my.attestation.com, etc.)
-glassfish_create_ssl_cert() {
-  if no_java ${JAVA_REQUIRED_VERSION:-$DEFAULT_JAVA_REQUIRED_VERSION}; then echo "Cannot find Java ${JAVA_REQUIRED_VERSION:-$DEFAULT_JAVA_REQUIRED_VERSION} or later"; return 1; fi
-  glassfish_require
-  local serverName="${1}"
-  serverName=$(echo "$serverName" | sed -e 's/ //g' | sed -e 's/,$//')
 
-  local domain_found=$($glassfish list-domains | head -n 1 | awk '{ print $1 }')
-  local GF_CONFIG_PATH="${GLASSFISH_HOME}/domains/${domain_found}/config"
-  local keystore="${GF_CONFIG_PATH}/keystore.jks"
-  local cacerts="${GF_CONFIG_PATH}/cacerts.jks"
-  local configDir="/opt/mtwilson/configuration"
-  local mtwilsonPropertiesFile="${configDir}/mtwilson.properties"
-  local keytool="${JAVA_HOME}/bin/keytool"
-  local mtwilson=$(which mtwilson 2>/dev/null)
-  local tmpHost=$(echo "$serverName" | awk -F ',' '{ print $1 }' | sed -e 's/ //g')
 
-    local keystorePassword="$MTWILSON_TLS_KEYSTORE_PASS"   #changeit
-  if [ -z "$MTWILSON_TLS_KEYSTORE_PASS" ] || [ "$MTWILSON_TLS_KEYSTORE_PASS" == "changeit" ]; then MTWILSON_TLS_KEYSTORE_PASS=$(generate_password 32); fi
-  keystorePassword="$MTWILSON_TLS_KEYSTORE_PASS"   #changeit
-  keystorePasswordOld=$(read_property_from_file "mtwilson.tls.keystore.password" "${mtwilsonPropertiesFile}")
-  keystorePasswordOld=${keystorePasswordOld:-"changeit"}
-
-  # Create an array of host ips and dns names from csv list passed into function
-  OIFS="$IFS"
-  IFS=','
-  read -a hostArray <<< "${serverName}"
-  IFS="$OIFS"
-
-  # create common names and sans strings by parsing array
-  local cert_cns=""
-  local cert_sans=""
-  for i in "${hostArray[@]}"; do
-    cert_cns+="CN=$i,"
-    tmpCN=""
-    if valid_ip "$i"; then 
-      tmpCN="ip:$i"
-    else
-      tmpCN="dns:$i"
-    fi
-    cert_sans+="$tmpCN,"
-  done
-  cert_cns=$(echo "$cert_cns" | sed -e 's/,$//')
-  cert_sans=$(echo "$cert_sans" | sed -e 's/,$//')
-  cert_cns='CN='$(echo "$serverName" | sed -e 's/ //g' | sed -e 's/,$//' | sed -e 's/,/, CN=/g')
-
-  # fix for if old version of mtwilson was saving incorrect password; reverts current password to "changeit"
-  has_incorrect_password=$($keytool -list -v -alias s1as -keystore "$keystore" -storepass "$keystorePasswordOld" 2>&1 | grep "password was incorrect")
-  if [ -n "$has_incorrect_password" ]; then
-    keystorePasswordOld="changeit"
-    has_incorrect_password=$($keytool -list -v -alias s1as -keystore "$keystore" -storepass "$keystorePasswordOld" 2>&1 | grep "password was incorrect")
-    if [ -n "$has_incorrect_password" ]; then
-      echo_failure "Current SSL keystore password is incorrect"
-      exit -1
-    fi
-  fi
-  
-  if [ "${GLASSFISH_CREATE_SSL_CERT:-yes}" == "yes" ]; then
-    if [ "$keystorePasswordOld" != "$keystorePassword" ]; then  # "OLD" != "NEW"
-      echo "Updating Glassfish master password..."
-      #change glassfish master password which is the keystore password
-      glassfish_stop >/dev/null
-      glassfishMaster=$(echo "$glassfish" | sed -e 's/--user=.*\b//g' | sed -e 's/--passwordfile=.*\b//g')
-      mv "${GF_CONFIG_PATH}/domain-passwords" "${GF_CONFIG_PATH}/domain-passwords_bkup" 2>/dev/null
-      touch "${GF_CONFIG_PATH}/master.passwd"
-      echo "AS_ADMIN_MASTERPASSWORD=$keystorePasswordOld" > "${GF_CONFIG_PATH}/master.passwd"
-      echo "AS_ADMIN_NEWMASTERPASSWORD=$keystorePassword" >> "${GF_CONFIG_PATH}/master.passwd"
-      $glassfishMaster change-master-password --savemasterpassword=true --passwordfile="${GF_CONFIG_PATH}/master.passwd" "${domain_found}"
-      rm -f "${GF_CONFIG_PATH}/master.passwd"
-      glassfish_start >/dev/null
-      update_property_in_file "mtwilson.tls.keystore.password" "${mtwilsonPropertiesFile}" "$keystorePassword"
-    fi
-    
-    echo "Creating SSL Certificate for ${serverName}..."
-    # Delete public insecure certs within keystore.jks and cacerts.jks
-    $keytool -delete -alias s1as  -keystore "$keystore" -storepass "$keystorePassword" 2>&1 >/dev/null
-    $keytool -delete -alias glassfish-instance -keystore "$keystore" -storepass "$keystorePassword" 2>&1 >/dev/null
-    $keytool -delete -alias s1as -keystore "$cacerts" -storepass "$keystorePassword" 2>&1 >/dev/null
-    $keytool -delete -alias glassfish-instance -keystore "$cacerts" -storepass "$keystorePassword" 2>&1 >/dev/null
-
-    # Update keystore.jks
-    $keytool -genkeypair -alias s1as -dname "$cert_cns, OU=Mt Wilson, O=Trusted Data Center, C=US" -ext san="$cert_sans" -keyalg RSA -keysize 2048 -validity 3650 -keystore "$keystore" -keypass "$keystorePassword" -storepass "$keystorePassword"
-    $keytool -genkeypair -alias glassfish-instance -dname "$cert_cns, OU=Mt Wilson, O=Trusted Data Center, C=US" -ext san="$cert_sans" -keyalg RSA -keysize 2048 -validity 3650 -keystore "$keystore" -keypass "$keystorePassword" -storepass "$keystorePassword"
-
-    echo "Restarting Glassfish as a new SSL certificate was generated..."
-    glassfish_restart >/dev/null
-  fi
-
-  has_cert=$($keytool -list -v -alias s1as -keystore "$keystore" -storepass "$keystorePassword" | grep "^Owner:" | grep "$tmpHost")
-  if [ -n "$has_cert" ]; then
-    # Export certificates from keystore.jks
-    $keytool -export -alias s1as -file "${GF_CONFIG_PATH}/ssl.s1as.${tmpHost}.crt" -keystore "$keystore" -storepass "$keystorePassword"
-    $keytool -export -alias glassfish-instance -file "${GF_CONFIG_PATH}/ssl.gi.${tmpHost}.crt" -keystore "$keystore" -storepass "$keystorePassword"
-
-    # Update cacerts.jks
-    $keytool -importcert -noprompt -alias s1as -file "${GF_CONFIG_PATH}/ssl.s1as.${tmpHost}.crt" -keystore "$cacerts" -storepass "$keystorePassword"
-    $keytool -importcert -noprompt -alias glassfish-instance -file "${GF_CONFIG_PATH}/ssl.gi.${tmpHost}.crt" -keystore "$cacerts" -storepass "$keystorePassword"
-
-    openssl x509 -in "${GF_CONFIG_PATH}/ssl.s1as.${tmpHost}.crt" -inform der -out "$configDir/ssl.crt.pem" -outform pem
-    cp "${GF_CONFIG_PATH}/ssl.s1as.${tmpHost}.crt" "$configDir/ssl.crt"
-    cp "$keystore" "$configDir/mtwilson-tls.jks"
-    mtwilson_tls_cert_sha1=`openssl sha1 -hex "$configDir/ssl.crt" | awk -F '=' '{ print $2 }' | tr -d ' '`
-    update_property_in_file "mtwilson.api.tls.policy.certificate.sha1" "$configDir/mtwilson.properties" "$mtwilson_tls_cert_sha1"
-    mtwilson_tls_cert_sha256=`openssl sha256 -hex "$configDir/ssl.crt" | awk -F '=' '{ print $2 }' | tr -d ' '`
-    update_property_in_file "mtwilson.api.tls.policy.certificate.sha256" "$configDir/mtwilson.properties" "$mtwilson_tls_cert_sha256"
-  else
-    echo_warning "No SSL certificate found in Glassfish keystore"
-  fi
-}
-
-glassfish_no_additional_webapps_exist() {
-  if [ -z "$GLASSFISH_HOME" ]; then glassfish_detect; fi
-  if [ -z "$GLASSFISH_HOME" ]; then return 1; fi
-  glassfishApplicationDirectories=($(find "$GLASSFISH_HOME/domains" -name "applications"))
-  for i in "${glassfishApplicationDirectories[@]}"; do
-    GLASSFISH_ADDITIONAL_APPLICATIONS_INSTALLED=$(ls "${i}" | sed '/^__internal$\|^$/d')
-  done
-  glassfishInternalApplicationDirectories=($(find "$GLASSFISH_HOME/domains" -name "__internal"))
-  for i in "${glassfishInternalApplicationDirectories[@]}"; do
-    GLASSFISH_ADDITIONAL_APPLICATIONS_INSTALLED+=" "$(ls "${i}" | sed '/^$/d')
-  done
-  GLASSFISH_ADDITIONAL_APPLICATIONS_INSTALLED=$(echo "$GLASSFISH_ADDITIONAL_APPLICATIONS_INSTALLED" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-  if [ -n "$GLASSFISH_ADDITIONAL_APPLICATIONS_INSTALLED" ]; then
-    return 1
-  fi
-  return 0
-}
-
-glassfish_no_additional_webapps_exist_wait() {
-  glassfish_no_additional_webapps_exist
-  if [[ "$GLASSFISH_ADDITIONAL_APPLICATIONS_INSTALLED" == *".war"* ]]; then
-    echo_warning "Additional glassfish webapps exist: $GLASSFISH_ADDITIONAL_APPLICATIONS_INSTALLED"
-    return 1
-  fi
-  echo -n "Checking if additional glassfish webapps exist..."
-  for (( c=1; c<=10; c++ )); do
-    if ! glassfish_no_additional_webapps_exist; then
-      echo -n "."
-      sleep 3
-    fi
-  done
-  if [ -n "$GLASSFISH_ADDITIONAL_APPLICATIONS_INSTALLED" ]; then
-    echo
-    echo_warning "Additional glassfish webapps exist: $GLASSFISH_ADDITIONAL_APPLICATIONS_INSTALLED"
-    return 1
-  else
-    echo
-    return 0
-  fi
-}
 
 ### FUNCTION LIBRARY: tomcat
 
@@ -2938,9 +2296,9 @@ tomcat_ready() {
   return $?
 }
 
-# How to use;   GLASSFISH_VERSION   =`glassfish_version`
-# If you pass a parameter, it is the path to a glassfish "asadmin" binary
-# If you do not pass a parameter, the "glassfish" variable is used as the path to the binary
+# How to use;   TOMCAT_VERSION   =`tomcat_version`
+# If you pass a parameter, it is the path to a tomcat "asadmin" binary
+# If you do not pass a parameter, the "tomcat" variable is used as the path to the binary
 tomcat_version() {
   # Either the JAVA_HOME or the JRE_HOME environment variable must be defined
   # At least one of these environment variable is needed to run this program
@@ -2948,7 +2306,7 @@ tomcat_version() {
   if [ -z $JAVA_HOME ]; then return 1; fi
 
   if [[ -n "$tomcat" ]]; then
-    # extract the version number from a string like: glassfish version "3.0"
+    # extract the version number from a string like: tomcat version "3.0"
     local current_tomcat_version=`$tomcat version 2>&1 | grep -i "^Server version:" | grep -i version | awk -F / '{ print $2 }'`
     if [ -n "$current_tomcat_version" ]; then
       echo "current_tomcat_version: $current_tomcat_version" >> $INSTALL_LOG_FILE
@@ -3008,7 +2366,7 @@ tomcat_detect() {
       tomcat_bin="$TOMCAT_HOME/bin/catalina.sh"
       if [ -z "$tomcat" ]; then
         if [ -n "$java" ]; then    
-          # the glassfish admin tool read timeout is in milliseconds, so 900,000 is 900 seconds
+          # the tomcat admin tool read timeout is in milliseconds, so 900,000 is 900 seconds
           tomcat="env PATH=$java_bindir:$PATH $tomcat_bin"
         else
           tomcat="$tomcat_bin"
@@ -3874,15 +3232,7 @@ print_env_summary_report() {
       error=1
     fi
   fi
-  if using_glassfish; then
-    if [ -n "$GLASSFISH_HOME" ]; then
-      GLASSFISH_VERSION=`glassfish_version`
-      echo "Glassfish: $GLASSFISH_VERSION"
-    else
-      echo_failure "Glassfish: not found"
-      error=1
-    fi
-  fi
+  
   if using_tomcat; then
     if [ -n "$TOMCAT_HOME" ]; then
       echo "Tomcat: $TOMCAT_CLIENT_VERSION"
@@ -3896,11 +3246,7 @@ print_env_summary_report() {
 
 mtwilson_running() {
   echo "Checking if mtwilson is running." >> $INSTALL_LOG_FILE
-  if using_glassfish; then
-    MTWILSON_API_BASEURL=${MTWILSON_API_BASEURL:-"https://127.0.0.1:8181/mtwilson/v2"}
-  else
-    MTWILSON_API_BASEURL=${MTWILSON_API_BASEURL:-"https://127.0.0.1:8443/mtwilson/v2"}
-  fi
+  MTWILSON_API_BASEURL=${MTWILSON_API_BASEURL:-"https://127.0.0.1:8443/mtwilson/v2"}
   MTWILSON_RUNNING=""
   
   MTWILSON_API_BASEURL_V2=`echo $MTWILSON_API_BASEURL | sed 's/\/mtwilson\/v1/\/mtwilson\/v2/'`
@@ -3980,18 +3326,8 @@ webservice_running() {
   WEBSERVICE_RUNNING=""
   WEBSERVICE_DEPLOYED=""
 
-  if using_glassfish; then
-    glassfish_running
-    if [ -n "$GLASSFISH_RUNNING" ]; then
-      WEBSERVICE_DEPLOYED=$($glassfish list-applications | grep "${webservice_application_name} " | awk '{ print $1 }')
-      if [ -n "$WEBSERVICE_DEPLOYED" ]; then
-        WEBSERVICE_RUNNING=$($glassfish show-component-status $WEBSERVICE_DEPLOYED | grep enabled)
-      fi
-    else
-      if [ -z "$GLASSFISH_HOME" ]; then glassfish_detect; fi
-      WEBSERVICE_DEPLOYED=$(ls -R "$GLASSFISH_HOME" | grep "${webservice_application_name}.war")
-    fi
-  elif using_tomcat; then
+
+  if using_tomcat; then
     tomcat_running
     echo "TOMCAT_RUNNING: $TOMCAT_RUNNING" >> $INSTALL_LOG_FILE
     if [ -z "$TOMCAT_MANAGER_USER" ]; then tomcat_init_manager 2>&1 >/dev/null; fi
@@ -4039,9 +3375,7 @@ webservice_start() {
   local webservice_application_name="$1"
   webservice_running  "${webservice_application_name}"
   if [ -n "$WEBSERVICE_DEPLOYED" ]; then
-    if using_glassfish; then
-      $glassfish enable $WEBSERVICE_DEPLOYED
-    elif using_tomcat; then
+    if using_tomcat; then
       if [ -z "$TOMCAT_MANAGER_USER" ]; then tomcat_init_manager 2>&1 >/dev/null; fi
       wget http://$TOMCAT_MANAGER_USER:$TOMCAT_MANAGER_PASS@$MTWILSON_SERVER:$TOMCAT_MANAGER_PORT/manager/text/start?path=/${webservice_application_name} -O - -q --no-check-certificate --no-proxy
       #$tomcat start
@@ -4056,9 +3390,7 @@ webservice_stop() {
   local webservice_application_name="$1"
   webservice_running "${webservice_application_name}"
   if [ -n "$WEBSERVICE_DEPLOYED" ]; then
-    if using_glassfish; then
-      $glassfish disable $WEBSERVICE_DEPLOYED
-    elif using_tomcat; then
+    if using_tomcat; then
       if [ -z "$TOMCAT_MANAGER_USER" ]; then tomcat_init_manager 2>&1 >/dev/null; fi
       wget http://$TOMCAT_MANAGER_USER:$TOMCAT_MANAGER_PASS@$MTWILSON_SERVER:$TOMCAT_MANAGER_PORT/manager/text/stop?path=/${webservice_application_name} -O - -q --no-check-certificate --no-proxy
       #$tomcat stop
@@ -4073,12 +3405,7 @@ webservice_stop() {
 webservice_start_report() {
     local webservice_application_name="$1"
     webservice_require
-    if using_glassfish; then
-      glassfish_running
-      if [ -z "$GLASSFISH_RUNNING" ]; then
-          glassfish_start_report
-      fi
-    elif using_tomcat; then
+    if using_tomcat; then
       tomcat_running
       if [ -z "$TOMCAT_RUNNING" ]; then
           tomcat_start_report
@@ -4096,9 +3423,7 @@ webservice_start_report() {
 webservice_stop_report() {
     local webservice_application_name="$1"
     webservice_require
-    if using_glassfish; then
-      glassfish_running
-    elif using_tomcat; then
+    if using_tomcat; then
       tomcat_running
     fi
     webservice_running "${webservice_application_name}"
@@ -4116,7 +3441,7 @@ webservice_stop_report() {
 # webservice_application_name such as "AttestationService"
 # webservice_war_file such as "/path/to/AttestationService-0.5.1.war"
 # Environment:
-# - glassfish_required_version
+
 webservice_install() {
   local webservice_application_name="$1"
   local webservice_war_file="$2"
@@ -4128,21 +3453,14 @@ webservice_install() {
   local WAR_NAME=${WAR_FILE##*/}
 
     if [ -n "$WEBSERVICE_DEPLOYED" ]; then
-      if using_glassfish; then
-        echo "Re-deploying ${WEBSERVICE_DEPLOYED} to Glassfish..."
-        $glassfish redeploy --name ${WEBSERVICE_DEPLOYED} ${WAR_FILE}
-      elif using_tomcat; then
+      if using_tomcat; then
         echo "Re-deploying ${WEBSERVICE_DEPLOYED} to Tomcat..."
         rm -rf $TOMCAT_HOME/webapps/$WAR_NAME
         cp $WAR_FILE $TOMCAT_HOME/webapps/
         #wget -O - -q --no-check-certificate --no-proxy https://tomcat:tomcat@$MTWILSON_SERVER:$DEFAULT_API_PORT/manager/reload?path=${WEBSERVICE_DEPLOYED}
       fi
     else
-      if using_glassfish; then
-        glassfish_require
-        echo "Deploying ${webservice_application_name} to Glassfish..."
-        $glassfish deploy --name ${webservice_application_name} ${WAR_FILE}
-      elif using_tomcat; then
+      if using_tomcat; then
         #if [ ! tomcat_running ]; then
         #  tomcat_start
         #fi
@@ -4168,27 +3486,7 @@ webservice_uninstall() {
   webservice_require
   local WAR_NAME="${webservice_application_name}.war"
   if [ -n "$WEBSERVICE_DEPLOYED" ]; then
-    if using_glassfish; then
-      echo "Undeploying ${WEBSERVICE_DEPLOYED} from Glassfish..."
-      glassfish_detect
-      if [ -n "$WEBSERVICE_RUNNING" ]; then
-        $glassfish undeploy ${WEBSERVICE_DEPLOYED}
-      else
-        applicationDirectoryPath=($(find "$GLASSFISH_HOME" -name "${webservice_application_name}"))
-        for i in "${applicationDirectoryPath[@]}"; do
-          if [ ! -w "$i" ]; then
-            echo_failure "Current user does not have permission to remove ${i} from glassfish installation"
-            return 1
-          fi
-        done
-        for i in "${applicationDirectoryPath[@]}"; do
-          rm -rf "$i"
-        done
-        glassfishDomainXmlFile=$(find "$GLASSFISH_HOME" -name domain.xml | head -1)
-        perl -0777 -p -i -e 's|(<application-ref .*?</application-ref>)|$1 =~ /'"${webservice_application_name}"'/?"":$1|gse' "$glassfishDomainXmlFile"
-        perl -0777 -p -i -e 's|(<application .*?</application>)|$1 =~ /'"${webservice_application_name}"'/?"":$1|gse' "$glassfishDomainXmlFile"
-      fi
-    elif using_tomcat; then
+    if using_tomcat; then
       echo "Undeploying ${WEBSERVICE_DEPLOYED} from Tomcat..."
       #wget -O - -q --no-check-certificate --no-proxy https://tomcat:tomcat@$MTWILSON_SERVER:$DEFAULT_API_PORT/manager/undeploy?path=${WEBSERVICE_DEPLOYED}
       if [ -f "$TOMCAT_HOME/webapps/$WAR_NAME" ] && [ ! -w "$TOMCAT_HOME/webapps/$WAR_NAME" ]; then
@@ -4203,17 +3501,13 @@ webservice_uninstall() {
       rm -rf "$TOMCAT_HOME/webapps/${webservice_application_name}"
     fi
   else
-    if using_glassfish; then
-      echo "Application is not deployed on Glassfish; skipping undeploy"
-    elif using_tomcat; then
+    if using_tomcat; then
       echo "Application is not deployed on Tomcat; skipping undeploy"
     fi
   fi
 }
 webservice_require(){
-  if using_glassfish; then
-    glassfish_require
-  elif using_tomcat; then
+  if using_tomcat; then
     tomcat_require
   fi
 }
@@ -4221,17 +3515,13 @@ webservice_require(){
 ### FUNCTION LIBRARY: DATABASE FUNCTIONS
 
 database_restart(){
-  if using_glassfish; then
-    glassfish_restart
-  elif using_tomcat; then
+  if using_tomcat; then
     tomcat_restart
   fi
 }
 
 database_shutdown(){
-  if using_glassfish; then
-    glassfish_shutdown
-  elif using_tomcat; then
+ if using_tomcat; then
     tomcat_shutdown
   fi
 }
@@ -4260,18 +3550,16 @@ The supported databases are m=MySQL | p=PostgreSQL"
 # determine web server
 which_web_server(){
 echo "Please identify the web server which will be used for the Mt Wilson server.
-The supported servers are g=Glassfish | t=Tomcat"
+The supported server is t=Tomcat"
   while true; do
     prompt_with_default WEBSERVER_CHOICE "Choose Web Server:" "t";
 
-    if [ "$WEBSERVER_CHOICE" != 't' ] && [ "$WEBSERVER_CHOICE" != 'g' ]; then
-      echo "[g]lassfish [t]omcat: "
+    if [ "$WEBSERVER_CHOICE" != 't' ]; then
+      echo "[t]omcat: "
       WEBSERVER_CHOICE=
     else
       if [ "$WEBSERVER_CHOICE" = 't' ]; then 
         export WEBSERVICE_VENDOR="tomcat"
-      else
-        export WEBSERVICE_VENDOR="glassfish"
       fi
       break
     fi
@@ -4450,10 +3738,7 @@ load_conf() {
       export CONF_MTWILSON_TAG_API_USERNAME=`echo $temp | awk -F'mtwilson.tag.api.username=' '{print $2}' | awk -F' ' '{print $1}'`
       export CONF_MTWILSON_TAG_API_PASSWORD=`echo $temp | awk -F'mtwilson.tag.api.password=' '{print $2}' | awk -F' ' '{print $1}'`
       export CONF_WEBSERVICE_VENDOR=$(echo $temp | awk -F'mtwilson.webserver.vendor=' '{print $2}' | awk -F' ' '{print $1}')
-      if [ "CONF_WEBSERVICE_VENDOR == glassfish" ]; then
-        export CONF_WEBSERVICE_MANAGER_USERNAME=$(echo $temp | awk -F'glassfish.admin.username=' '{print $2}' | awk -F' ' '{print $1}')
-        export CONF_WEBSERVICE_MANAGER_PASSWORD=$(echo $temp | awk -F'glassfish.admin.password=' '{print $2}' | awk -F' ' '{print $1}')
-      elif [ "CONF_WEBSERVICE_VENDOR == tomcat" ]; then
+      if [ "CONF_WEBSERVICE_VENDOR == tomcat" ]; then
         export CONF_WEBSERVICE_MANAGER_USERNAME=$(echo $temp | awk -F'tomcat.admin.username=' '{print $2}' | awk -F' ' '{print $1}')
         export CONF_WEBSERVICE_MANAGER_PASSWORD=$(echo $temp | awk -F'tomcat.admin.password=' '{print $2}' | awk -F' ' '{print $1}')
       fi
@@ -4471,10 +3756,7 @@ load_conf() {
       export CONF_MTWILSON_TAG_API_USERNAME=`read_property_from_file mtwilson.tag.api.username "$mtw_props_path"`
       export CONF_MTWILSON_TAG_API_PASSWORD=`read_property_from_file mtwilson.tag.api.password "$mtw_props_path"`
       export CONF_WEBSERVICE_VENDOR=$(read_property_from_file mtwilson.webserver.vendor "$mtw_props_path")
-      if [ "$CONF_WEBSERVICE_VENDOR" == "glassfish" ]; then
-        export CONF_WEBSERVICE_MANAGER_USERNAME=$(read_property_from_file glassfish.admin.username "$mtw_props_path")
-        export CONF_WEBSERVICE_MANAGER_PASSWORD=$(read_property_from_file glassfish.admin.password "$mtw_props_path")
-      elif [ "$CONF_WEBSERVICE_VENDOR" == "tomcat" ]; then
+      if [ "$CONF_WEBSERVICE_VENDOR" == "tomcat" ]; then
         export CONF_WEBSERVICE_MANAGER_USERNAME=$(read_property_from_file tomcat.admin.username "$mtw_props_path")
         export CONF_WEBSERVICE_MANAGER_PASSWORD=$(read_property_from_file tomcat.admin.password "$mtw_props_path")
       fi
@@ -4766,11 +4048,7 @@ change_db_pass() {
   #fi
 
   # Restart
-  if using_glassfish; then
-    echo_success "using glassfish"
-    echo "Restarting mtwilson......"
-    $mtwilson glassfish-restart
-  elif using_tomcat; then
+  if using_tomcat; then
     echo_success "using tomcat"
     echo "Restarting mtwilson......"
     $mtwilson tomcat-restart
