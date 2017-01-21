@@ -32,7 +32,7 @@ TERM_COLOR_NORMAL="\\033[0;39m"
 #DEFAULT_POSTGRES_PASSWORD=""
 #DEFAULT_POSTGRES_DATABASE="mw_as"
 
-DEFAULT_JAVA_REQUIRED_VERSION="1.7"
+DEFAULT_JAVA_REQUIRED_VERSION="1.8"
 DEFAULT_TOMCAT_REQUIRED_VERSION="7.0"
 DEFAULT_MYSQL_REQUIRED_VERSION="5.0"
 DEFAULT_POSTGRES_REQUIRED_VERSION="9.3"
@@ -1855,7 +1855,9 @@ postgres_server_detect() {
   
   local is_systemd=$($postgres_com status 2>/dev/null | grep -E 'Active:')
   if [ -n "$is_systemd" ]; then
-    postgres_com="service postgresql-${POSTGRES_SERVER_VERSION_SHORT}"
+    if service postgresql-${POSTGRES_SERVER_VERSION_SHORT} status >/dev/null 2>&1 -ne 3; then
+      postgres_com="service postgresql-${POSTGRES_SERVER_VERSION_SHORT}"
+	fi
   fi
   
   postgres_pghb_conf=$(find / -name pg_hba.conf 2>/dev/null | grep $best_version_short | head -n 1)
@@ -2812,8 +2814,7 @@ jetty_start() {
     local mtwilson_jars=$(JARS=($java_lib_dir/*.jar); IFS=:; echo "${JARS[*]}")
     mainclass=com.intel.mtwilson.launcher.console.Main
     local jvm_memory=2048m
-    local jvm_maxperm=512m
-    { $java -Xmx${jvm_memory} -XX:MaxPermSize=${jvm_maxperm} -cp "$mtwilson_jars" -Dlogback.configurationFile=${conf_dir:-$DEFAULT_MTWILSON_CONF_DIR}/logback-stderr.xml $mainclass $@ | grep -vE "^\[EL Info\]|^\[EL Warning\]" ; } 2> /var/log/mtwilson.log
+    { $java -Xmx${jvm_memory} -cp "$mtwilson_jars" -Dlogback.configurationFile=${conf_dir:-$DEFAULT_MTWILSON_CONF_DIR}/logback-stderr.xml $mainclass $@ | grep -vE "^\[EL Info\]|^\[EL Warning\]" ; } 2> /var/log/mtwilson.log
     return $?
   fi
 }
@@ -2889,7 +2890,7 @@ java_ready() {
 java_version() {
   if [ -n "$java" ]; then
     # extract the version number from a string like: java version "1.7.0_51"
-    local current_java_version=`$java -version 2>&1 | head -n 1 | sed -e 's/"//g' | awk '{ print $3 }'`
+    local current_java_version=`java -version 2>&1 | head -n 1 | sed -e 's/"//g' | awk '{ print $3 }'`
     if [ -n "$current_java_version" ]; then
       echo $current_java_version
       return 0
@@ -3046,21 +3047,21 @@ no_java() {
 # Environment:
 # - JAVA_REQUIRED_VERSION in the format "1.7.0_51"
 java_install_openjdk() {
-  JAVA_YUM_PACKAGES="java-1.7.0-openjdk java-1.7.0-openjdk-devel"
-  JAVA_APT_PACKAGES="openjdk-7-jre openjdk-7-jdk"
-  java_detect
-  if [[ -z "$JAVA_HOME" || -z "$java" ]]; then
-    auto_install "Java" "JAVA"
-    if [ $? -ne 0 ]; then echo_failure "Failed to install openjdk through package installer"; return 1; fi
-    java_detect
-    if [[ -z "$JAVA_HOME" || -z "$java" ]]; then
-      echo_failure "Cannot install Java"
-      echo "Java download URL:"
-      echo "http://www.java.com/en/download/"
-    fi
-  else
-    echo "Java is already installed"
-  fi
+echo "Installing Java from pacakage manager..." >> $INSTALL_LOG_FILE
+if [ "$(whoami)" == "root" ]; then
+  JAVA_YUM_PACKAGES="java-1.8.0-openjdk-devel"
+  JAVA_APT_PACKAGES="openjdk-8-jdk"
+  JAVA_YAST_PACKAGES=""
+  JAVA_ZYPPER_PACKAGES="java-1.8.0-openjdk-headless.x86_64"
+  auto_install "Installer requirements" "JAVA"
+  if [ $? -ne 0 ]; then echo_failure "Failed to install prerequisites through package installer"; exit -1; fi
+else
+  echo_warning "You must be root to install Java through package manager"
+fi
+# Set Java related varibales 
+java=$(type -p java | xargs readlink -f)
+JAVA_CMD=$java
+java_bindir=$(dirname $JAVA_CMD)
 }
 
 java_install() {
@@ -3638,7 +3639,7 @@ call_setupcommand() {
   if no_java ${JAVA_REQUIRED_VERSION:-$DEFAULT_JAVA_REQUIRED_VERSION}; then echo "Cannot find Java ${JAVA_REQUIRED_VERSION:-$DEFAULT_JAVA_REQUIRED_VERSION} or later"; return 1; fi
   SETUP_CONSOLE_JARS=$(JARS=($java_lib_dir/*.jar); IFS=:; echo "${JARS[*]}")
   mainclass=com.intel.mtwilson.setup.TextConsole
-  $java -cp "$SETUP_CONSOLE_JARS" -Dlogback.configurationFile=${conf_dir:-$DEFAULT_MTWILSON_CONF_DIR}/logback-stderr.xml $mainclass $@ | grep -vE "^\[EL Info\]|^\[EL Warning\]" 2> /dev/null
+  java -cp "$SETUP_CONSOLE_JARS" -Dlogback.configurationFile=${conf_dir:-$DEFAULT_MTWILSON_CONF_DIR}/logback-stderr.xml $mainclass $@ | grep -vE "^\[EL Info\]|^\[EL Warning\]" 2> /dev/null
   return $?
 }
 
@@ -3649,8 +3650,7 @@ call_tag_setupcommand() {
   SETUP_CONSOLE_JARS=$(JARS=($java_lib_dir/*.jar); IFS=:; echo "${JARS[*]}")
   mainclass=com.intel.mtwilson.launcher.console.Main
   local jvm_memory=2048m
-  local jvm_maxperm=512m
-  $java -Xmx${jvm_memory} -XX:MaxPermSize=${jvm_maxperm} -cp "$SETUP_CONSOLE_JARS" -Dlogback.configurationFile=${conf_dir:-$DEFAULT_MTWILSON_CONF_DIR}/logback-stderr.xml $mainclass $@ --ext-java=$java_lib_dir | grep -vE "^\[EL Info\]|^\[EL Warning\]" 2> /dev/null
+  java -Xmx${jvm_memory} -cp "$SETUP_CONSOLE_JARS" -Dlogback.configurationFile=${conf_dir:-$DEFAULT_MTWILSON_CONF_DIR}/logback-stderr.xml $mainclass $@ --ext-java=$java_lib_dir | grep -vE "^\[EL Info\]|^\[EL Warning\]" 2> /dev/null
   return $?
 }
 
