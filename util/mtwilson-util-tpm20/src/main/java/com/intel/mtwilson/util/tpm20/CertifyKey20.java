@@ -4,6 +4,7 @@
  */
 package com.intel.mtwilson.util.tpm20;
 
+import com.intel.dcsg.cpg.crypto.Sha1Digest;
 import com.intel.dcsg.cpg.crypto.Sha256Digest;
 import com.intel.mtwilson.util.tpm20.x509.TpmCertifyKeyInfo;
 import com.intel.mtwilson.util.tpm20.x509.TpmCertifyKeySignature;
@@ -40,7 +41,7 @@ public class CertifyKey20 {
     public static final String TCG_STRUCTURE_CERTIFY_INFO_OID = "2.5.4.133.3.2.41";
     public static final String TCG_STRUCTURE_CERTIFY_INFO_SIGNATURE_OID = "2.5.4.133.3.2.41.1";
 
-    public static boolean verifyTpmBindingKeyCertificate(X509Certificate keyCertificate, PublicKey aikPublicKey) {
+    public static boolean verifyTpmBindingKeyCertificate(X509Certificate keyCertificate, PublicKey aikPublicKey) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, TpmUtils.TpmBytestreamResouceException, TpmUtils.TpmUnsignedConversionException {
         /*
          * First check that the given AIK public key can verify the signature
          * on the TPM binding public key.
@@ -82,7 +83,7 @@ public class CertifyKey20 {
 
     }
 
-    public static boolean verifyTpmSigningKeyCertificate(X509Certificate keyCertificate, PublicKey aikPublicKey) {
+    public static boolean verifyTpmSigningKeyCertificate(X509Certificate keyCertificate, PublicKey aikPublicKey) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, TpmUtils.TpmBytestreamResouceException, TpmUtils.TpmUnsignedConversionException {
         /*
          * First check that the given AIK public key can verify the signature
          * on the TPM binding public key.
@@ -142,13 +143,19 @@ public class CertifyKey20 {
      * @throws BadPaddingException
      */
     public static boolean isCertifiedKeySignatureValid(byte[] certifyKeyDataBlob, byte[] certifyKeySignatureBlob, PublicKey aikPublicKey)
-            throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, DecoderException {
+            throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, DecoderException, TpmUtils.TpmBytestreamResouceException, TpmUtils.TpmUnsignedConversionException {
         //TPM2.0 has 4 additional bytes vs. TPM 1.2
         byte[] oidPadding = Hex.decodeHex("3031300d060960864801650304020105000420".toCharArray()); //TpmUtils.hexStringToByteArray("3031300d060960864801650304020105000420");
-
+        //byte[] SHA256_ENCRYPTION_SCHEME = {(byte) 0x00, (byte) 0x0b};
+        short SHA256_ENCRYPTION_SCHEME = 0x000b;
         try {
 
             log.debug("Verifying the certify key signature against the AIK cert which signed it.");
+            //Check encryption scheme used, Linux TPM 2.0 default is sha256, on Windows Tpm2.0 Sha1 is default
+            TpmCertifyKey20 tpmCertifyKey20 = new TpmCertifyKey20(certifyKeyDataBlob);
+            short hashAlg = tpmCertifyKey20.getTpmuAttest().getTpmsCertifyInfoBlob().getTpmtHa().getHashAlg();
+            log.debug("Checking encryption sheme {} vs {}, result is {}",SHA256_ENCRYPTION_SCHEME,hashAlg,SHA256_ENCRYPTION_SCHEME == hashAlg);
+            
             Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.DECRYPT_MODE, aikPublicKey);
             byte[] signedDigest = null;
@@ -160,7 +167,11 @@ public class CertifyKey20 {
                 signedDigest = cipher.doFinal(certifyKeySignatureBlob);
             }
             byte[] signedDigestWithoutOidPadding = Arrays.copyOfRange(signedDigest, oidPadding.length, signedDigest.length);
-            byte[] computedDigest = Sha256Digest.digestOf(certifyKeyDataBlob).toByteArray();
+            byte[] computedDigest = null;
+            if(SHA256_ENCRYPTION_SCHEME == hashAlg)
+                computedDigest = Sha256Digest.digestOf(certifyKeyDataBlob).toByteArray();
+            else
+                computedDigest = Sha1Digest.digestOf(certifyKeyDataBlob).toByteArray();
             log.debug("Verifying the signed digest {} of size {} against the computed digest {} of size {}",
                     Hex.encodeHexString(signedDigestWithoutOidPadding), signedDigestWithoutOidPadding.length, //TpmUtils.byteArrayToHexString(signedDigestWithoutOidPadding), 
                     Hex.encodeHexString(computedDigest), computedDigest.length); //TpmUtils.byteArrayToHexString(computedDigest));
