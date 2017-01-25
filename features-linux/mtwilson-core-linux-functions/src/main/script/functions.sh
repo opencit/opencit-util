@@ -3704,13 +3704,7 @@ if [ "$(whoami)" == "root" ]; then
   if [ $? -ne 0 ]; then echo_failure "Failed to install prerequisites through package installer"; exit -1; fi
 else
   echo_warning "You must be root to install Java through package manager"
-fi
-
-if [[ -n "$aptget" && -n "$apt_packages" ]]; then
-	add-apt-repository ppa:openjdk-r/ppa
-	apt-get update
-	
-	
+fi	
 # Set Java related varibales 
 java=$(type -p java | xargs readlink -f)
 JAVA_CMD=$java
