@@ -3695,11 +3695,22 @@ if [ "$(whoami)" == "root" ]; then
   JAVA_APT_PACKAGES="openjdk-8-jdk"
   JAVA_YAST_PACKAGES=""
   JAVA_ZYPPER_PACKAGES="java-1.8.0-openjdk-headless.x86_64"
+  aptget_detect
+  if [[ -n "$aptget" && -n "$JAVA_APT_PACKAGES" ]]; then
+	add-apt-repository ppa:openjdk-r/ppa
+	apt-get update
+  fi
   auto_install "Installer requirements" "JAVA"
   if [ $? -ne 0 ]; then echo_failure "Failed to install prerequisites through package installer"; exit -1; fi
 else
   echo_warning "You must be root to install Java through package manager"
 fi
+
+if [[ -n "$aptget" && -n "$apt_packages" ]]; then
+	add-apt-repository ppa:openjdk-r/ppa
+	apt-get update
+	
+	
 # Set Java related varibales 
 java=$(type -p java | xargs readlink -f)
 JAVA_CMD=$java
