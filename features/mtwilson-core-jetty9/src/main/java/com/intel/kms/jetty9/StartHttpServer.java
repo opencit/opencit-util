@@ -288,12 +288,15 @@ public class StartHttpServer implements Runnable {
 //            sslConnectionFactory.setIncludeProtocols("TLSv1", "TLSv1.1", "TLSv1.2");
             sslConnectionFactory.setExcludeProtocols("SSL", "SSLv2", "SSLv2Hello", "SSLv3", "TLSv1", "TLSv1.1");
             sslConnectionFactory.setIncludeCipherSuites(
-                    "TLS_DHE_RSA.*", "TLS_ECDHE.*"
+                    "TLS_DHE_RSA_WITH_AES_128_GCM_SHA256",
+                    "TLS_RSA_WITH_AES_128_GCM_SHA256",
+                    "TLS_RSA_WITH_AES_128_CCM"
             );
-            sslConnectionFactory.setExcludeCipherSuites(
-                    ".*NULL.*", ".*RC4.*", ".*MD5.*", ".*DES.*", ".*DSS.*",
-                    "TLS_DHE_RSA_WITH_AES_128_CBC_SHA"
-            );
+//            sslConnectionFactory.setExcludeCipherSuites(
+//                    ".*NULL.*", ".*RC4.*", ".*MD5.*", ".*DES.*", ".*DSS.*", ".*CBC.*",
+//                     ".*EC.*", "*ECDHE.*", ".*ECDH.*",
+//                    "TLS_DHE_RSA_WITH_AES_128_CBC_SHA"
+//            );
             sslConnectionFactory.setRenegotiationAllowed(false);
             ServerConnector https = new ServerConnector(jetty, new ConnectionFactory[]{new SslConnectionFactory(sslConnectionFactory, "http/1.1"), new HttpConnectionFactory(httpsConfiguration)});
             https.setPort(getHttpsPort());
