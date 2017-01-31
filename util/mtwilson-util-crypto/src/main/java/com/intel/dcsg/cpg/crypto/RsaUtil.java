@@ -105,7 +105,7 @@ public class RsaUtil {
      */
     public static X509Certificate generateX509Certificate(String dn, String alternativeName, KeyPair pair, int days) throws CryptographyException, IOException {
         X500Name owner = new X500Name(dn, "Mt Wilson", "Trusted Data Center", "US"); // the constructor X500Name(dn) was throwing an exception;  replaced "Intel" with "Trusted Data Center" to avoid confusion about the owner of the certificate... this is not an "Intel certificate", it's generated at the customer site.
-        return createX509CertificateWithIssuer(pair.getPublic(), dn, alternativeName, days, pair.getPrivate(), new CertificateIssuerName(owner));
+        return createX509CertificateWithIssuer(pair.getPublic(), dn, alternativeName, days, pair.getPrivate(), owner);
     }
 
     /**
@@ -125,7 +125,7 @@ public class RsaUtil {
      */
     public static X509Certificate createX509CertificateWithIssuer(PublicKey subjectPublicKey, String dn, String alternativeName, int days, PrivateKey issuerPrivateKey, X509Certificate issuerCertificate) throws CryptographyException, IOException {
         X500Name issuerName = X500Name.asX500Name(issuerCertificate.getSubjectX500Principal());
-        return createX509CertificateWithIssuer(subjectPublicKey, dn, alternativeName, days, issuerPrivateKey, new CertificateIssuerName(issuerName));
+        return createX509CertificateWithIssuer(subjectPublicKey, dn, alternativeName, days, issuerPrivateKey, issuerName);
     }
 
     /**
@@ -144,88 +144,22 @@ public class RsaUtil {
      * @return
      * @throws GeneralSecurityException
      * @throws IOException
-     * @deprecated use X509Builder instead, or RsaUtil.createSelfSignedTlsCredential (not exactly the same but can make a variation of it to cover this function)
      */
-    public static X509Certificate createX509CertificateWithIssuer(PublicKey subjectPublicKey, String dn, String alternativeName, int days, PrivateKey issuerPrivateKey, CertificateIssuerName issuerName) throws IOException, CryptographyException {
-//        X509
-        X509CertInfo info = new X509CertInfo();
-        Date from = new Date();
-        Date to = new Date(from.getTime() + days * 86400000l);
-        CertificateValidity interval = new CertificateValidity(from, to);
-        BigInteger sn = new BigInteger(64, new SecureRandom());
-        X500Name subjectName = new X500Name(dn, "Mt Wilson", "Trusted Data Center", "US"); // the constructor X500Name(dn) was throwing an exception;  replaced "Intel" with "Trusted Data Center" to avoid confusion about the owner of the certificate... this is not an "Intel certificate", it's generated at the customer site.
-        AlgorithmId algorithm;
-        try {
-            info.set(X509CertInfo.VALIDITY, interval); // CertificateException, IOException
-            info.set(X509CertInfo.SERIAL_NUMBER, new CertificateSerialNumber(sn)); // CertificateException, IOException
-            info.set(X509CertInfo.SUBJECT, new CertificateSubjectName(subjectName)); // CertificateException, IOException
-            info.set(X509CertInfo.ISSUER, issuerName); // CertificateException, IOException
-            info.set(X509CertInfo.KEY, new CertificateX509Key(subjectPublicKey)); // CertificateException, IOException
-            info.set(X509CertInfo.VERSION, new CertificateVersion(CertificateVersion.V3)); // CertificateException, IOException
-            if (alternativeName != null) {
-                boolean isIpAddress = alternativeName.startsWith("ip:");
-                boolean isDnsName = alternativeName.startsWith("dns:");
-                if( isIpAddress ) {
-                    alternativeName = alternativeName.substring(3); // remove ip: prefix
-                }
-                if( isDnsName ) {
-                    alternativeName = alternativeName.substring(4); // remove dns: prefix
-                }
-                if( !isIpAddress && !isDnsName ) {
-                    // currently we only support ip or dns, and user didn't specify either one so let's try to automatically
-                    // detect
-                    InternetAddress address = new InternetAddress(alternativeName);
-                    if( address.isValid() ) {
-                        if( address.isHostname() ) {
-                            isDnsName = true;
-                        }
-                        else if( address.isIPv4() || address.isIPv6() ) {
-                            isIpAddress = true;
-                        }
-                    }
-                }
-                if(isIpAddress) {
-                    //                InetAddress ipAddress = new InetAddress.getByName(alternativeName.substring(3));
-                    //                IPAddressName ipAddressName = new IPAddressName(ipAddress.getAddress());
-                    IPAddressName ipAddressName = new IPAddressName(alternativeName);
-                    GeneralNames generalNames = new GeneralNames();
-                    generalNames.add(new GeneralName(ipAddressName));
-                    SubjectAlternativeNameExtension san = new SubjectAlternativeNameExtension(generalNames);
-                    CertificateExtensions ext = new CertificateExtensions();
-                    ext.set(san.getExtensionId().toString(), san);
-                    info.set(X509CertInfo.EXTENSIONS, ext);
-                    //   ObjectIdentifier("2.5.29.17") , false, "ipaddress".getBytes()                            
-                }
-                if(isDnsName) {
-                    DNSName dnsName = new DNSName(alternativeName);
-                    GeneralNames generalNames = new GeneralNames();
-                    generalNames.add(new GeneralName(dnsName));
-                    SubjectAlternativeNameExtension san = new SubjectAlternativeNameExtension(generalNames);
-                    CertificateExtensions ext = new CertificateExtensions();
-                    ext.set(san.getExtensionId().toString(), san);
-                    info.set(X509CertInfo.EXTENSIONS, ext);
-                }
+    public static X509Certificate createX509CertificateWithIssuer(PublicKey subjectPublicKey, String dn, String alternativeName, int days, PrivateKey issuerPrivateKey, X500Name issuerName) throws CryptographyException, IOException{
+            X509Builder certBuilder = X509Builder.factory();
+            certBuilder.subjectName(String.format("CN=%s, OU=Mt Wilson, O=Trusted Data Center, C=US", dn))
+                    .expires(days, TimeUnit.HOURS)
+                    .issuerName(issuerName)
+                    .subjectPublicKey(subjectPublicKey)
+                    .issuerPrivateKey(issuerPrivateKey);
+            if (alternativeName != null){
+                certBuilder.alternativeName(alternativeName);
+            }        
+            X509Certificate cert= certBuilder.build();
+            if (cert == null) {
+                throw new CryptographyException("Cannot sign certificate");
             }
-            algorithm = new AlgorithmId(AlgorithmId.sha256WithRSAEncryption_oid); // md5WithRSAEncryption_oid
-            info.set(X509CertInfo.ALGORITHM_ID, new CertificateAlgorithmId(algorithm));
-        } catch (CertificateException e) {
-            throw new CryptographyException("Cannot generate certificate", e);
-        }
-        try {
-            // Sign the cert to identify the algorithm that's used.
-            X509CertImpl cert = new X509CertImpl(info);
-            System.out.println("Algorithm name: " + algorithm.getName()); // if this isn't SHA256withRSA need to hard code it
-            cert.sign(issuerPrivateKey, algorithm.getName()); // NoSuchAlgorithMException, InvalidKeyException, NoSuchProviderException, , SignatureException
-
-            // Update the algorith, and resign.
-            algorithm = (AlgorithmId) cert.get(X509CertImpl.SIG_ALG);
-            info.set(CertificateAlgorithmId.NAME + "." + CertificateAlgorithmId.ALGORITHM, algorithm);
-            cert = new X509CertImpl(info);
-            cert.sign(issuerPrivateKey, algorithm.getName()); // NoSuchAlgorithMException, InvalidKeyException, NoSuchProviderException, SignatureException
             return cert;
-        } catch (CertificateException | NoSuchAlgorithmException | InvalidKeyException | NoSuchProviderException | SignatureException e) {
-            throw new CryptographyException("Cannot sign certificate", e);
-        }
     }
     
     
