@@ -3697,7 +3697,9 @@ if [ "$(whoami)" == "root" ]; then
   JAVA_ZYPPER_PACKAGES="java-1.8.0-openjdk-headless.x86_64"
   aptget_detect
   if [[ -n "$aptget" && -n "$JAVA_APT_PACKAGES" ]]; then
-	add-apt-repository ppa:openjdk-r/ppa
+    PROPERTIES_APT_PACKAGES="software-properties-common"
+	auto_install "Python Software Properties" "PROPERTIES"
+	add-apt-repository ppa:openjdk-r/ppa -y
 	apt-get update
   fi
   auto_install "Installer requirements" "JAVA"
