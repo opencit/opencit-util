@@ -3698,7 +3698,8 @@ if [ "$(whoami)" == "root" ]; then
   aptget_detect
   if [[ -n "$aptget" && -n "$JAVA_APT_PACKAGES" ]]; then
     PROPERTIES_APT_PACKAGES="software-properties-common"
-	auto_install "Python Software Properties" "PROPERTIES"
+	auto_install "Software Properties Common" "PROPERTIES"
+	# Note: We could also refactor function 'add_package_repository' to perform below steps
 	add-apt-repository ppa:openjdk-r/ppa -y
 	apt-get update
   fi
@@ -3706,7 +3707,7 @@ if [ "$(whoami)" == "root" ]; then
   if [ $? -ne 0 ]; then echo_failure "Failed to install prerequisites through package installer"; exit -1; fi
 else
   echo_warning "You must be root to install Java through package manager"
-fi	
+fi
 # Set Java related varibales 
 java=$(type -p java | xargs readlink -f)
 JAVA_CMD=$java
