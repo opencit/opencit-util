@@ -3053,6 +3053,14 @@ if [ "$(whoami)" == "root" ]; then
   JAVA_APT_PACKAGES="openjdk-8-jdk"
   JAVA_YAST_PACKAGES=""
   JAVA_ZYPPER_PACKAGES="java-1.8.0-openjdk-headless.x86_64"
+  aptget_detect
+  if [[ -n "$aptget" && -n "$JAVA_APT_PACKAGES" ]]; then
+    PROPERTIES_APT_PACKAGES="software-properties-common"
+	auto_install "Software Properties Common" "PROPERTIES"
+	# Note: We could also refactor function 'add_package_repository' to perform below steps
+	add-apt-repository ppa:openjdk-r/ppa -y
+	apt-get update
+  fi
   auto_install "Installer requirements" "JAVA"
   if [ $? -ne 0 ]; then echo_failure "Failed to install prerequisites through package installer"; exit -1; fi
 else
