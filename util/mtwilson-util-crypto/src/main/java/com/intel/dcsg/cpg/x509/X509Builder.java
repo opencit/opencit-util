@@ -5,6 +5,7 @@
 package com.intel.dcsg.cpg.x509;
 
 import com.intel.dcsg.cpg.crypto.RsaCredentialX509;
+import com.intel.dcsg.cpg.io.JavaVersion;
 import com.intel.dcsg.cpg.net.InternetAddress;
 import com.intel.dcsg.cpg.validation.BuilderModel;
 import com.intel.dcsg.cpg.x500.DNBuilder;
@@ -62,6 +63,7 @@ import sun.security.x509.X509CertInfo;
  * @author jbuhacoff
  */
 public class X509Builder extends BuilderModel {
+    private static final boolean JAVA_1_8 = JavaVersion.runtime().isAtLeast(1, 8);
     private X509CertInfo info = new X509CertInfo();
     private CertificateValidity certificateValidity = null;
     private CertificateSerialNumber certificateSerialNumber = null;
@@ -110,7 +112,7 @@ public class X509Builder extends BuilderModel {
             info.set(X509CertInfo.VALIDITY, certificateValidity); // CertificateException, IOException
         }
         catch(CertificateException | IOException e) {
-            fault(e, "certificateValidity(%s)", certificateValidity==null?"null":certificateValidity.toString());
+            fault(e, "certificateValidity(%s): %s: %s", certificateValidity==null?"null":certificateValidity.toString(), e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -123,7 +125,7 @@ public class X509Builder extends BuilderModel {
             info.set(X509CertInfo.VALIDITY, certificateValidity); // CertificateException, IOException
         }
         catch(CertificateException | IOException e) {
-            fault(e, "expires(%d,%s)", expiration, units==null?"null":units.name());
+            fault(e, "expires(%d,%s): %s: %s", expiration, units==null?"null":units.name(), e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -134,7 +136,7 @@ public class X509Builder extends BuilderModel {
             info.set(X509CertInfo.VALIDITY, certificateValidity); // CertificateException, IOException
         }
         catch(CertificateException | IOException e) {
-            fault(e, "valid(%s,%s)", from==null?"null":from.toString(), to==null?"null":to.toString());
+            fault(e, "valid(%s,%s): %s: %s", from==null?"null":from.toString(), to==null?"null":to.toString(), e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -146,7 +148,7 @@ public class X509Builder extends BuilderModel {
             info.set(X509CertInfo.SERIAL_NUMBER, certificateSerialNumber);
         }
         catch(CertificateException | IOException e) {
-            fault(e, "randomSerial");
+            fault(e, "randomSerial: %s: %s", e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -154,10 +156,15 @@ public class X509Builder extends BuilderModel {
     public X509Builder subjectName(X500Name subjectName) {
         try {
             certificateSubjectName = new CertificateSubjectName(subjectName);
-            info.set(X509CertInfo.SUBJECT, certificateSubjectName); // CertificateException, IOException
+            if( JAVA_1_8 ) {
+                info.set(X509CertInfo.SUBJECT, subjectName); // CertificateException, IOException
+            }
+            else {
+                info.set(X509CertInfo.SUBJECT, certificateSubjectName); // CertificateException, IOException
+            } 
         }
         catch(CertificateException | IOException e) {
-            fault(e, "subjectName(%s)", subjectName==null?"null":subjectName.getRFC2253Name());
+            fault(e, "subjectName(%s): %s: %s", subjectName==null?"null":subjectName.getRFC2253Name(), e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -169,11 +176,10 @@ public class X509Builder extends BuilderModel {
      */
     public X509Builder subjectName(String dn) {
         try {
-            certificateSubjectName = new CertificateSubjectName(new X500Name(dn));
-            info.set(X509CertInfo.SUBJECT, certificateSubjectName); // CertificateException, IOException
+            subjectName(new X500Name(dn));
         }
-        catch(IOException | CertificateException e) {
-            fault(e, "subjectName(%s)", dn);
+        catch(IOException e) {
+            fault(e, "subjectName(%s): %s: %s", dn, e.getClass().getName(), e.getMessage());
         }
         return this;        
     }
@@ -183,6 +189,13 @@ public class X509Builder extends BuilderModel {
     public X509Builder organizationName(String text) { organizationName = text; return this; }
     public X509Builder country(String text) { country = text; return this; }
     
+    /**
+     * Will not work in Java 1.8, use one of the other issuerName methods in Java 1.8 or later
+     * 
+     * @param certificateIssuerName
+     * @return 
+     */
+    @Deprecated
     public X509Builder issuerName(CertificateIssuerName certificateIssuerName) {
         try {
             this.certificateIssuerName = certificateIssuerName;
@@ -197,10 +210,15 @@ public class X509Builder extends BuilderModel {
     public X509Builder issuerName(X500Name issuerName) {
         try {
             certificateIssuerName = new CertificateIssuerName(issuerName);
-            info.set(X509CertInfo.ISSUER, certificateIssuerName); // CertificateException, IOException
+            if( JAVA_1_8 ) {                
+                info.set(X509CertInfo.ISSUER, issuerName); // CertificateException, IOException
+            }
+            else {
+                info.set(X509CertInfo.ISSUER, certificateIssuerName); // CertificateException, IOException
+            }
         }
         catch(CertificateException | IOException e) {
-            fault(e, "issuerName(%s)", issuerName.getRFC2253Name());
+            fault(e, "issuerName(%s): %s: %s", issuerName.getRFC2253Name(), e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -213,11 +231,10 @@ public class X509Builder extends BuilderModel {
 
     public X509Builder issuerName(String dn) {
         try {
-            certificateIssuerName = new CertificateIssuerName(new X500Name(dn));
-            info.set(X509CertInfo.ISSUER, certificateIssuerName); // CertificateException, IOException
+            issuerName(new X500Name(dn));
         }
-        catch(IOException | CertificateException e) {
-            fault(e, "issuerName(%s)", dn);
+        catch(IOException e) {
+            fault(e, "issuerName(%s): %s: %s", dn, e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -233,7 +250,7 @@ public class X509Builder extends BuilderModel {
             issuerName(issuerCredential.getCertificate());
         }
         catch(Exception e) {
-            fault(e, "issuer(%s)", issuerCredential==null?"null":issuerCredential.getCertificate().getIssuerX500Principal().getName());
+            fault(e, "issuer(%s): %s: %s", issuerCredential==null?"null":issuerCredential.getCertificate().getIssuerX500Principal().getName(), e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -244,7 +261,7 @@ public class X509Builder extends BuilderModel {
             info.set(X509CertInfo.KEY, subjectPublicKey); // CertificateException, IOException
         }
         catch(CertificateException | IOException e) {
-            fault(e, "subjectPublicKey(%s)", publicKey==null?"null":String.format("%d bytes, %s %s",publicKey.getEncoded().length,publicKey.getAlgorithm(),publicKey.getFormat()));
+            fault(e, "subjectPublicKey(%s): %s: %s", publicKey==null?"null":String.format("%d bytes, %s %s",publicKey.getEncoded().length,publicKey.getAlgorithm(),publicKey.getFormat()), e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -300,7 +317,7 @@ public class X509Builder extends BuilderModel {
             }
         }
         catch(CertificateException | IOException e) {
-            fault(e, "certificateVersion(%d)", version==null?"null":version.toString());
+            fault(e, "certificateVersion(%d): %s: %s", version==null?"null":version.toString(), e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -326,7 +343,7 @@ public class X509Builder extends BuilderModel {
             info.set(X509CertInfo.EXTENSIONS, certificateExtensions);
         }
         catch(IOException | CertificateException e) {
-            fault(e, "noncriticalExtension(%s,%s)", oid, Base64.encodeBase64String(value));
+            fault(e, "noncriticalExtension(%s,%s): %s: %s", oid, Base64.encodeBase64String(value), e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -342,7 +359,7 @@ public class X509Builder extends BuilderModel {
             info.set(X509CertInfo.EXTENSIONS, certificateExtensions);
         }
         catch(IOException | CertificateException e) {
-            fault(e, "criticalExtension(%s,%s)", oid, Base64.encodeBase64String(value));
+            fault(e, "criticalExtension(%s,%s): %s: %s", oid, Base64.encodeBase64String(value), e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -367,7 +384,7 @@ public class X509Builder extends BuilderModel {
             
         }
         catch(IOException | CertificateException e) {
-            fault(e, "ipAlternativeName(%s)", ip);
+            fault(e, "ipAlternativeName(%s): %s: %s", ip, e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -388,7 +405,7 @@ public class X509Builder extends BuilderModel {
             info.set(X509CertInfo.EXTENSIONS, certificateExtensions);
         }        
         catch(IOException | CertificateException e) {
-            fault(e, "dnsAlternativeName(%s)", dns);
+            fault(e, "dnsAlternativeName(%s): %s: %s", dns, e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -416,7 +433,7 @@ public class X509Builder extends BuilderModel {
             }
         }
         catch(Exception e) {
-            fault(e, "alternativeName(%s)", alternativeName);
+            fault(e, "alternativeName(%s): %s: %s", alternativeName, e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -428,7 +445,7 @@ public class X509Builder extends BuilderModel {
 //                info.set(CertificateAlgorithmId.NAME + "." + CertificateAlgorithmId.ALGORITHM, algorithm); // was present in older monolith version of the certificate factory, but it seems we don't really need it
         }
         catch(CertificateException | IOException e) {
-            fault(e, "algorithm(%s)", algorithmId.getName());
+            fault(e, "algorithm(%s): %s: %s", algorithmId.getName(), e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -443,7 +460,7 @@ public class X509Builder extends BuilderModel {
             info.set(X509CertInfo.EXTENSIONS, certificateExtensions);
         }
         catch(IOException | CertificateException e) {
-            fault(e, "keyUsageDigitalSignature");
+            fault(e, "keyUsageDigitalSignature: %s: %s", e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -458,7 +475,7 @@ public class X509Builder extends BuilderModel {
             info.set(X509CertInfo.EXTENSIONS, certificateExtensions);
         }
         catch(IOException | CertificateException e) {
-            fault(e, "keyUsageNonRepudiation");
+            fault(e, "keyUsageNonRepudiation: %s: %s", e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -473,7 +490,7 @@ public class X509Builder extends BuilderModel {
             info.set(X509CertInfo.EXTENSIONS, certificateExtensions);
         }
         catch(IOException | CertificateException e) {
-            fault(e, "keyUsageKeyEncipherment");
+            fault(e, "keyUsageKeyEncipherment: %s: %s", e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -488,7 +505,7 @@ public class X509Builder extends BuilderModel {
             info.set(X509CertInfo.EXTENSIONS, certificateExtensions);
         }
         catch(IOException | CertificateException e) {
-            fault(e, "keyUsageDataEncipherment");
+            fault(e, "keyUsageDataEncipherment: %s: %s", e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -508,7 +525,7 @@ public class X509Builder extends BuilderModel {
             info.set(X509CertInfo.EXTENSIONS, certificateExtensions);
         }
         catch(IOException | CertificateException e) {
-            fault(e, "keyUsageCertificateAuthority");
+            fault(e, "keyUsageCertificateAuthority: %s: %s", e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -523,7 +540,7 @@ public class X509Builder extends BuilderModel {
             info.set(X509CertInfo.EXTENSIONS, certificateExtensions);             
         }
         catch(IOException | CertificateException e) {
-            fault(e, "keyUsageCRLSign");
+            fault(e, "keyUsageCRLSign: %s: %s", e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -540,7 +557,7 @@ public class X509Builder extends BuilderModel {
             }
         }
         catch(IOException | CertificateException e) {
-            fault(e, "extKeyUsageIsCritical");
+            fault(e, "extKeyUsageIsCritical: %s: %s", e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -550,7 +567,7 @@ public class X509Builder extends BuilderModel {
             extKeyUsage(new ObjectIdentifier(serverAuthOidData));
         }
         catch(Exception e) {
-            fault(e, "extKeyUsageServerAuth");
+            fault(e, "extKeyUsageServerAuth: %s: %s", e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -560,7 +577,7 @@ public class X509Builder extends BuilderModel {
             extKeyUsage(new ObjectIdentifier(clientAuthOidData));
         }
         catch(Exception e) {
-            fault(e, "extKeyUsageClientAuth");
+            fault(e, "extKeyUsageClientAuth: %s: %s", e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -576,7 +593,7 @@ public class X509Builder extends BuilderModel {
             info.set(X509CertInfo.EXTENSIONS, certificateExtensions);             
         }
         catch(IOException | CertificateException e) {
-            fault(e, "extKeyUsage(%s)", oid.toString());
+            fault(e, "extKeyUsage(%s): %s: %s", oid.toString(), e.getClass().getName(), e.getMessage());
         }
         return this;
     }
@@ -603,7 +620,7 @@ public class X509Builder extends BuilderModel {
                 subjectName(new X500Name(dn));
             }
             catch(Exception e) {
-                fault(e, "commonName(%s) organizationUnit(%s) organizationName(%s) country(%s)", commonName, organizationUnit, organizationName, country);
+                fault(e, "commonName(%s) organizationUnit(%s) organizationName(%s) country(%s): %s: %s", commonName, organizationUnit, organizationName, country, e.getClass().getName(), e.getMessage());
             }
         }
         if( certificateIssuerName == null ) {
@@ -615,7 +632,7 @@ public class X509Builder extends BuilderModel {
                     issuerName(new X500Name(commonName, organizationUnit, organizationName, country));
                 }
                 catch(Exception e) {
-                    fault(e, "commonName(%s) organizationUnit(%s) organizationName(%s) country(%s)", commonName, organizationUnit, organizationName, country);
+                    fault(e, "commonName(%s) organizationUnit(%s) organizationName(%s) country(%s): %s: %s", commonName, organizationUnit, organizationName, country, e.getClass().getName(), e.getMessage());
                 }
             }
             
@@ -652,7 +669,7 @@ public class X509Builder extends BuilderModel {
             return null;
         }
         catch(CertificateException | NoSuchAlgorithmException | InvalidKeyException | NoSuchProviderException | SignatureException e) {
-            fault(e, "cannot sign certificate");
+            fault(e, "cannot sign certificate: %s: %s", e.getClass().getName(), e.getMessage());
             return null;
         }
         finally {
