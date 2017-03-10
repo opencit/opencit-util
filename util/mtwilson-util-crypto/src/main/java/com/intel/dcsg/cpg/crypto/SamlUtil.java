@@ -38,6 +38,8 @@ public class SamlUtil {
     private XMLSignatureFactory factory;
     private Logger log = LoggerFactory.getLogger(getClass());
     
+    public static final String ALGO_SIGNATURE_RSA_SHA256 = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+    
     
     // keystore must already be unlocked with its password
     public SamlUtil() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
@@ -156,7 +158,7 @@ public class SamlUtil {
                 algURI.equalsIgnoreCase (SignatureMethod.DSA_SHA1)) 
             ||
                (algName.equalsIgnoreCase ("RSA") &&
-                algURI.equalsIgnoreCase(SignatureMethod.RSA_SHA1));
+                (algURI.equalsIgnoreCase(SignatureMethod.RSA_SHA1) || algURI.equalsIgnoreCase(ALGO_SIGNATURE_RSA_SHA256)));
     }
 
     /**
