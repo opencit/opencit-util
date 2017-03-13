@@ -70,9 +70,11 @@ public class XML {
         StreamSource[] schemaSources = new StreamSource[schemaLocations.size()];
         int i = 0;
         for (String schemaLocation : schemaLocations) {
-            InputStream in = resolver.findResource(schemaLocation);
-            schemaSources[i] = new StreamSource(in);
+            InputStream inputStream = resolver.findResource(schemaLocation);
+            schemaSources[i] = new StreamSource(inputStream);
             i++;
+            if(inputStream != null)
+                inputStream.close();
         }
         Schema schema = schemaFactory.newSchema(schemaSources);
 

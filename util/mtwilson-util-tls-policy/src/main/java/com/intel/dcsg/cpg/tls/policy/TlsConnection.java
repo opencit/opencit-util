@@ -162,13 +162,14 @@ public class TlsConnection {
         catch(NoSuchAlgorithmException | KeyManagementException e) {
             throw new IOException(e);
         }
-        SSLSocket socket = (SSLSocket) sslSocketFactory.createSocket(); // ignore "socket not closed on exit" warnings; clearly we intend our return value to be the open socket
-        socket.connect(new InetSocketAddress(url.getHost(), port()), timeoutMilliseconds);
-        if (!tlsPolicy.getHostnameVerifier().verify(url.getHost(), socket.getSession())) {
-            socket.close();
-            throw new SSLPeerUnverifiedException("Invalid certificate for address: " + url.getHost());
+        try(SSLSocket socket = (SSLSocket) sslSocketFactory.createSocket()){ // ignore "socket not closed on exit" warnings; clearly we intend our return value to be the open socket
+            socket.connect(new InetSocketAddress(url.getHost(), port()), timeoutMilliseconds);
+            if (!tlsPolicy.getHostnameVerifier().verify(url.getHost(), socket.getSession())) {
+                socket.close();
+                throw new SSLPeerUnverifiedException("Invalid certificate for address: " + url.getHost());
+            }
+            return socket;
         }
-        return socket;
     }
 
     /**
