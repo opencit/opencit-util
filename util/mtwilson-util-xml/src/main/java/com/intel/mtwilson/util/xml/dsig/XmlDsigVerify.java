@@ -31,6 +31,8 @@ import org.xml.sax.SAXException;
 public class XmlDsigVerify {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(XmlDsigVerify.class);
     
+    public static final String ALGO_SIGNATURE_RSA_SHA256 = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+    
     public static boolean isValid(String xmlData, X509Certificate trustedCert) throws ParserConfigurationException, SAXException, IOException, MarshalException, XMLSignatureException {
 
         // Instantiate the document to be validated
@@ -141,7 +143,7 @@ public class XmlDsigVerify {
     */
     static boolean algEquals(String algURI, String algName) {
         if ((algName.equalsIgnoreCase("DSA") && algURI.equalsIgnoreCase(SignatureMethod.DSA_SHA1))
-                || (algName.equalsIgnoreCase("RSA") && algURI.equalsIgnoreCase(SignatureMethod.RSA_SHA1))) {
+                || (algName.equalsIgnoreCase("RSA") && (algURI.equalsIgnoreCase(SignatureMethod.RSA_SHA1) || algURI.equalsIgnoreCase(ALGO_SIGNATURE_RSA_SHA256)))) {
             return true;
         } else {
             return false;
