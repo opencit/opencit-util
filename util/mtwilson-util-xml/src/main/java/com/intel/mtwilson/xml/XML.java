@@ -73,9 +73,8 @@ public class XML {
             InputStream inputStream = resolver.findResource(schemaLocation);
             schemaSources[i] = new StreamSource(inputStream);
             i++;
-            if(inputStream != null)
-                inputStream.close();
         }
+		// Note: Don't close the file streams. These are being closed in method closeInputStreamsQuietly.
         Schema schema = schemaFactory.newSchema(schemaSources);
 
 //        Validator validator = schema.newValidator();
