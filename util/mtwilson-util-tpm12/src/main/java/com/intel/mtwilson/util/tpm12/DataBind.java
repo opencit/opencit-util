@@ -204,6 +204,8 @@ public class DataBind {
     public static byte[] bind(byte[] plaintext, PublicKey publicKey, EncScheme encScheme) throws GeneralSecurityException {
         Cipher cipher = getCipher(publicKey, encScheme); // throws NoSuchAlgorithmException, InvalidKeyException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException
 //        byte[] encrypted = cipher.wrap(secretKey); // throws IllegalBlockSizeException
+        if(cipher == null)
+            throw new GeneralSecurityException("cipher is null, unable to continue");
         byte[] encrypted;
         if (encScheme==EncScheme.TPM_ALG_RSAES) { //tpm2.0 defines TPM_ALG_RSAES, which does not seem needs the tpm version and PT_BIND padding
             encrypted = cipher.doFinal(plaintext); // throws BadPaddingException            
@@ -221,7 +223,8 @@ public class DataBind {
     public static byte[] bind(byte[] plaintext, PublicKey publicKey) throws GeneralSecurityException {
         Cipher cipher = getCipher(publicKey, EncScheme.TPM_ES_RSAESOAEP_SHA1_MGF); // throws NoSuchAlgorithmException, InvalidKeyException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException
 //        byte[] encrypted = cipher.wrap(secretKey); // throws IllegalBlockSizeException
-
+        if(cipher == null)
+            throw new GeneralSecurityException("cipher is null, unable to continue");
         byte[] encrypted = cipher.doFinal(new DataBind.TpmBoundData(DataBind.VERSION_1_1, DataBind.TpmPayloadType.TPM_PT_BIND, plaintext).toByteArray()); // throws BadPaddingException
         return encrypted;
     }
