@@ -4,6 +4,7 @@
  */
 package com.intel.dcsg.cpg.tls.policy;
 
+import com.intel.dcsg.cpg.crypto.RandomUtil;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URL;
@@ -90,8 +91,8 @@ public class TlsConnection {
             log.debug("init with SSLContext class {} hashcode {}", sslContext.getClass().getName(), sslContext.hashCode());
 //            KeyManager[] kms = null;
             TrustManager[] tms = new TrustManager[] { tlsPolicy.getTrustManager() };
-//            sslContext.init(kms, tms, new java.security.SecureRandom()); //kms always null: klocwork 88
-            sslContext.init(null, tms, new java.security.SecureRandom());
+//            sslContext.init(kms, tms, RandomUtil.getSecureRandom()); //kms always null: klocwork 88
+            sslContext.init(null, tms, RandomUtil.getSecureRandom());
             sslSocketFactory = sslContext.getSocketFactory();
         }        
     }

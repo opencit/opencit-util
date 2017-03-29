@@ -9,6 +9,7 @@ import com.intel.dcsg.cpg.io.JavaVersion;
 import com.intel.dcsg.cpg.net.InternetAddress;
 import com.intel.dcsg.cpg.validation.BuilderModel;
 import com.intel.dcsg.cpg.x500.DNBuilder;
+import com.intel.dcsg.cpg.crypto.RandomUtil;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -18,7 +19,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -143,7 +143,7 @@ public class X509Builder extends BuilderModel {
     
     public X509Builder randomSerial() {
         try {
-            BigInteger sn = new BigInteger(64, new SecureRandom());
+            BigInteger sn = new BigInteger(64, RandomUtil.getSecureRandom());
             certificateSerialNumber = new CertificateSerialNumber(sn);
             info.set(X509CertInfo.SERIAL_NUMBER, certificateSerialNumber);
         }
