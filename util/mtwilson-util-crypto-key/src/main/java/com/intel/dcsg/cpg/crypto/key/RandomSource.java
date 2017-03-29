@@ -40,7 +40,7 @@ public class RandomSource {
     private long max = Integer.MAX_VALUE; // number of random bytes before we force a re-seed
     
     public RandomSource() {
-        random = new SecureRandom();
+        random = RandomUtil.getSecureRandom();
     }
     
     public RandomSource(SecureRandom random) {

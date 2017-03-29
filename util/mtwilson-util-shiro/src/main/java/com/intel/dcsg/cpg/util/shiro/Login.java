@@ -4,6 +4,7 @@
  */
 package com.intel.dcsg.cpg.util.shiro;
 
+import com.intel.dcsg.cpg.crypto.RandomUtil;
 import java.io.File;
 import java.security.SecureRandom;
 import org.apache.shiro.SecurityUtils;
@@ -59,7 +60,7 @@ import org.apache.shiro.util.StringUtils;
  */
 public class Login {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Login.class);
-    private static final SecureRandom random = new SecureRandom();
+    private static final SecureRandom random = RandomUtil.getSecureRandom();
     
     private static void init(String username, String password, String role, String... permissions) {
         Ini ini = new Ini();

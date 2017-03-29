@@ -2,6 +2,7 @@ package com.intel.mtwilson.security.http;
 
 import com.intel.dcsg.cpg.crypto.HmacCredential;
 import com.intel.dcsg.cpg.iso8601.Iso8601Date;
+import com.intel.dcsg.cpg.crypto.RandomUtil;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -206,7 +207,7 @@ public class HmacAuthorization {
         long currentTime = System.currentTimeMillis();
         dos.writeLong(currentTime);
 
-        SecureRandom r = new SecureRandom();
+        SecureRandom r = RandomUtil.getSecureRandom();
         byte[] nonce = new byte[16];
         r.nextBytes(nonce);
         dos.write(nonce);
