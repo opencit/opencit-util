@@ -4,6 +4,7 @@
  */
 package com.intel.dcsg.cpg.tls.policy;
 
+import com.intel.dcsg.cpg.crypto.RandomUtil;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -51,7 +52,7 @@ public class TlsPolicyAwareSSLSocketFactory extends SSLSocketFactory {
         try {
             SSLContext sslContext = TlsUtil.findBestContext(tlsPolicy);
             if( sslContext == null ) { throw new IllegalStateException("Cannot find SSL context"); }
-            sslContext.init(null, new javax.net.ssl.TrustManager[]{TlsPolicyManager.getInstance().getTrustManager()}, new java.security.SecureRandom()); // throws KeyManagementException
+            sslContext.init(null, new javax.net.ssl.TrustManager[]{TlsPolicyManager.getInstance().getTrustManager()}, RandomUtil.getSecureRandom()); // throws KeyManagementException
             SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
             return sslSocketFactory;
         }

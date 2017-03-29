@@ -4,6 +4,7 @@
  */
 package com.intel.dcsg.cpg.crypto.key.password;
 
+import com.intel.dcsg.cpg.crypto.key.RandomUtil;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -48,7 +49,7 @@ public class PBESecretKeyGenerator implements SecretKeyGenerator {
      */
     public int benchmarkIterationCount(String password, PasswordProtection protection, double elapsedTimeTarget) {
         try {
-            SecureRandom rnd = new SecureRandom(); // don't really need a secure random since we are not generating keys for production use here -- only to test encryption speed
+            SecureRandom rnd = RandomUtil.getSecureRandom(); // don't really need a secure random since we are not generating keys for production use here -- only to test encryption speed
             // generate random input for the trial
             byte[] plaintextInput = new byte[1024];
             rnd.nextBytes(plaintextInput);

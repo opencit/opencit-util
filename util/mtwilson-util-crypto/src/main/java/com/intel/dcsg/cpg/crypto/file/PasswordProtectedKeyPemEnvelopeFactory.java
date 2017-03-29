@@ -7,6 +7,7 @@ package com.intel.dcsg.cpg.crypto.file;
 import com.intel.dcsg.cpg.crypto.CryptographyException;
 import com.intel.dcsg.cpg.crypto.PasswordHash;
 import com.intel.dcsg.cpg.io.pem.Pem;
+import com.intel.dcsg.cpg.crypto.RandomUtil;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -114,7 +115,7 @@ public class PasswordProtectedKeyPemEnvelopeFactory {
             }
             // create a new random salt for the password
             byte[] salt = new byte[SALT_LENGTH_BYTES];
-            SecureRandom rnd = new SecureRandom();
+            SecureRandom rnd = RandomUtil.getSecureRandom();
             rnd.nextBytes(salt);
             // create a password-based key-encryption key (kek) and encrypt the secret key
             SecretKey kek = secretKeyFactory.generateSecret(new PBEKeySpec(password.toCharArray(), salt, PBE_ITERATIONS, PBE_KEY_SIZE));
