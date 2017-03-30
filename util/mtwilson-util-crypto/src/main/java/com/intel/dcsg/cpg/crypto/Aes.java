@@ -220,7 +220,7 @@ public class Aes {
     
     
     private byte[] generateIV() {
-        SecureRandom random = new SecureRandom();
+        SecureRandom random = RandomUtil.getSecureRandom();
         int blockSize = cipher.getBlockSize();
         assert blockSize > 0;
         byte[] iv = new byte[blockSize];

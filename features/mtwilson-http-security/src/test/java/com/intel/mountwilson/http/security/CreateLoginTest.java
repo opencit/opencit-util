@@ -4,6 +4,7 @@
  */
 package com.intel.mountwilson.http.security;
 
+import com.intel.dcsg.cpg.crypto.RandomUtil;
 import java.security.SecureRandom;
 import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
@@ -32,7 +33,7 @@ public class CreateLoginTest {
     
     @Test
     public void testSecureRandomSecretKey() {
-        SecureRandom rnd = new SecureRandom();
+        SecureRandom rnd = RandomUtil.getSecureRandom();
         byte[] secretKey = new byte[128];
         rnd.nextBytes(secretKey);
         String secretStr = new String(secretKey);
