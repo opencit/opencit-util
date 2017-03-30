@@ -26,6 +26,7 @@
         <module>mtwilson-util-configuration</module>
         <module>mtwilson-util-console</module>
         <module>mtwilson-util-crypto</module>
+		<module>mtwilson-util-crypto-jca</module>
         <module>mtwilson-util-crypto-key</module>
         <module>mtwilson-util-crypto-password</module>
         <module>mtwilson-util-dbcp</module>

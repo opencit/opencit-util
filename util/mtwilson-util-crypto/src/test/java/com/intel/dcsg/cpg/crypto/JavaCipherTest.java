@@ -4,6 +4,7 @@
  */
 package com.intel.dcsg.cpg.crypto;
 
+import com.intel.dcsg.cpg.crypto.RandomUtil;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -110,7 +111,7 @@ public class JavaCipherTest {
         int iterationCount = Integer.MAX_VALUE-1;
         // byte[] salt = new byte[] { 0,0,0,0, 0,0,0,0 }         
         byte[] salt = new byte[8];
-        SecureRandom rnd = new SecureRandom();
+        SecureRandom rnd = RandomUtil.getSecureRandom();
         rnd.nextBytes(salt);
         while(iterationCount < Integer.MAX_VALUE) { //  do this to find out in one step what is the delay when you use Integer.MAX_VALUE iterations
 //         while(currentTime < startTime+100) {    // do this to start at one iteration and work your way up... warning... it is futile on modern systems, since Integer.MAX_VALUE produced just 1ms delay
@@ -176,7 +177,7 @@ public class JavaCipherTest {
 //        HashMap<Integer,Double> perfdata = new HashMap<Integer,Double>();  //  iteration count -> avg cipher time
          byte[] salt = new byte[] { 0,0,0,0, 0,0,0,0 };
 //        byte[] salt = new byte[8];
-        SecureRandom rnd = new SecureRandom();
+        SecureRandom rnd = RandomUtil.getSecureRandom();
         rnd.nextBytes(salt);
         PBEKeySpec pbeKeySpecX = new PBEKeySpec(password.toCharArray(), salt, iterationCount, 56); // a keyspec with no salt (as above) and variable iteration cont; 
         SecretKey secretKeyX = secretKeyFactory.generateSecret(pbeKeySpecX);             // throws InvalidKeySpecException

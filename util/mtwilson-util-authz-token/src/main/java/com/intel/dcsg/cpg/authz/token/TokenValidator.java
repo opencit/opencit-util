@@ -14,7 +14,6 @@ import com.intel.dcsg.cpg.crypto.key.KeyNotFoundException;
 import com.intel.dcsg.cpg.crypto.key.Protection;
 import com.intel.dcsg.cpg.crypto.key.ProtectionBuilder;
 import com.intel.dcsg.cpg.crypto.key.ProtectionPolicy;
-import com.intel.dcsg.cpg.crypto.key.RandomSource;
 import com.intel.dcsg.cpg.io.ByteArray;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
