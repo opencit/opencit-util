@@ -2,6 +2,7 @@ package com.intel.mtwilson.security.http;
 
 import com.intel.dcsg.cpg.crypto.RsaCredential;
 import com.intel.dcsg.cpg.rfc822.Rfc822Date;
+import com.intel.dcsg.cpg.crypto.RandomUtil;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -210,7 +211,7 @@ public class RsaAuthorization {
         long currentTime = System.currentTimeMillis();
         dos.writeLong(currentTime);
 
-        SecureRandom r = new SecureRandom();
+        SecureRandom r = RandomUtil.getSecureRandom();
         byte[] nonce = new byte[16];
         r.nextBytes(nonce);
         dos.write(nonce);

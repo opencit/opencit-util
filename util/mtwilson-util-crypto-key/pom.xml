@@ -18,6 +18,11 @@
     <dependencies>
         <dependency>
             <groupId>com.intel.mtwilson.util</groupId>
+            <artifactId>mtwilson-util-crypto-jca</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.intel.mtwilson.util</groupId>
             <artifactId>mtwilson-util-io</artifactId>
         </dependency>
         <!-- used by PasswordProtectionBuilder to parse key algorithm value like  "PBKDF2WithHmacSHA1; iterations=1000; salt-bytes=8" -->
