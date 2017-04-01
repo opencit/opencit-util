@@ -2,10 +2,9 @@
  * Copyright (C) 2013 Intel Corporation
  * All rights reserved.
  */
-package com.intel.dcsg.cpg.crypto;
+package com.intel.dcsg.cpg.crypto.key;
 
 import com.intel.dcsg.cpg.crypto.jca.MtWilsonProvider;
-import com.intel.dcsg.cpg.crypto.key.RandomSource;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;

@@ -56,7 +56,7 @@ public class PasswordHash {
     public PasswordHash(String password) throws CryptographyException  {
         // generate a random 8-byte salt
         salt = new byte[SALT_LENGTH];
-        SecureRandom rnd = new SecureRandom();
+        SecureRandom rnd = RandomUtil.getSecureRandom();
         rnd.nextBytes(salt);
         hash = hash(password);
     }

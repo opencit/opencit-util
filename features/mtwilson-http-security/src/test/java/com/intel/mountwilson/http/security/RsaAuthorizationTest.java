@@ -5,6 +5,7 @@
 package com.intel.mountwilson.http.security;
 
 import com.intel.dcsg.cpg.crypto.CryptographyException;
+import com.intel.dcsg.cpg.crypto.RandomUtil;
 import com.intel.mtwilson.security.http.RsaAuthorization;
 import com.intel.dcsg.cpg.crypto.RsaCredential;
 import java.io.IOException;
@@ -36,7 +37,7 @@ public class RsaAuthorizationTest {
         return credential;
         /*
         RSAKeyPairGenerator r = new RSAKeyPairGenerator();
-        r.init(new KeyGenerationParameters(new SecureRandom(), keySizeInBits));
+        r.init(new KeyGenerationParameters(RandomUtil.getSecureRandom(), keySizeInBits));
         AsymmetricCipherKeyPair keys = r.generateKeyPair();
         RSAKeyParameters publicKeyParams = (RSAKeyParameters)keys.getPublic();
         RSAKeyParameters privateKeyParams = (RSAKeyParameters)keys.getPrivate();
