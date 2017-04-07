@@ -7,6 +7,7 @@ package com.intel.mtwilson.servlet;
 //import com.intel.mtwilson.My;
 import com.intel.mtwilson.configuration.ConfigurationFactory;
 import com.intel.dcsg.cpg.configuration.Configuration;
+import com.intel.dcsg.cpg.http.Query;
 import com.intel.dcsg.cpg.validation.ValidationUtil;
 import java.io.*;
 import javax.servlet.http.HttpServlet;
