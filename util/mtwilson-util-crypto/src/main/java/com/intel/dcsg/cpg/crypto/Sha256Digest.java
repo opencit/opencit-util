@@ -14,6 +14,8 @@ import java.security.NoSuchAlgorithmException;
 public class Sha256Digest extends AbstractDigest {
     private static final DigestAlgorithm ALGORITHM = DigestAlgorithm.SHA256;
     
+    public final static Sha256Digest ZERO = new Sha256Digest(new byte[] {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0});
+    
     /**
      * This constructor exists so the valueOf methods can instantiate an SHA256 object
      * and set its value after validating the input. If they were to call the public

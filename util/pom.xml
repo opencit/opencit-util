@@ -26,6 +26,7 @@
         <module>mtwilson-util-configuration</module>
         <module>mtwilson-util-console</module>
         <module>mtwilson-util-crypto</module>
+        <module>mtwilson-util-crypto-jca</module>
         <module>mtwilson-util-crypto-key</module>
         <module>mtwilson-util-crypto-password</module>
         <module>mtwilson-util-dbcp</module>
@@ -57,6 +58,7 @@
         <module>mtwilson-util-text-transform</module>
         <module>mtwilson-util-tls-policy</module>
         <module>mtwilson-util-tpm12</module>
+	<module>mtwilson-util-tpm20</module>
         <module>mtwilson-util-tree</module>
         <module>mtwilson-util-validation</module>
         <module>mtwilson-util-xml</module>

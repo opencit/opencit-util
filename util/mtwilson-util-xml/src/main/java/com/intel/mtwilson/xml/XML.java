@@ -70,10 +70,11 @@ public class XML {
         StreamSource[] schemaSources = new StreamSource[schemaLocations.size()];
         int i = 0;
         for (String schemaLocation : schemaLocations) {
-            InputStream in = resolver.findResource(schemaLocation);
-            schemaSources[i] = new StreamSource(in);
+            InputStream inputStream = resolver.findResource(schemaLocation);
+            schemaSources[i] = new StreamSource(inputStream);
             i++;
         }
+		// Note: Don't close the file streams. These are being closed in method closeInputStreamsQuietly.
         Schema schema = schemaFactory.newSchema(schemaSources);
 
 //        Validator validator = schema.newValidator();

@@ -98,7 +98,10 @@ public class DataBind {
 
     public static enum EncScheme {
         TPM_ES_RSAESPKCSv15((int) 0x0002),
-        TPM_ES_RSAESOAEP_SHA1_MGF((int) 0x0003);
+        TPM_ES_RSAESOAEP_SHA1_MGF((int) 0x0003),
+        TPM_ALG_RSAES((int) 0x0015),
+        TPM_ALG_OAEP((int) 0x0017);
+
         public final int value;
 
         private EncScheme(int value) {
@@ -181,7 +184,7 @@ public class DataBind {
 //            Cipher cipher = Cipher.getInstance("RSA/ECB/OAEP", bc); // commented out because when specifying OAEP it goes to a list of pre-defined ones, instead of using the parameter spec provided below, so because "OAEP" itself is not in the bouncycastle list it rhwos:   javax.crypto.NoSuchPaddingException: OAEP unavailable with RSA
             cipher = Cipher.getInstance("RSA", bc); //
             cipher.init(Cipher.ENCRYPT_MODE, publicKey, getOAEPParameterSpec()); // throws InvalidKeyException, InvalidAlgorithmParameterException
-        } else if (encScheme == EncScheme.TPM_ES_RSAESPKCSv15) {
+        } else if (encScheme == EncScheme.TPM_ES_RSAESPKCSv15 || encScheme==EncScheme.TPM_ALG_RSAES) {
             cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);
         }
@@ -201,8 +204,15 @@ public class DataBind {
     public static byte[] bind(byte[] plaintext, PublicKey publicKey, EncScheme encScheme) throws GeneralSecurityException {
         Cipher cipher = getCipher(publicKey, encScheme); // throws NoSuchAlgorithmException, InvalidKeyException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException
 //        byte[] encrypted = cipher.wrap(secretKey); // throws IllegalBlockSizeException
-
-        byte[] encrypted = cipher.doFinal(new DataBind.TpmBoundData(DataBind.VERSION_1_1, DataBind.TpmPayloadType.TPM_PT_BIND, plaintext).toByteArray()); // throws BadPaddingException
+        if(cipher == null)
+            throw new GeneralSecurityException("cipher is null, unable to continue");
+        byte[] encrypted;
+        if (encScheme==EncScheme.TPM_ALG_RSAES) { //tpm2.0 defines TPM_ALG_RSAES, which does not seem needs the tpm version and PT_BIND padding
+            encrypted = cipher.doFinal(plaintext); // throws BadPaddingException            
+        }
+        else { //tpm1.2 needs the tpm version and TPM_PT_BIND patch for binding
+            encrypted = cipher.doFinal(new DataBind.TpmBoundData(DataBind.VERSION_1_1, DataBind.TpmPayloadType.TPM_PT_BIND, plaintext).toByteArray()); // throws BadPaddingException
+        }
         return encrypted;
     }
 
@@ -213,7 +223,8 @@ public class DataBind {
     public static byte[] bind(byte[] plaintext, PublicKey publicKey) throws GeneralSecurityException {
         Cipher cipher = getCipher(publicKey, EncScheme.TPM_ES_RSAESOAEP_SHA1_MGF); // throws NoSuchAlgorithmException, InvalidKeyException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException
 //        byte[] encrypted = cipher.wrap(secretKey); // throws IllegalBlockSizeException
-
+        if(cipher == null)
+            throw new GeneralSecurityException("cipher is null, unable to continue");
         byte[] encrypted = cipher.doFinal(new DataBind.TpmBoundData(DataBind.VERSION_1_1, DataBind.TpmPayloadType.TPM_PT_BIND, plaintext).toByteArray()); // throws BadPaddingException
         return encrypted;
     }

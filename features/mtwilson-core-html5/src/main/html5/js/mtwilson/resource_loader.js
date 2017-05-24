@@ -236,7 +236,8 @@ function ResourceLoader() {
                     headers: {'Accept': 'text/plain'}, // prevents most browsers from executing the code immediately after download; so we have a chance to eval below and catch errors.  if you set it to application/javascript then browser will execute immediately , then eval below to execute it a second time
                     beforeSend: function(xhr, settings) { xhr.meta = { "url":url }; }, // define a new field "meta" in the xhr with our original request url
                     success: function(content, status, xhr) {
-                        var url = xhr.meta.url; // get it from the request object NOT the outer scope (which might change values before we are called)
+                        content = htmlCharactersEncode(content);
+						var url = xhr.meta.url; // get it from the request object NOT the outer scope (which might change values before we are called)
                         console.log("Fetch JS url: %s results %O", url, content);
                         console.log("XHR is: %O", xhr);
                         /*

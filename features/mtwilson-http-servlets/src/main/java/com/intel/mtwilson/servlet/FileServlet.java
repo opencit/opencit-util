@@ -7,6 +7,7 @@ package com.intel.mtwilson.servlet;
 //import com.intel.mtwilson.My;
 import com.intel.mtwilson.configuration.ConfigurationFactory;
 import com.intel.dcsg.cpg.configuration.Configuration;
+import com.intel.dcsg.cpg.http.Query;
 import com.intel.dcsg.cpg.validation.ValidationUtil;
 import java.io.*;
 import javax.servlet.http.HttpServlet;
@@ -79,10 +80,10 @@ public void doGet(HttpServletRequest request, HttpServletResponse response)
     // redirect to use trailing slash on directories in order for relative filenames in links to work
     file = new File(target);
     if( file.isDirectory() && !path.endsWith("/") ) {
-        String queryString = request.getQueryString() == null ? "" : "?" + request.getQueryString();
-        if (queryString.contains("\r\n")) {
-            response.setStatus(400);
-            return;
+        String queryString = "";
+        if(request.getQueryString() != null){            
+            Query queryParameters = new Query(request.getParameterMap());
+            queryString = "?" + queryParameters.toString();
         }
     if( !ValidationUtil.isValidWithRegex(queryString, ALLOWED_QUERY)) {
         log.debug("Rejecting invalid query string: {}", queryString);
