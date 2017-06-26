@@ -23,6 +23,7 @@
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
+					<version>1.9</version>
                     <showWeaveInfo>true</showWeaveInfo>
                     <aspectLibraries>
                         <!-- security framework -->
@@ -45,12 +46,12 @@
                     <dependency>
                         <groupId>org.aspectj</groupId>
                         <artifactId>aspectjrt</artifactId>
-                        <version>1.7.4</version>
+                        <version>1.8.9</version>
                     </dependency>
                     <dependency>
                         <groupId>org.aspectj</groupId>
                         <artifactId>aspectjtools</artifactId>
-                        <version>1.7.4</version>
+                        <version>1.8.9</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -84,20 +85,20 @@
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-aspectj</artifactId>
-            <version>1.2.2</version>
+            <version>1.2.4</version>
         </dependency>
         
         <!-- for compile-time aspects declared in the plugins section (not necessary except to force the correct version number; without these you would get an error like "bad version number found in ... expected 1.7.4 found 1.6.12") -->
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
-            <version>1.7.4</version>
+            <version>1.8.9</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjtools</artifactId>
-            <version>1.7.4</version>
+            <version>1.8.9</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
