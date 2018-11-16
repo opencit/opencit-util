@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Profile Button</title>
+        <meta name="author" content="jbuhacoff">
+    </head>
+    <body>
+
+<!-- NOTE:  the <ul> is for markup correctness; the navbar feature looks for body ul here and gets the inner html as the button content
+so the ul itself is not copied -->
+<ul>
+<li class="dropdown">
+	<a class="dropdown-toggle" role="button" data-toggle="dropdown" href="#"><i class="glyphicon glyphicon-user"></i> <span data-bind="text: loginViewModel.userProfile.username()">Me</span> <span class="caret"></span></a>
+	<ul id="g-account-menu" class="dropdown-menu" role="menu">
+		<!-- TODO: need an extension point so we can load the profile menu item and others dynamically (logout would remain static) -->
+		<!-- TODO:   THIS MUST BE LOADED BY EXTENSION :  <li role="menuitem"><a href="#my_profile" data-toggle="tab">My Profile</a></li> -->
+        <!-- logout will always be last link in this menu -->
+		<li role="menuitem"><a href="#logout" data-toggle="tab">Logout</a></li>
+	</ul>                
+</li>
+</ul>
+
+    </body>
+</html>

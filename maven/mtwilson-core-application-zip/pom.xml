@@ -1,0 +1,182 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <groupId>com.intel.mtwilson.maven</groupId>
+    <artifactId>mtwilson-core-application-zip</artifactId>
+    <version>3.2.1-SNAPSHOT</version>
+    
+    <packaging>pom</packaging>
+    <description>
+        Projects that inherit this pom and need to generate a zip file with all jars simply have to create target/content
+        during the build and it will be zipped.
+
+        Obsoletes: dcg_security-contrib/maven/mtwilson-maven-package-zip
+    </description>
+    
+    <parent>
+        <groupId>com.intel.mtwilson</groupId>
+        <artifactId>mtwilson-maven-build-coreutil-maven</artifactId>
+        <version>3.2.1-SNAPSHOT</version>
+    </parent>
+    
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.intel.mtwilson.maven</groupId>
+                <artifactId>mtwilson-maven-bom-coreutil</artifactId>
+                <version>3.2.1-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.intel.mtwilson.maven</groupId>
+                <artifactId>mtwilson-maven-bom-external</artifactId>
+                <version>3.2.1-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    
+    <build>
+        <plugins>
+            <!-- copy all java dependencies (transitive) to the java folder for later packaging -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-java</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeTypes>jar</includeTypes>
+                            <outputDirectory>${project.build.directory}/application/java</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <!-- any project that has a feature will have its jar inside the feature zip too; we will just extract everything later to consolidate -->
+                    <execution>
+                        <id>copy-features</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeTypes>zip</includeTypes>
+                            <includeClassifiers>feature</includeClassifiers>
+                            <outputDirectory>${project.build.directory}/application/features</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>default-cli</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target xmlns:ac="antlib:net.sf.antcontrib">
+                                <mkdir dir="${project.build.directory}/application/features"/>
+                                <mkdir dir="${project.build.directory}/application/java"/>
+                                <available property="application.content.exists" file="${basedir}/src/main/application" type="dir" />
+                                <ac:if>
+                                    <equals arg1="${application.content.exists}" arg2="true"/>
+                                    <then>
+                                        <echo message="***** APPLICATION CONTENT EXISTS *****"/>
+                                        <copy todir="${project.build.directory}/application">
+                                            <fileset dir="${basedir}/src/main/application"/>
+                                        </copy>
+                                    </then>
+                                </ac:if>
+                                
+                                <available property="application.jar.exists" file="${project.build.directory}/${project.artifactId}-${project.version}.jar" type="file" />
+                                <ac:if>
+                                    <equals arg1="${application.jar.exists}" arg2="true"/>
+                                    <then>
+                                        <echo message="***** APPLICATION JAR EXISTS *****"/>
+                                        <mkdir dir="${project.build.directory}/application/java"/>
+                                        <copy file="${project.build.directory}/${project.artifactId}-${project.version}.jar" todir="${project.build.directory}/application/java"/>
+                                    </then>
+                                </ac:if>
+                                
+                                <!-- for all downloaded features, extract them into the application/features folder and move any jar files into the application/java folder -->
+                                <ac:for param="feature.zip.file">
+                                    <path>
+                                        <fileset dir="${project.build.directory}/application/features">
+                                            <include name="*.zip"/>
+                                        </fileset>
+                                    </path>
+                                    <sequential>
+                                        <!-- read the feature.xml inside the feature.zip.file to map element //feature/id to property feature.id and use that as feature subdirectory name under application/features -->
+                                        <xmlproperty prefix="feature" keepRoot="false">
+                                            <zipentry archive="@{feature.zip.file}" name="feature.xml"/>
+                                        </xmlproperty>
+                                        <echo message="Extracting feature: ${feature.id}"/>
+                                        <!-- move jar files into the application/java folder; without mapper it would be application/java/java -->
+                                        <!--
+                                        <unzip src="@{feature.zip.file}" dest="${project.build.directory}/application/java">
+                                            <patternset>
+                                                <include name="java/"/>
+                                            </patternset>
+                                            <mapper type="flatten"/>
+                                        </unzip>
+                                        -->
+                                        <unzip src="@{feature.zip.file}" dest="${project.build.directory}/application/features/${feature.id}">
+                                            <!--
+                                            <patternset>
+                                                <exclude name="java/"/>
+                                            </patternset>
+                                            -->
+                                        </unzip>
+                                        <!-- at this time, no need to keep the original feature.zip.file around because we extracted all its content -->
+                                        <delete file="@{feature.zip.file}"/>
+                                        <!-- unset feature.zip.name (generated by basename) for next iteration -->
+                                        <ac:var name="feature.zip.name" unset="true"/>
+                                        <!-- unset feature.id (geenrated by xmlproperty) for next iteration -->
+                                        <ac:var name="feature.id" unset="true"/>
+                                    </sequential>
+                                </ac:for>
+                                <zip destfile="${project.build.directory}/${project.artifactId}-${project.version}-application.zip">
+                                    <fileset dir="${project.build.directory}/application" />
+                                </zip>
+                                <!-- check if the application zip file was generated before attempting to add it to the pom -->
+                                <available property="application.zip.exists" file="${project.build.directory}/${project.artifactId}-${project.version}-application.zip" type="file" />
+                                <ac:if>
+                                    <equals arg1="${application.zip.exists}" arg2="true"/>
+                                    <then>
+                                        <echo message="***** APPLICATION ZIP EXISTS *****"/>
+                                        <attachartifact file="${project.build.directory}/${project.artifactId}-${project.version}-application.zip" classifier="application" type="zip"/>
+                                    </then>
+                                </ac:if>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.ant</groupId>
+                        <artifactId>ant</artifactId>
+                        <version>1.9.6</version>
+                        <!-- was version 1.8.4 previously -->
+                    </dependency>
+                    <dependency>
+                        <groupId>ant-contrib</groupId>
+                        <artifactId>ant-contrib</artifactId>
+                        <version>1.0b3</version>
+                    </dependency>
+                </dependencies>
+            </plugin>	    
+      
+        </plugins>
+    </build>
+	
+</project>

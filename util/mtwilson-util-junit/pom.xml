@@ -1,0 +1,43 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <groupId>com.intel.mtwilson.core</groupId>
+    <artifactId>mtwilson-core-junit</artifactId>
+    <!--<version>0.1-SNAPSHOT</version>-->
+    
+    <packaging>jar</packaging>
+    <description>
+        This feature makes it easy to keep environment information outside the
+        source and use it in the integration tests. It should be used with scope "test".
+    </description>
+    
+    <parent>
+        <groupId>com.intel.mtwilson.util</groupId>
+        <artifactId>mtwilson-util</artifactId>
+        <version>3.2.1-SNAPSHOT</version>
+    </parent>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+                
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    
+</project>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Logout</title>
+        <meta name="author" content="jbuhacoff">
+    </head>
+    <body>
+
+            <div class="row">
+                <div class="col-xs-2 col-sm-4"></div>
+                <div class="col-xs-8 col-sm-4" data-bind="with: loginViewModel">
+                    <form id="loginForm" class="form-signin" data-bind="with: userProfile, submit: logout">
+                        <h2 class="form-signin-heading">Click the button to sign out</h2>
+
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign out</button>
+                        <div class="form-group has-error">
+                            <p style="color: red" data-bind="text: error, visible: error"></p>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-xs-2 col-sm-4"></div>
+
+            </div>
+
+<!--        <script src="js/kms_login.js"></script> -->
+        <script type="text/javascript">
+            // script requires:  kms_login.js  for loginViewModel
+            // style requires: bootstrap, dashboard, intel
+            console.log("logout.html script");
+            resourceLoader.loadJS(['js/knockout.js' /*, 'js/jquery.js'*/, '/v1/html5/public/com.intel.mtwilson.core.login.token/js/login.js'], function() { 
+                console.log("logout.html: loaded scripts");
+                if( !mainViewModel.loginViewModel ) {
+                    // only set the model if it's not already there, so we don't lose current profile information
+                    mainViewModel.loginViewModel = new LoginViewModel();
+                }
+                ko.applyBindings(mainViewModel, document.getElementById("logout"));
+            });
+            
+//            
+        </script>
+    </body>
+</html>

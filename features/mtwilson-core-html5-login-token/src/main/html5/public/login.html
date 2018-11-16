@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Login</title>
+        <meta name="author" content="jbuhacoff">
+    </head>
+    <body>
+
+            <div class="row">
+                <div class="col-xs-2 col-sm-4"></div>
+                <div class="col-xs-8 col-sm-4" data-bind="with: loginViewModel">
+                    <form id="loginForm" class="form-signin" data-bind="with: loginRequest, submit: login">
+                        <h2 class="form-signin-heading">Please sign in</h2>
+
+                        <div class="form-group">        
+                            <label for="inputUsername">Username</label>
+                            <input type="text" id="inputUsername" class="form-control" placeholder="Username" data-bind="value: username" required autofocus>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputPassword">Password</label>
+                            <input type="password" id="inputPassword" class="form-control" placeholder="Password" data-bind="value: password" required>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" value="remember-me" data-bind="checked: remember_me"> Remember me
+                            </label>
+                        </div>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit" id="loginButton">Sign in</button>
+                        <div class="form-group has-error">
+                            <p style="color: red" data-bind="html: error, visible: error"></p>
+                        </div>
+                    </form>
+                    <div id="login_https_redirect" style="display: none;">
+                        <p style="font-size: 1.5em; margin-top: 50px;"><a href="#">Login via secure site</a></p>
+                    </div>
+                </div>
+                <div class="col-xs-2 col-sm-4"></div>
+
+            </div>
+
+<!--        <script src="js/kms_login.js"></script> -->
+        <script type="text/javascript">
+            // script requires:  kms_login.js  for loginViewModel
+            // style requires: bootstrap, dashboard, intel
+            console.log("login.html script");
+            resourceLoader.loadJS(['js/knockout.js' /*, 'js/jquery.js'*/, '/v1/html5/public/com.intel.mtwilson.core.login.token/js/login.js'], function() { 
+                console.log("login.html: loaded scripts");
+                mainViewModel.loginViewModel = new LoginViewModel();
+                ko.applyBindings(mainViewModel, document.getElementById("login"));
+            });
+            
+            // this can be moved into a separate feature so that if an application wants to allow http login, it can simply omit this feature
+            resourceLoader.loadJS(['js/URI.js' /*, 'js/jquery.js' */], function() {
+                // Prevent insecure non-TLS login requests by redirection to https site
+                var uri = new URI();
+                console.log("Application request is via %s", uri.protocol());
+                if( uri.protocol() !== "https" ) {
+                    var httpsUri = new URI();
+                    httpsUri.protocol("https");
+                    $("#loginForm").hide();
+                    $("#login_https_redirect a").attr("href", httpsUri.toString());
+                    $("#login_https_redirect").show();
+                    window.location.replace(httpsUri.toString());
+                }
+                
+                
+            });
+            
+            // autofocus the username field (the autofocus attribute is not supported on all browsers)
+            $("input[autofocus]").focus();
+        </script>
+    </body>
+</html>

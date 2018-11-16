@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Settings</title>
+        <meta name="author" content="jbuhacoff">
+    </head>
+    <body>
+
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8" style="margin-top: 10px;">        
+                <div class="panel panel-default" data-bind="with: settingsViewModel">
+                    <div class="panel-heading">
+
+                        <ul class="list-inline pull-right">
+                            <!--
+                           <li><a href="#"><i class="glyphicon glyphicon-cog"></i></a></li>
+                           <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-comment"></i><span class="count">3</span></a><ul class="dropdown-menu" role="menu"><li><a href="#">1. Is there a way..</a></li><li><a href="#">2. Hello, admin. I would..</a></li><li><a href="#"><strong>All messages</strong></a></li></ul></li>
+                           <li><a href="#"><i class="glyphicon glyphicon-user"></i></a></li>
+                            -->
+                            <li><a title="Refresh" data-toggle="modal" href="#" data-bind="click: reloadSettings"><span class="glyphicon glyphicon-refresh"></span> Refresh</a></li>
+                            <li><a title="Add Setting" data-toggle="modal" href="#editSettingModalDialog"><span class="glyphicon glyphicon-plus-sign"></span> Add Setting</a></li>
+                        </ul>
+
+                        <h1>Settings</h1>
+                    </div>
+                    <div class="panel-body">
+                        <p><span data-bind="text: settings().length"></span> settings</p>
+                        <table class="table table-striped" data-bind="visible: settings().length > 0">
+                            <thead>
+                                <tr>
+                                    <th style="width: 150px;">Setting Name</th>
+                                    <th style="width: 75px;">Setting Value</th>
+                                    <th style="width: 75px;"><!-- Action Icons --></th>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="foreach: settings">
+                                <tr>
+                                    <td><span data-bind="text: name"></span></td>
+                                    <td><span data-bind="text: value"></span></td>
+                                    <td>
+                                        <a title="Edit Setting" data-toggle="modal" href="#editSettingModalDialog" data-bind="click: $parent.confirmEditSetting"><span class="glyphicon glyphicon-edit"></span></a>
+                                        <a title="Delete Setting" data-toggle="modal" href="#deleteSettingModalDialog" data-bind="click: $parent.confirmDeleteSetting"><span class="glyphicon glyphicon-trash"></span></a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2"></div>
+
+        </div>
+
+        <div class="row" data-bind="with: settingsViewModel, visible: settingsViewModel.moreSettings().length > 0">
+            <div class="col-md-2"></div>
+            <div class="col-md-8" style="margin-top: 10px;">        
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h1>More Settings</h1>
+                    </div>
+                    <div class="panel-body">
+                        <ul data-bind="foreach: moreSettings().sort(sortBy('label'))" class="list-unstyled">
+                            <li><a data-toggle="tab" data-bind="text: label, attr: { href: targetTabHref }"></a></li>
+                        </ul>
+                    </div>
+
+                </div>
+                <div class="col-md-2"></div>
+            </div>
+        </div>
+        
+
+        <div class="modal" id="editSettingModalDialog" data-bind="with: settingsViewModel">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 class="modal-title">Edit Setting</h4>
+                    </div>
+                    <div class="modal-body">        
+                        <form id="editSettingForm" data-bind="with: editSettingRequest">
+                            <fieldset>
+                                <p>Submit this form to request the server to create a new setting or edit an existing setting.</p>
+                                <input type="text" name="name" data-bind="value: name" placeholder="setting name" value=""/>
+                                <input type="text" name="value" data-bind="value: value" placeholder="setting value" value=""/>
+                                <br>
+                                <input type="submit" class="btn btn-primary"  value="Save" data-bind="click: $parent.editSetting" />
+                            </fieldset>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#" data-dismiss="modal" class="btn">Close</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="deleteSettingModalDialog" data-bind="with: settingsViewModel">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 class="modal-title">Delete Setting</h4>
+                    </div>
+                    <div class="modal-body">        
+                        <form id="deleteSettingForm" data-bind="with: deleteSettingRequest">
+                            <fieldset>
+                                <p>Submit this form to request the server to delete an existing setting.</p>
+                                <input type="text" name="name" data-bind="value: name" placeholder="setting name" value="" disabled/>
+                                <input type="text" name="value" data-bind="value: value" placeholder="setting value" value="" disabled/>
+                                <br>
+                                <input type="submit" class="btn btn-primary"  value="Delete" data-bind="click: $parent.deleteSetting" />
+                            </fieldset>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#" data-dismiss="modal" class="btn">Close</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Placed at the end of the document so the pages load faster -->
+
+        <!--        
+                <script src="js/kms_settings.js"></script>
+        -->    
+        <script type="text/javascript">
+            /*
+             var endpoint = "/v1";
+             function MainViewModel() {
+             var self = this;
+             self.keysViewModel = new KeyListViewModel();
+             self.settingsViewModel = new SettingListViewModel();
+             }
+             */
+            console.log("settings.html script");
+            var moreSettingsArray = [];
+            
+            resourceLoader.loadJS(['js/knockout.js', 'js/jquery.js', 'js/kms_settings.js'], function() {
+                console.log("settings.html: loaded scripts");
+                // add our view models to the main view model defined by index.html
+                mainViewModel.settingsViewModel = new SettingListViewModel();
+                ko.applyBindings(mainViewModel, document.getElementById("settings"));
+                mainViewModel.settingsViewModel.searchSettings({});
+                
+                
+                // load "more settings" extensions
+                discovery.eachJSON("/mtwilson-core-configuration/more_settings.json", function(json,context) { 
+                    // check we don't already have this link in moreSettingsArray
+                    var existingIndexOf = moreSettingsArray.indexOf(context.entry.feature);
+                    if( existingIndexOf > -1 ) { console.log("more setting link %s is already in more settings", context.entry.feature); return; }
+                    for(var i=0; i<json.items.length; i++) {
+                        mainViewModel.settingsViewModel.addMoreSettingLink( json.items[i] );
+                    }
+                });
+            });
+
+        </script>
+
+    </body>
+</html>
